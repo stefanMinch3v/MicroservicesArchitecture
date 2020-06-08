@@ -1,2 +1,2 @@
 # Microservices Architecture
-# Architecture of ASP.NET Core Microservices Applications - June 2020
+# Architecture of ASP.NET Core Microservices Applications @SoftUni - June 2020
