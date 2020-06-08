@@ -62,6 +62,11 @@
         [Route(nameof(Login))]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
+            if (model is null)
+            {
+                return BadRequest(model);
+            }
+
             var result = await this.signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
             if (!result.Succeeded)
             {
@@ -73,7 +78,7 @@
             var user = await this.userManager.FindByNameAsync(model.Username);
             if (user is null)
             {
-                return this.BadRequest("Unexisting user.");
+                return this.BadRequest(model.Username);
             }
 
             this.logger.LogInformation("User logged in.");
@@ -83,7 +88,7 @@
             return this.Ok(securityToken);
         }
 
-        private async Task<string> GenerateToken(ApplicationUser user)
+        private async Task<JwtModel> GenerateToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(this.applicationSettings.Secret);
@@ -112,7 +117,12 @@
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var encryptedToken = tokenHandler.WriteToken(token);
 
-            return encryptedToken;
+            return new JwtModel
+            {
+                Token = encryptedToken,
+                Roles = roles,
+                Expiration = token.ValidTo
+            };
         }
     }
 }
