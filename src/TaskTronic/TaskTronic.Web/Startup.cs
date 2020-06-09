@@ -86,6 +86,15 @@ namespace TaskTronic.Web
 
             app.UseHttpsRedirection();
 
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:4200");
+
+                builder.AllowAnyHeader()
+                    .WithMethods("GET", "POST", "PUT", "DELETE")
+                    .AllowCredentials();
+            });
+
             app.UseRouting();
 
             app.UseAuthentication();
