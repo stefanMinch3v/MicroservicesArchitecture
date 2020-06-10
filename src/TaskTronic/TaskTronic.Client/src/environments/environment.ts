@@ -4,7 +4,12 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'https://localhost:5001/api'
+  baseUrl: 'https://localhost:5001/api',
+  toastr: {
+    timeOut: 3000,
+    positionClass: 'toast-top-right',
+    preventDuplicates: true
+  } 
 };
 
 /*

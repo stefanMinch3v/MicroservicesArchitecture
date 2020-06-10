@@ -2,9 +2,11 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormGroup, FormBuilder } from 'ngx-strongly-typed-forms';
 import { LoginFormModel } from './login.model';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { IdentityService } from 'src/app/core/identity.service';
 import { AuthService } from 'src/app/core/auth.service';
+import { NotificationService } from 'src/app/core/notification.service';
+import { notificationMessages } from 'src/app/core/notification-messages.constants';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +21,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private router: Router,
+    private route: ActivatedRoute,
+    private notificationService: NotificationService,
     private identityService: IdentityService,
     private authService: AuthService) { 
       if (this.authService.isUserAuthenticated()) {
@@ -27,6 +31,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     this.loginForm = this.fb.group<LoginFormModel>({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -41,8 +46,8 @@ export class LoginComponent implements OnInit {
         this.authService.saveRoles(res.roles);
         this.authService.saveExpirationTime(res.expiration);
         
-        //window.location.reload();
-        this.router.navigate(['somewhere']);
+        this.notificationService.successMessage(notificationMessages.successLogin);
+        this.router.navigateByUrl(this.returnUrl);
       });
   }
 }
