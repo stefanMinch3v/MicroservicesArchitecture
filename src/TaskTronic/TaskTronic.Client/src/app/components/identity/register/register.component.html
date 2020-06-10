@@ -10,7 +10,7 @@
 
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" class="form-control" formControlName="name">
+                        <input type="text" class="form-control" formControlName="username">
                     </div>
 
                     <div class="form-group">
@@ -22,7 +22,7 @@
                         <label>Confirm password</label>
                         <input type="password" class="form-control" formControlName="confirmPassword">
                     </div>
-                    <p>Already have an account? <a [routerLink]="['/login']">Sign in</a></p>
+                    <p>Already have an account? <a [routerLink]="['/identity/login']">Sign in</a></p>
                     <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">Submit</button>
                 </form>
             </div>
