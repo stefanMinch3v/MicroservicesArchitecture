@@ -1,4 +1,4 @@
-﻿namespace TaskTronic.Web.Models
+﻿namespace TaskTronic.Identity.Data.Models
 {
     using Microsoft.AspNetCore.Identity;
 

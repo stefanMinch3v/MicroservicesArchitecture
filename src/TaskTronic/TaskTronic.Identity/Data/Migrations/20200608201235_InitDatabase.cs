@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace TaskTronic.Web.Data.Migrations
+namespace TaskTronic.Identity.Data.Migrations
 {
     public partial class InitDatabase : Migration
     {

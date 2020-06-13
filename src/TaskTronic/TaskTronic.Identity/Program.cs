@@ -1,4 +1,4 @@
-namespace TaskTronic.Web
+namespace TaskTronic.Identity
 {
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;

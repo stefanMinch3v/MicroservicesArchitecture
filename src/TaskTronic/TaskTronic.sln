@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTronic.Web", "TaskTronic.Web\TaskTronic.Web.csproj", "{55EEA281-AE88-4E0B-A8E8-8444A49BED24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTronic", "TaskTronic\TaskTronic.csproj", "{D2FDC593-9519-4770-B215-2C8CDAFAEF3C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTronic.Identity", "TaskTronic.Identity\TaskTronic.Identity.csproj", "{084B9C3D-99E6-4142-9959-77762E2E2665}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{55EEA281-AE88-4E0B-A8E8-8444A49BED24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{55EEA281-AE88-4E0B-A8E8-8444A49BED24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{55EEA281-AE88-4E0B-A8E8-8444A49BED24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{55EEA281-AE88-4E0B-A8E8-8444A49BED24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2FDC593-9519-4770-B215-2C8CDAFAEF3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2FDC593-9519-4770-B215-2C8CDAFAEF3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2FDC593-9519-4770-B215-2C8CDAFAEF3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2FDC593-9519-4770-B215-2C8CDAFAEF3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084B9C3D-99E6-4142-9959-77762E2E2665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084B9C3D-99E6-4142-9959-77762E2E2665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084B9C3D-99E6-4142-9959-77762E2E2665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084B9C3D-99E6-4142-9959-77762E2E2665}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

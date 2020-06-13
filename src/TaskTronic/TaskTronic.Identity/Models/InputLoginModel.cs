@@ -1,8 +1,8 @@
-﻿namespace TaskTronic.Web.ViewModels
+﻿namespace TaskTronic.Identity.Models
 {
     using System.ComponentModel.DataAnnotations;
 
-    public class LoginViewModel
+    public class InputLoginModel
     {
         [Required]
         public string Username { get; set; }
