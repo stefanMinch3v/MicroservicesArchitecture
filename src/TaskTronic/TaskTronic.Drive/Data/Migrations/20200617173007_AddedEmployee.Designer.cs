@@ -197,33 +197,6 @@ namespace TaskTronic.Drive.Data.Migrations
 
                     b.ToTable("Permissions");
                 });
-
-            modelBuilder.Entity("TaskTronic.Drive.Data.Models.File", b =>
-                {
-                    b.HasOne("TaskTronic.Drive.Data.Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TaskTronic.Drive.Data.Models.Folder", b =>
-                {
-                    b.HasOne("TaskTronic.Drive.Data.Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TaskTronic.Drive.Data.Models.Permission", b =>
-                {
-                    b.HasOne("TaskTronic.Drive.Data.Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
 #pragma warning restore 612, 618
         }
     }
