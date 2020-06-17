@@ -16,7 +16,7 @@
 
         Task<FolderServiceModel> GetRootFolderByCatIdAsync(int catId);
 
-        Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId, string userId);
+        Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId);
 
         Task<bool> CheckForParentFolderAsync(int folderId);
 
@@ -24,7 +24,7 @@
 
         Task<bool> IsFolderPrivateAsync(int folderId);
 
-        Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, string userId);
+        Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, int employeeId);
 
         Task<bool> MoveFolderToNewParentAsync(int catId, int folderToMoveId, int newFolderParentId, string folderName);
 

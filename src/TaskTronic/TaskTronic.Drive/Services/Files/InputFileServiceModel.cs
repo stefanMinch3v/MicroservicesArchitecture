@@ -13,7 +13,7 @@
         public string Revision { get; set; } = string.Empty;
         public string FileType { get; set; }
         public string ContentType { get; set; }
-        public string UserId { get; set; }
+        public int EmployeeId { get; set; }
 
         public Stream Stream { get; set; }
         public int Chunk { get; set; }

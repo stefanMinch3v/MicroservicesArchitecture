@@ -108,24 +108,24 @@
             }
         }
 
-        public async Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, string userId)
+        public async Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, int employeeId)
         {
             var sql = string.Format(FolderSql.GET_FOLDER_TREE, FolderTableName, PermissionsTableName, FileTableName);
 
             using (var conn = this.dbConnectionFactory.GetSqlConnection())
             {
-                return (await conn.QueryAsync<FolderWithAccessServiceModel>(sql, new { folderId, userId })).AsList();
+                return (await conn.QueryAsync<FolderWithAccessServiceModel>(sql, new { folderId, employeeId })).AsList();
             }
         }
 
 
-        public async Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId, string userId)
+        public async Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId)
         {
             var sql = string.Format(FolderSql.GET_SUBFOLDERS, FolderTableName);
 
             using (var conn = this.dbConnectionFactory.GetSqlConnection())
             {
-                return (await conn.QueryAsync<FolderServiceModel>(sql, new { folderId, userId })).AsList();
+                return (await conn.QueryAsync<FolderServiceModel>(sql, new { folderId })).AsList();
             }
         }
 

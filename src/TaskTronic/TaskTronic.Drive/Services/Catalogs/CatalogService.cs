@@ -18,7 +18,7 @@
             this.folderService = folder;
         }
 
-        public async Task<int> GetIdAsync(int companyId, int departmentId, string userId)
+        public async Task<int> GetIdAsync(int companyId, int departmentId, int employeeId)
         {
             var catalogId = await this.catalogDAL.GetAsync(companyId, departmentId);
 
@@ -26,7 +26,7 @@
             {
                 var createdCatId = await this.catalogDAL.AddAsync(companyId, departmentId);
 
-                await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(createdCatId, userId));
+                await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(createdCatId, employeeId));
 
                 return createdCatId;
             }
@@ -34,11 +34,11 @@
             return catalogId.Value;
         }
 
-        private InputFolderServiceModel CreateInputFolderModel(int catId, string userId)
+        private InputFolderServiceModel CreateInputFolderModel(int catId, int employeeId)
             => new InputFolderServiceModel
             {
                 CatalogId = catId,
-                UserId = userId,
+                EmployeeId = employeeId,
                 Name = "Root",
                 CreateDate = DateTimeOffset.UtcNow
             };

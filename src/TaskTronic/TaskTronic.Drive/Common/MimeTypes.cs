@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    public class MimeTypes
+    public static class MimeTypes
     {
         public static IDictionary<string, string> mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
             // http://stackoverflow.com/questions/1029740/get-mime-type-from-filename-extension

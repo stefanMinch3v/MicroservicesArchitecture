@@ -11,6 +11,6 @@
         public long FileSize { get; set; }
         public string ContentType { get; set; }
         public string UpdaterUsername { get; set; }
-        public string UpdaterId { get; set; }
+        public int UpdaterId { get; set; }
     }
 }

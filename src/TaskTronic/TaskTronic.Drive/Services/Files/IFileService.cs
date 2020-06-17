@@ -10,22 +10,22 @@
 
         Task<FileServiceModel> GetFileByIdAsync(int catId, int folderId, int fileId);
 
-        Task<IReadOnlyCollection<FileServiceModel>> GetFilesByFolderIdAsync(int catId, int folderId, string userId);
+        Task<IReadOnlyCollection<FileServiceModel>> GetFilesByFolderIdAsync(int catId, int folderId, int employeeId);
 
-        Task<bool> DeleteFileAsync(string userId, int catId, int folderId, int fileId);
+        Task<bool> DeleteFileAsync(int employeeId, int catId, int folderId, int fileId);
 
         Task<bool> UploadFileAsync(InputFileServiceModel file);
 
-        Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(int catId, string userId, int folderId, string[] fileNames);
+        Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(int catId, int employeeId, int folderId, string[] fileNames);
 
-        Task<OutputFileDownloadServiceModel> GetFileInfoForDownloadAsync(int catId, string userId, int folderId, int fileId);
+        Task<OutputFileDownloadServiceModel> GetFileInfoForDownloadAsync(int catId, int employeeId, int folderId, int fileId);
 
-        Task<bool> RenameFileAsync(int catId, int folderId, int fileId, string userId, string newFileName);
+        Task<bool> RenameFileAsync(int catId, int folderId, int fileId, int employeeId, string newFileName);
 
-        Task<bool> MoveFileAsync(int catId, int folderId, int fileId, int newFolderId, string userId);
+        Task<bool> MoveFileAsync(int catId, int folderId, int fileId, int newFolderId, int employeeId);
 
-        Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catId, string userId, string value);
+        Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catId, int employeeId, string value);
 
-        Task<bool> CreateNewFileAsync(int catId, string userId, int folderId, NewFileType fileType);
+        Task<bool> CreateNewFileAsync(int catId, int employeeId, int folderId, NewFileType fileType);
     }
 }

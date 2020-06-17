@@ -28,7 +28,7 @@
                 .IsRequired();
 
             builder
-                .Property(f => f.UserId)
+                .Property(f => f.EmployeeId)
                 .IsRequired();
 
             builder

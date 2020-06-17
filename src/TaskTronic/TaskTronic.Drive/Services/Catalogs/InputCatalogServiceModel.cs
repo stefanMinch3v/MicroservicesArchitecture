@@ -2,7 +2,7 @@
 {
     public class InputCatalogServiceModel
     {
-        public string UserId { get; set; }
+        public int EmployeeId { get; set; }
         public int CompanyId { get; set; }
         public int DepartmentId { get; set; }
     }

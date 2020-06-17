@@ -40,7 +40,7 @@
 
             var dbParams = new DynamicParameters();
             dbParams.Add("@data", file.Stream, DbType.Binary, size: size);
-            dbParams.Add("@userId", file.UserId, DbType.String);
+            dbParams.Add("@userId", file.EmployeeId, DbType.String);
             dbParams.Add("@fileName", file.FileName, DbType.String);
             dbParams.Add("@fileSize", file.Filesize, DbType.Int64);
             dbParams.Add("@finishedUpload", false, DbType.Boolean);
@@ -69,7 +69,7 @@
 
             var dbParams = new DynamicParameters();
             dbParams.Add("@data", file.Stream, DbType.Binary, size: size);
-            dbParams.Add("@userId", file.UserId, DbType.Int32);
+            dbParams.Add("@userId", file.EmployeeId, DbType.Int32);
             dbParams.Add("@fileSize", file.Filesize, DbType.Int64);
             dbParams.Add("@fileName", file.FileName, DbType.String);
 
@@ -95,7 +95,7 @@
 
                     var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
 
-                    var userId = file.UserId;
+                    var userId = file.EmployeeId;
                     var fileName = file.FileName;
 
                     var updatedBlobId = await conn.ExecuteScalarAsync<int>(sqlUpdate, new
@@ -107,7 +107,7 @@
 
                     file.BlobId = updatedBlobId;
                     file.Revision = string.Empty;
-                    file.UserId = userId;
+                    file.EmployeeId = userId;
 
                     insertedId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
 
@@ -139,7 +139,7 @@
 
                     var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
 
-                    var userId = file.UserId;
+                    var userId = file.EmployeeId;
                     var fileName = file.FileName;
 
                     var updatedBlobId = await conn.ExecuteScalarAsync<int>(sqlUpdate, new
@@ -150,7 +150,7 @@
 
                     file.BlobId = updatedBlobId;
                     file.Revision = string.Empty;
-                    file.UserId = userId;
+                    file.EmployeeId = userId;
 
                     insertedId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
 
@@ -184,7 +184,7 @@
 
                     var sqlUpdateFile = string.Format(FilesSql.UPDATE_FIlE_WITH_NEW_BLOB, FileTableName);
 
-                    var userId = file.UserId;
+                    var userId = file.EmployeeId;
                     var fileName = file.FileName;
 
                     var updatedBlobId = await conn.ExecuteScalarAsync<int>(sqlUpdate, new

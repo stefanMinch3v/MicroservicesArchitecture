@@ -9,7 +9,7 @@
         public int? RootId { get; set; }
         public string Name { get; set; }
         public bool IsPrivate { get; set; }
-        public string CreatedBy { get; set; }
+        public int EmployeeId { get; set; }
         public bool HasAccess { get; set; }
         public int FileCount { get; set; }
         public int FolderCount { get; set; }

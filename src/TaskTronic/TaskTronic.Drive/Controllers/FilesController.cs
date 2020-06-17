@@ -8,32 +8,48 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
+    using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Services.Identity;
 
     public class FilesController : ApiController
     {
         private const int MAX_ALLOWED_FILE_SIZE = int.MaxValue; // The data column cannot hold more than 2^31-1 bytes (~2GB)
         private readonly IFileService fileService;
+        private readonly IEmployeeService employeeService;
         private readonly ICurrentUserService currentUser;
 
         public FilesController(
-            IFileService fileService,
+            IFileService fileService, 
+            IEmployeeService employeeService,
             ICurrentUserService currentUser)
         {
             this.fileService = fileService;
+            this.employeeService = employeeService;
             this.currentUser = currentUser;
         }
 
         [Route(nameof(GetFileById)), HttpGet]
-        public async Task<FileServiceModel> GetFileById(int catId, int folderId, int fileId)
+        public async Task<ActionResult<FileServiceModel>> GetFileById(int catId, int folderId, int fileId)
             => await this.fileService.GetFileByIdAsync(catId, folderId, fileId);
 
         [Route(nameof(DownloadFile)), HttpGet]
         public async Task<ActionResult> DownloadFile(int catId, int folderId, int fileId, bool shouldOpen = false)
         {
-            var downloadFile = await this.fileService.GetFileInfoForDownloadAsync(catId, this.currentUser.UserId, folderId, fileId);
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest();
+            }
+
+            var downloadFile = await this.fileService.GetFileInfoForDownloadAsync(
+                catId,
+                employeeId, 
+                folderId, 
+                fileId);
 
             if (downloadFile is null)
             {
@@ -52,20 +68,54 @@
         }
 
         [Route(nameof(MoveFile)), HttpPost]
-        public async Task<bool> MoveFile(int fileId, int catId, int folderId, int newFolderId)
-            => await this.fileService.MoveFileAsync(catId, folderId, fileId, newFolderId, this.currentUser.UserId);
+        public async Task<ActionResult<bool>> MoveFile(int fileId, int catId, int folderId, int newFolderId)
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest();
+            }
+
+            return await this.fileService.MoveFileAsync(catId, folderId, fileId, newFolderId, employeeId);
+        }
 
         [Route(nameof(RenameFile)), HttpPost]
-        public async Task<bool> RenameFile(int catId, int folderId, int fileId, string name)
-            => await this.fileService.RenameFileAsync(catId, folderId, fileId, this.currentUser.UserId, name);
+        public async Task<ActionResult<bool>> RenameFile(int catId, int folderId, int fileId, string name)
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest();
+            }
+
+            return await this.fileService.RenameFileAsync(catId, folderId, fileId, employeeId, name);
+        }
 
         [Route(nameof(DeleteFile)), HttpDelete]
-        public async Task<bool> DeleteFile(int catId, int folderId, int fileId)
-            => await this.fileService.DeleteFileAsync(this.currentUser.UserId, catId, folderId, fileId);
+        public async Task<ActionResult<bool>> DeleteFile(int catId, int folderId, int fileId)
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest();
+            }
+
+            return await this.fileService.DeleteFileAsync(employeeId, catId, folderId, fileId);
+        }
 
         [Route(nameof(UploadFileToFolder)), HttpPost]
-        public async Task<bool> UploadFileToFolder(IFormFile file)
+        public async Task<ActionResult<bool>> UploadFileToFolder(IFormFile file)
         {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest();
+            }
+
             if (file.Length > MAX_ALLOWED_FILE_SIZE)
             {
                 throw new FileException { Message = $"The file is too large. {file.Length} exceeds the maximum size of {MAX_ALLOWED_FILE_SIZE}." };
@@ -85,7 +135,7 @@
                 contentType,
                 extension,
                 Path.GetFileNameWithoutExtension(form["name"]),
-                this.currentUser.UserId,
+                employeeId,
                 int.Parse(form["chunk"]),
                 int.Parse(form["chunks"]),
                 replaceExistingFiles,
@@ -96,19 +146,30 @@
         }
 
         [Route(nameof(SearchForFiles)), HttpGet]
-        public async Task<IReadOnlyCollection<OutputFileServiceModel>> SearchForFiles(int catalogId, string value)
+        public async Task<ActionResult<IReadOnlyCollection<OutputFileServiceModel>>> SearchForFiles(int catalogId, string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
             {
-                return Array.Empty<OutputFileServiceModel>();
+                return BadRequest();
             }
 
-            return await this.fileService.SearchFilesAsync(catalogId, this.currentUser.UserId, value);
+            return (await this.fileService.SearchFilesAsync(catalogId, employeeId, value)).ToArray();
         }
 
         [Route(nameof(CreateNewFile)), HttpPost]
-        public async Task<bool> CreateNewFile(int catalogId, int folderId, NewFileType newFileType)
-            => await this.fileService.CreateNewFileAsync(catalogId, this.currentUser.UserId, folderId, newFileType);
+        public async Task<ActionResult<bool>> CreateNewFile(int catalogId, int folderId, NewFileType newFileType)
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest();
+            }
+
+            return await this.fileService.CreateNewFileAsync(catalogId, employeeId, folderId, newFileType);
+        }
 
         private static string GetMimeType(string extension)
         {
@@ -131,7 +192,7 @@
             string contentType,
             string fileType,
             string name,
-            string userId,
+            int employeeId,
             int chunk,
             int chunks,
             bool replaceExistingFiles,
@@ -144,7 +205,7 @@
                 ContentType = contentType,
                 FileType = fileType,
                 FileName = name,
-                UserId = userId,
+                EmployeeId = employeeId,
                 Chunk = chunk,
                 Chunks = chunks,
                 ReplaceExistingFiles = replaceExistingFiles,

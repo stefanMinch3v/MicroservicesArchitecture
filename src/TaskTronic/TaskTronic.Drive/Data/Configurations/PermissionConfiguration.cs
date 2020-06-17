@@ -20,8 +20,8 @@
                 .IsRequired();
 
             builder
-                .Property(p => p.UserId)
-                .IsRequired();
+                .HasOne(p => p.Employee)
+                .WithMany();
         }
     }
 }

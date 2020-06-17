@@ -61,7 +61,7 @@
                     RootId,
                     Name,
                     IsPrivate,
-                    UserId,
+                    EmployeeId,
                     CreateDate
                 )
                 VALUES
@@ -71,7 +71,7 @@
                    @RootId,
                    @Name,
                    @IsPrivate,
-                   @UserId,
+                   @EmployeeId,
                    @CreateDate
                 ); SELECT CAST (SCOPE_IDENTITY() AS INT)";
 
@@ -119,7 +119,7 @@
 				                FROM {1} p 
 				                WHERE 
 					                p.FolderId = f.FolderId
-					                AND p.UserId = @userId
+					                AND p.EmployeeId = @employeeId
 			                )
 		                )
 		                THEN 1
@@ -166,30 +166,30 @@
                 (
                     CatalogId,
                     FolderId,
-                    UserId
+                    EmployeeId
                 )
                 VALUES
                 (
                     @CatalogId,
                     @FolderId,
-                    @UserId
+                    @EmployeeId
                 );";
 
             public const string GET_USER_FOLDER_PERMISSIONS = @"
                 SELECT FolderId FROM {0}                   
-                WHERE UserId = @userId
+                WHERE EmployeeId = @employeeId
                     AND CatalogId = @catalogId";
 
             public const string HAS_USER_PERMISSION_FOR_FOLDER = @"
                 SELECT COUNT(1) FROM {0}
-                WHERE UserId = @userId
+                WHERE EmployeeId = @employeeId
                     AND CatalogId = @catalogId
                     AND FolderId = @folderId";
 
             public const string GET_USERNAME_BY_USER_ID = @"
                 SELECT TOP(1) UserName, FirstName, LastName
                 FROM {0}
-                WHERE Id = @userId";
+                WHERE Id = @employeeId";
         }
 
         public class BlobsSql
@@ -203,7 +203,7 @@
                 DECLARE @newdata varbinary(max) = @data
                 INSERT INTO {0}
                 (
-                    [UserId],
+                    [EmployeeId],
                     [FileName],
                     [Timestamp],
                     [Filesize],
@@ -212,7 +212,7 @@
                 )
                 VALUES
                 (
-                    @userId,
+                    @employeeId,
                     @fileName,
                     @timestamp,
                     @fileSize,
@@ -225,7 +225,7 @@
                 SET Data = Data + @data, 
                     Filesize = Filesize + @fileSize 
                 WHERE 
-                    UserId = @userId 
+                    EmployeeId = @employeeId 
                     AND FinishedUpload = 0
                     AND FileName = @fileName";
 
@@ -233,7 +233,7 @@
                 UPDATE {0}
                 SET FinishedUpload = 1
                 OUTPUT INSERTED.BlobId
-                WHERE UserId = @userId
+                WHERE EmployeeId = @employeeId
                     AND FinishedUpload = 0
                     AND FileName = @fileName";
 
@@ -241,7 +241,7 @@
                 UPDATE {0}
                 SET FinishedUpload = 1
                 OUTPUT INSERTED.BlobId
-                WHERE UserId = @userId
+                WHERE EmployeeId = @employeeId
                     AND FinishedUpload = 0
                     AND FileName = @oldFileName";
 
@@ -272,7 +272,7 @@
                     [FileType],
                     [FileSize],
                     [ContentType],
-                    [UserId],
+                    [EmployeeId],
                     [CreateDate]
                 )
                 VALUES
@@ -284,7 +284,7 @@
                     @Filetype,
                     (SELECT Filesize FROM {1} WHERE BlobId = @BlobId),
                     @ContentType,
-                    @UserId,
+                    @EmployeeId,
                     @CreateDate
                 ); SELECT CAST (SCOPE_IDENTITY() AS INT)";
 
