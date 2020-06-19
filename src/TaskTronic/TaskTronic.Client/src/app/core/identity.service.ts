@@ -17,13 +17,13 @@ export class IdentityService {
         private router: Router) { }
 
     public login(user): Observable<PayloadModel> {
-        const url = environment.baseUrl + '/identity/login';
+        const url = environment.identityUrl + '/identity/login';
         return this.http.post(url, user)
             .pipe(map((response: PayloadModel) => response));
     }
 
     public register(user): Observable<any> {
-        const url = environment.baseUrl + '/identity/register';
+        const url = environment.identityUrl + '/identity/register';
         return this.http.post(url, user);
     }
 

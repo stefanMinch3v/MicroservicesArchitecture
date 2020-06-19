@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
   register(): void {
     this.identityService.register(this.registerForm.value)
       .subscribe(res => {
-        this.router.navigate(['somewhere']);
+        this.router.navigate(['/identity/login']);
     })
   }
 

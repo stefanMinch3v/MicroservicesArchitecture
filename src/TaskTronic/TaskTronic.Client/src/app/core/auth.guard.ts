@@ -13,17 +13,17 @@ export class AuthGuard implements CanActivate {
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<boolean> | Promise<boolean> | boolean {
-        return this.check();
+        return this.check(state);
     }
 
-    check(): boolean {
+    check(state: RouterStateSnapshot): boolean {
         const expirationTime = new Date(this.authService.getExpirationTime());
         if (this.authService.isUserAuthenticated() && expirationTime > new Date) {
             return true;
         }
 
         this.authService.deauthenticateUser();
-        this.router.navigate(['/account/login']);
+        this.router.navigate(['/identity/login'], { queryParams: { returnUrl: state.url }});
         return false;
     }
 }

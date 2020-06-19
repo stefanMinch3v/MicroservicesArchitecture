@@ -18,7 +18,21 @@ export class ErrorInterceptorService  implements HttpInterceptor {
     return next.handle(request).pipe(
       retry(1),
       catchError((err) => {
-        const errorDescription = err.error.description ? err.error.description : err.error;
+        let errorDescription = '';
+        const errors = err.error.errors ? err.error.errors : err.error;
+
+        if (errors) {
+          for (let key in errors) {
+            let obj = errors[key];
+
+            for (let prop in obj) {
+              errorDescription += obj[prop];
+            }
+          }
+        } else {
+          errorDescription = "Something went wrong.";
+        }
+        
         let message = ""
 
         if (err.status === 401) {

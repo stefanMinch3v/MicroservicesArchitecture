@@ -8,6 +8,10 @@ const routes: Routes = [
     loadChildren: () => import('./components/identity/identity-routing.module').then(m => m.IdentityRoutingModule)
   },
   {
+    path: 'drive',
+    loadChildren: () => import('./components/drive/drive-routing.module').then(m => m.DriveRoutingModule)
+  },
+  {
       path: '**',
       redirectTo: ''
   }

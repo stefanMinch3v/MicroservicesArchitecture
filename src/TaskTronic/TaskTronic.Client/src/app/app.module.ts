@@ -14,6 +14,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { CommonModule } from '@angular/common';
 import { ErrorInterceptorService } from './core/error.interceptor';
+import { DriveModule } from './components/drive/drive.module';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { ErrorInterceptorService } from './core/error.interceptor';
     ToastrModule.forRoot(environment.toastr),
     AppRoutingModule,
     IdentityModule,
-    SharedModule
+    SharedModule,
+    DriveModule
   ],
   providers: [
     {

@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
     private identityService: IdentityService,
     private authService: AuthService) { 
       if (this.authService.isUserAuthenticated()) {
-        this.router.navigate(['somewhere'])
+        this.router.navigate(['/drive'])
       }
   }
 

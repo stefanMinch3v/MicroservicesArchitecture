@@ -69,7 +69,7 @@
 
             var dbParams = new DynamicParameters();
             dbParams.Add("@data", file.Stream, DbType.Binary, size: size);
-            dbParams.Add("@userId", file.EmployeeId, DbType.Int32);
+            dbParams.Add("@employeeId", file.EmployeeId, DbType.Int32);
             dbParams.Add("@fileSize", file.Filesize, DbType.Int64);
             dbParams.Add("@fileName", file.FileName, DbType.String);
 
