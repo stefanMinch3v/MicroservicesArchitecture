@@ -95,19 +95,19 @@
 
                     var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
 
-                    var userId = file.EmployeeId;
+                    var employeeId = file.EmployeeId;
                     var fileName = file.FileName;
 
                     var updatedBlobId = await conn.ExecuteScalarAsync<int>(sqlUpdate, new
                     {
-                        userId,
+                        employeeId,
                         fileName,
                         oldFileName
                     }, transaction);
 
                     file.BlobId = updatedBlobId;
                     file.Revision = string.Empty;
-                    file.EmployeeId = userId;
+                    file.EmployeeId = employeeId;
 
                     insertedId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
 
@@ -184,12 +184,12 @@
 
                     var sqlUpdateFile = string.Format(FilesSql.UPDATE_FIlE_WITH_NEW_BLOB, FileTableName);
 
-                    var userId = file.EmployeeId;
+                    var employeeId = file.EmployeeId;
                     var fileName = file.FileName;
 
                     var updatedBlobId = await conn.ExecuteScalarAsync<int>(sqlUpdate, new
                     {
-                        userId,
+                        employeeId,
                         fileName
                     }, transaction);
 

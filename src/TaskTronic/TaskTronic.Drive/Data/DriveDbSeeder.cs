@@ -72,7 +72,8 @@
                         CreateDate = DateTime.UtcNow,
                         Name = $"Awesome folder {i}",
                         RootId = rootFolder.FolderId,
-                        EmployeeId = employee.EmployeeId
+                        EmployeeId = employee.EmployeeId,
+                        ParentId = rootFolder.FolderId
                     };
 
                     parentFolders.Add(folder);
@@ -108,20 +109,26 @@
                     if (i % 2 == 0)
                     {
                         // word
-                        await this.fileService.CreateNewFileAsync(
-                            catalog.CatalogId,
-                            employee.EmployeeId,
-                            parentFolders[i].FolderId,
-                            NewFileType.Word);
+                        for (int j = 0; j < 3; j++)
+                        {
+                            await this.fileService.CreateNewFileAsync(
+                                catalog.CatalogId,
+                                employee.EmployeeId,
+                                parentFolders[i].FolderId,
+                                NewFileType.Word);
+                        }
                     }
                     else
                     {
                         // excel
-                        await this.fileService.CreateNewFileAsync(
-                            catalog.CatalogId,
-                            employee.EmployeeId,
-                            parentFolders[i].FolderId,
-                            NewFileType.Excel);
+                        for (int k = 0; k < 2; k++)
+                        {
+                            await this.fileService.CreateNewFileAsync(
+                                catalog.CatalogId,
+                                employee.EmployeeId,
+                                parentFolders[i].FolderId,
+                                NewFileType.Excel);
+                        }
                     }
                 }
             }).GetAwaiter().GetResult();
