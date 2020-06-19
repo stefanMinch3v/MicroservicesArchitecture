@@ -5,6 +5,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using TaskTronic.Services;
 
     public static class ApplicationBuilderExtensions
     {
@@ -43,6 +44,12 @@
 
             var dbContext = serviceProvider.GetRequiredService<DbContext>();
             dbContext.Database.Migrate();
+
+            var seeders = serviceProvider.GetServices<IDbSeeder>();
+            foreach (var seeder in seeders)
+            {
+                seeder.SeedData();
+            }
 
             return app;
         }

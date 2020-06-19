@@ -434,7 +434,8 @@
                     EmployeeId = employeeId,
                     FolderId = folderId,
                     ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    Stream = ms
+                    Stream = ms,
+                    CreateDate = DateTime.UtcNow
                 });
             }
         }
@@ -447,14 +448,15 @@
                 {
                     Chunk = 0,
                     Chunks = 1,
-                    FileName = $"Mappe",
+                    FileName = $"Excel",
                     FileType = ".xlsx",
                     Filesize = ms.Length,
                     CatalogId = catId,
                     EmployeeId = employeeId,
                     FolderId = folderId,
                     ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    Stream = ms
+                    Stream = ms,
+                    CreateDate = DateTime.UtcNow
                 });
             }
         }

@@ -6,5 +6,6 @@
     {
         Task<int> GetIdByUserAsync(string userId);
         Task<string> GetEmailByIdAsync(int employeeId);
+        Task SaveAsync(string userId, string email);
     }
 }

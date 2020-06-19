@@ -11,6 +11,7 @@ namespace TaskTronic.Drive
     using Services.Folders;
     using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Infrastructure;
+    using TaskTronic.Services;
 
     public class Startup
     {
@@ -25,6 +26,7 @@ namespace TaskTronic.Drive
             => services
                 .AddApiService<DriveDbContext>(this.Configuration)
                 .AddSingleton<IDbConnectionFactory, DbConnectionFactory>()
+                .AddTransient<IDbSeeder, DriveDbSeeder>()
                 .AddTransient<IFileService, FileService>()
                 .AddTransient<IEmployeeService, EmployeeService>()
                 .AddTransient<ICatalogService, CatalogService>()

@@ -23,5 +23,19 @@
                 .Where(e => e.EmployeeId == employeeId)
                 .Select(u => u.Email)
                 .FirstOrDefaultAsync();
+
+        public async Task SaveAsync(string userId, string email)
+        {
+            var existing = await this.db.Employees.FirstOrDefaultAsync(e => e.Email == email);
+
+            if (!(existing is null))
+            {
+                return;
+            }
+
+            this.db.Employees.Add(new Data.Models.Employee { Email = email, UserId = userId });
+
+            await this.db.SaveChangesAsync();
+        }
     }
 }

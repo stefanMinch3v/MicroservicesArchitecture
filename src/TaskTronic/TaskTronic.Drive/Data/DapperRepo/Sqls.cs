@@ -206,7 +206,7 @@
                     [EmployeeId],
                     [FileName],
                     [Timestamp],
-                    [Filesize],
+                    [FileSize],
                     [FinishedUpload],
                     [Data]
                 )
