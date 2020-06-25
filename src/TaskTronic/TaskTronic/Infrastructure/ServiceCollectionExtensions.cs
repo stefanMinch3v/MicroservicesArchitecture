@@ -1,11 +1,15 @@
 ﻿namespace TaskTronic.Infrastructure
 {
+    using AutoMapper;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Tokens;
+    using System;
+    using System.Reflection;
     using System.Text;
+    using TaskTronic.Models;
     using TaskTronic.Services.Identity;
 
     public static class ServiceCollectionExtensions
@@ -18,13 +22,14 @@
             services
                 .AddDatabase<TDbContext>(configuration)
                 .AddApplicationSettings(configuration)
-                .AddApiTokenAuthentication(configuration)
+                .AddTokenAuthentication(configuration)
+                .AddAutoMapperProfile(Assembly.GetCallingAssembly())
                 .AddControllers();
 
             return services;
         }
 
-        private static IServiceCollection AddDatabase<TDbContext>(
+        public static IServiceCollection AddDatabase<TDbContext>(
             this IServiceCollection services,
             IConfiguration configuration)
             where TDbContext : DbContext
@@ -33,7 +38,7 @@
                 .AddDbContext<TDbContext>(options => options
                     .UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]));
 
-        private static IServiceCollection AddApplicationSettings(
+        public static IServiceCollection AddApplicationSettings(
             this IServiceCollection services,
             IConfiguration configuration)
             => services
@@ -41,7 +46,7 @@
                     configuration.GetSection(nameof(ApplicationSettings)),
                     options => options.BindNonPublicProperties = true);
 
-        private static IServiceCollection AddApiTokenAuthentication(
+        public static IServiceCollection AddTokenAuthentication(
             this IServiceCollection services,
             IConfiguration configuration)
         {
@@ -75,5 +80,13 @@
 
             return services;
         }
+
+        public static IServiceCollection AddAutoMapperProfile(
+            this IServiceCollection services,
+            Assembly assembly)
+            => services
+                .AddAutoMapper(
+                    (_, config) => config.AddProfile(new MappingProfile(assembly)),
+                    Array.Empty<Assembly>());
     }
 }

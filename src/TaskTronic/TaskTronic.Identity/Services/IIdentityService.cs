@@ -8,6 +8,6 @@
     {
         Task<Result<bool>> RegisterAsync(InputRegisterModel model);
 
-        Task<Result<JwtModel>> LoginAsync(InputLoginModel model);
+        Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model);
     }
 }

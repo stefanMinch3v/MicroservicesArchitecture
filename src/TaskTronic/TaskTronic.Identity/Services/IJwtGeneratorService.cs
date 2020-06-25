@@ -6,6 +6,6 @@
 
     public interface IJwtGeneratorService
     {
-        Task<JwtModel> GenerateTokenAsync(ApplicationUser appUser);
+        Task<JwtOutputModel> GenerateTokenAsync(ApplicationUser appUser);
     }
 }

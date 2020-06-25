@@ -369,5 +369,15 @@
                 return (await db.QuerySingleOrDefaultAsync<int?>(sql, new { catalogId, folderId, fileName, fileType }));
             }
         }
+
+        public async Task<int> CountFilesForEmployeeAsync(int employeeId)
+        {
+            var sql = string.Format(FilesSql.COUNT_FILES_FOR_EMPLOYEE, FileTableName);
+
+            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            {
+                return await db.ExecuteScalarAsync<int>(sql, new { employeeId });
+            }
+        }
     }
 }

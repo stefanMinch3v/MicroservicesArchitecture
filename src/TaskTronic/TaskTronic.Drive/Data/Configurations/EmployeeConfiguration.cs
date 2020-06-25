@@ -18,6 +18,10 @@
             builder
                 .Property(e => e.UserId)
                 .IsRequired();
+
+            builder
+                .Property(e => e.Name)
+                .IsRequired();
         }
     }
 }

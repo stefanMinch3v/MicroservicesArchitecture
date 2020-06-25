@@ -148,5 +148,15 @@
                 return (await conn.ExecuteAsync(sql, new { folderId, catId })) > 0;
             }
         }
+
+        public async Task<int> CountFoldersForEmployeeAsync(int employeeId)
+        {
+            var sql = string.Format(FolderSql.COUNT_FOLDERS_FOR_EMPLOYEE, FolderTableName);
+
+            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            {
+                return await db.ExecuteScalarAsync<int>(sql, new { employeeId });
+            }
+        }
     }
 }

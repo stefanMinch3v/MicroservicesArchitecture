@@ -157,6 +157,10 @@
                 DELETE FROM {0}
                 WHERE FolderId = @folderId
                     AND CatalogId = @CatalogId";
+
+            public const string COUNT_FOLDERS_FOR_EMPLOYEE = @"
+                SELECT COUNT(*) FROM {0}
+                WHERE EmployeeId = @employeeId";
         }
 
         public class PermissionsSql
@@ -346,6 +350,10 @@
                     WHERE CHARINDEX('{1}', Filename) > 0 
                         OR CHARINDEX('{1}', FileType) > 0
                     AND CatalogId = @CatalogId";
+
+            public const string COUNT_FILES_FOR_EMPLOYEE = @"
+                SELECT COUNT(*) FROM {0}
+                WHERE EmployeeId = @employeeId";
 
         }
     }

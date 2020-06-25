@@ -29,6 +29,8 @@
 
         Task<IEnumerable<FileServiceModel>> SearchFilesAsync(int catId, string value);
 
+        Task<int> CountFilesForEmployeeAsync(int employeeId);
+
         // transaction
         Task<int> SaveCompletedUploadAsync(InputFileServiceModel file);
         Task<int> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName);

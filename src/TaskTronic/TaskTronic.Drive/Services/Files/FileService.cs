@@ -313,6 +313,9 @@
             return file;
         }
 
+        public Task<int> CountFilesAsync(int employeeId)
+            => this.fileDAL.CountFilesForEmployeeAsync(employeeId);
+
         private void RenameFileName(IEnumerable<FileServiceModel> filesInFolder, InputFileServiceModel inputFileModel = null, FileServiceModel fileModel = null)
         {
             if (inputFileModel is null && fileModel is null)

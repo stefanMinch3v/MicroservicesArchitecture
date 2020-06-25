@@ -1,27 +1,27 @@
 namespace TaskTronic.Identity
 {
     using Data;
-    using Data.Models;
+    using Infrastructure;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Services;
+    using TaskTronic.Identity.Data.Models;
     using TaskTronic.Infrastructure;
-    using TaskTronic.Identity.Services;
+    using TaskTronic.Services;
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => this.Configuration = configuration;
 
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
             => services
                 .AddApiService<IdentityDbContext>(this.Configuration)
+                .AddTransient<IDbSeeder, IdentityDbSeeder>()
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<IJwtGeneratorService, JwtGeneratorService>()
                 .AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -33,6 +33,7 @@ namespace TaskTronic.Identity
                     options.Password.RequireUppercase = false;
                 })
                 .AddEntityFrameworkStores<IdentityDbContext>();
+                
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app

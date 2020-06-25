@@ -22,5 +22,7 @@
         Task<bool> IsFolderPrivateAsync(int folderId);
 
         Task<FolderServiceModel> GetAccessableFolders(int catId, int employeeId);
+
+        Task<int> CountFoldersAsync(int employeeId);
     }
 }

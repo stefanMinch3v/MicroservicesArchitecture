@@ -31,5 +31,7 @@
         Task<bool> CheckForFolderWithSameNameAsync(string name, int parentFolderId);
 
         Task<bool> DeleteAsync(int catId, int folderId);
+
+        Task<int> CountFoldersForEmployeeAsync(int employeeId);
     }
 }

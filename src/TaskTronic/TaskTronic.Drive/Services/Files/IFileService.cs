@@ -27,5 +27,7 @@
         Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catId, int employeeId, string value);
 
         Task<bool> CreateNewFileAsync(int catId, int employeeId, int folderId, NewFileType fileType);
+
+        Task<int> CountFilesAsync(int employeeId);
     }
 }

@@ -26,20 +26,20 @@
             this.jwtGeneratorService = jwtGeneratorService;
         }
 
-        public async Task<Result<JwtModel>> LoginAsync(InputLoginModel model)
+        public async Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model)
         {
             if (model is null)
             {
                 return EMPTY_FORM;
             }
 
-            var result = await this.signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
+            var result = await this.signInManager.PasswordSignInAsync(model.UserName, model.Password, false, false);
             if (!result.Succeeded)
             {
                 return INVALID_CREDENTIALS;
             }
 
-            var user = await this.userManager.FindByNameAsync(model.Username);
+            var user = await this.userManager.FindByNameAsync(model.UserName);
             if (user is null)
             {
                 return INVALID_CREDENTIALS;

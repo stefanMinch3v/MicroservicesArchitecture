@@ -6,5 +6,6 @@
     [Route("api/[controller]")]
     public abstract class ApiController : ControllerBase
     {
+        public const string Id = "{id}";
     }
 }

@@ -260,6 +260,9 @@
             return await this.DeleteFolderOperationsAsync(catId, employeeId, existingFolder);
         }
 
+        public Task<int> CountFoldersAsync(int employeeId)
+            => this.folderDAL.CountFoldersForEmployeeAsync(employeeId);
+
         private async Task<bool> DeleteFolderOperationsAsync(int catId, int employeeId, FolderServiceModel existingFolder)
         {
             try

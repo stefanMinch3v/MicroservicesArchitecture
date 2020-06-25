@@ -22,7 +22,7 @@
 
         [HttpPost]
         [Route(nameof(Register))]
-        public async Task<IActionResult> Register([FromBody] InputRegisterModel model)
+        public async Task<ActionResult> Register([FromBody] InputRegisterModel model)
         {
             var result = await this.identityService.RegisterAsync(model);
 
@@ -38,7 +38,7 @@
 
         [HttpPost]
         [Route(nameof(Login))]
-        public async Task<IActionResult> Login([FromBody] InputLoginModel model)
+        public async Task<ActionResult<JwtOutputModel>> Login([FromBody] InputLoginModel model)
         {
             var result = await this.identityService.LoginAsync(model);
 
@@ -48,7 +48,7 @@
                 return BadRequest(result.Errors);
             }
 
-            this.logger.LogInformation($"Logged in user: {model.Username}");
+            this.logger.LogInformation($"Logged in user: {model.UserName}");
             return this.Ok(result.Data);
         }
     }
