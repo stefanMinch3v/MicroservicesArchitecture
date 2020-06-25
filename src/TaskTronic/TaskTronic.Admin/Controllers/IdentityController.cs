@@ -51,7 +51,7 @@
         {
             this.Response.Cookies.Delete(InfrastructureConstants.AuthenticationCookieName);
 
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).ToControllerName());
         }
     }
 }
