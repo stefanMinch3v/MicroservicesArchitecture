@@ -8,7 +8,7 @@
         {
             if (string.IsNullOrWhiteSpace(controllerName))
             {
-                throw new InvalidOperationException($"{controllerName} cannot be empty.");
+                throw new InvalidOperationException($"{nameof(controllerName)} cannot be empty.");
             }
 
             var controllerIndex = controllerName.IndexOf("Controller");

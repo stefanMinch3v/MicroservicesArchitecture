@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTronic.Identity", "Task
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTronic.Drive", "TaskTronic.Drive\TaskTronic.Drive.csproj", "{015E31AE-7035-4E14-B65F-E73DAE6CE890}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTronic.Admin", "TaskTronic.Admin\TaskTronic.Admin.csproj", "{5045E916-DE38-4437-9050-7596B53FCC93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaskTronic.Admin", "TaskTronic.Admin\TaskTronic.Admin.csproj", "{5045E916-DE38-4437-9050-7596B53FCC93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskTronic.Statistics", "TaskTronic.Statistics\TaskTronic.Statistics.csproj", "{A09BB8EA-CC1F-453C-B7FE-0018E3B3DD7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{5045E916-DE38-4437-9050-7596B53FCC93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5045E916-DE38-4437-9050-7596B53FCC93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5045E916-DE38-4437-9050-7596B53FCC93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A09BB8EA-CC1F-453C-B7FE-0018E3B3DD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A09BB8EA-CC1F-453C-B7FE-0018E3B3DD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A09BB8EA-CC1F-453C-B7FE-0018E3B3DD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A09BB8EA-CC1F-453C-B7FE-0018E3B3DD7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

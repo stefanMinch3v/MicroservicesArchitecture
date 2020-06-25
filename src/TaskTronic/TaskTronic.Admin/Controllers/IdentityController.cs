@@ -30,12 +30,12 @@
             => await base.HandleAsync(
                 async () =>
                 {
-                    var jwt = await this.identityService
+                    var jwtModel = await this.identityService
                         .Login(this.mapper.Map<UserInputModel>(model));
 
                     this.Response.Cookies.Append(
                         InfrastructureConstants.AuthenticationCookieName,
-                        jwt.Token,
+                        jwtModel.Token,
                         new CookieOptions
                         {
                             HttpOnly = true,
