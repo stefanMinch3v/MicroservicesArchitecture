@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
+    // does not work for some reason, TODO: try to fix it after the gateway task
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddDefaultUserStorage(
