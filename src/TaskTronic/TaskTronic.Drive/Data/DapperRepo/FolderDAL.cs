@@ -22,7 +22,7 @@
         {
             var sql = string.Format(FolderSql.ADD, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteScalarAsync<int>(sql, inputModel);
             }
@@ -32,7 +32,7 @@
         {
             var sql = string.Format(FolderSql.RENAME_FOLDER, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteAsync(sql, new { catId, folderId, newFolderName }) > 0;
             }
@@ -42,7 +42,7 @@
         {
             var sql = string.Format(FolderSql.MOVE_FOLDER_TO_NEW_PARENT, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await (db.ExecuteAsync(sql, new { catId, folderToMoveId, newFolderParentId, folderName })) > 0;
             }
@@ -52,7 +52,7 @@
         {
             var sql = string.Format(FolderSql.CHECK_FOR_FOLDER, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await db.QuerySingleOrDefaultAsync<int>(sql, new { folderId })) > 0;
             }
@@ -62,7 +62,7 @@
         {
             var sql = string.Format(FolderSql.CHECK_FOR_FOLDER, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await db.QuerySingleOrDefaultAsync<int>(sql, new { folderId })) > 0;
             }
@@ -72,7 +72,7 @@
         {
             var sql = string.Format(FolderSql.CHECK_FOR_FOLDER_NAME_EXIST_IN_FOLDER, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.QuerySingleOrDefaultAsync<int>(sql, new { name, parentFolderId }) > 0;
             }
@@ -82,7 +82,7 @@
         {
             var sql = string.Format(FolderSql.GET_BY_ID, FolderTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await conn.QuerySingleOrDefaultAsync<FolderServiceModel>(sql, new { folderId });
             }
@@ -92,7 +92,7 @@
         {
             var sql = string.Format(FolderSql.GET_FOLDERS_BY_CATID, FolderTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.QueryAsync<FolderServiceModel>(sql, new { catId })).AsList();
             }
@@ -102,7 +102,7 @@
         {
             var sql = string.Format(FolderSql.GET_ROOT_FOLDER_BY_CATID, FolderTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await conn.QuerySingleOrDefaultAsync<FolderServiceModel>(sql, new { catalogId });
             }
@@ -112,7 +112,7 @@
         {
             var sql = string.Format(FolderSql.GET_FOLDER_TREE, FolderTableName, PermissionsTableName, FileTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.QueryAsync<FolderWithAccessServiceModel>(sql, new { folderId, employeeId })).AsList();
             }
@@ -123,7 +123,7 @@
         {
             var sql = string.Format(FolderSql.GET_SUBFOLDERS, FolderTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.QueryAsync<FolderServiceModel>(sql, new { folderId })).AsList();
             }
@@ -133,7 +133,7 @@
         {
             var sql = string.Format(FolderSql.CHECK_IF_FOLDER_IS_PRIVATE, FolderTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.QuerySingleOrDefaultAsync<int>(sql, new { folderId })) > 0;
             }
@@ -143,7 +143,7 @@
         {
             var sql = string.Format(FolderSql.DELETE_FOLDER, FolderTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.ExecuteAsync(sql, new { folderId, catId })) > 0;
             }
@@ -153,9 +153,19 @@
         {
             var sql = string.Format(FolderSql.COUNT_FOLDERS_FOR_EMPLOYEE, FolderTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteScalarAsync<int>(sql, new { employeeId });
+            }
+        }
+
+        public async Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllFlatForEmployeeAsync(int employeeId)
+        {
+            var sql = string.Format(FolderSql.FLAT_FOLDERS_FOR_INITIATOR, FolderTableName);
+
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
+            {
+                return (await db.QueryAsync<OutputFolderFlatServiceModel>(sql, new { employeeId })).AsList();
             }
         }
     }

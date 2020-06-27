@@ -10,7 +10,7 @@
         public DbConnectionFactory(IConfiguration configuration)
             => this.dbConnectionString = configuration["ConnectionStrings:DefaultConnection"];
 
-        public SqlConnection GetSqlConnection()
+        public SqlConnection GetSqlConnection
             => new SqlConnection(this.dbConnectionString);
     }
 }

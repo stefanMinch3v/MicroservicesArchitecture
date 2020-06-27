@@ -263,6 +263,9 @@
         public Task<int> CountFoldersAsync(int employeeId)
             => this.folderDAL.CountFoldersForEmployeeAsync(employeeId);
 
+        public Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllForEmployeeAsync(int employeeId)
+            => this.folderDAL.GetAllFlatForEmployeeAsync(employeeId);
+
         private async Task<bool> DeleteFolderOperationsAsync(int catId, int employeeId, FolderServiceModel existingFolder)
         {
             try

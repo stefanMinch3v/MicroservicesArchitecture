@@ -22,7 +22,7 @@
 
         [HttpGet]
         [Authorize]
-        public async Task<IEnumerable<FolderViewOutputModel>> TotalViews([FromQuery] IEnumerable<int> ids)
+        public async Task<IReadOnlyCollection<FolderViewOutputModel>> TotalViews([FromQuery] IEnumerable<int> ids)
             => await this.folderViewService.GetTotalViews(ids);
     }
 }

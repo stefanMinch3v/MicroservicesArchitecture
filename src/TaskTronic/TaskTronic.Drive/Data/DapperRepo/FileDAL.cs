@@ -46,7 +46,7 @@
             dbParams.Add("@finishedUpload", false, DbType.Boolean);
             dbParams.Add("@timestamp", DateTimeOffset.UtcNow, DbType.DateTimeOffset);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.ExecuteAsync(sql, dbParams)) > 0;
             }
@@ -73,7 +73,7 @@
             dbParams.Add("@fileSize", file.Filesize, DbType.Int64);
             dbParams.Add("@fileName", file.FileName, DbType.String);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.ExecuteAsync(sql, dbParams)) > 0;
             }
@@ -81,7 +81,7 @@
 
         public async Task<int> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName)
         {
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 conn.Open();
 
@@ -125,7 +125,7 @@
 
         public async Task<int> SaveCompletedUploadAsync(InputFileServiceModel file)
         {
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 conn.Open();
 
@@ -168,7 +168,7 @@
 
         public async Task<int> SaveCompletedUploadAsReplaceExistingFileAsync(InputFileServiceModel file, int fileId)
         {
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 conn.Open();
 
@@ -232,7 +232,7 @@
         {
             var sql = string.Format(FilesSql.GET_FILES_BY_FOLDER_ID, FileTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.QueryAsync<FileServiceModel>(sql, new { folderId })).AsList();
             }
@@ -242,7 +242,7 @@
         {
             var sql = string.Format(FilesSql.GET_FILE_BY_ID, FileTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await conn.QueryFirstOrDefaultAsync<FileServiceModel>(sql, new { catId, folderId, fileId }));
             }
@@ -250,7 +250,7 @@
 
         public async Task<bool> DeleteFileAsync(int catId, int folderId, int fileId, int blobId)
         {
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 conn.Open();
                 var transaction = conn.BeginTransaction();
@@ -298,7 +298,7 @@
         {
             var sql = string.Format(BlobsSql.READ_STREAM_FROM_FILE, BlobsTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             using (var reader = await conn.ExecuteReaderAsync(sql, new { blobId }))
             {
                 while (reader.Read())
@@ -324,7 +324,7 @@
         {
             var sql = string.Format(FilesSql.GET_FILE_DETAILS_FOR_DOWNLOAD, FileTableName);
 
-            using (var conn = this.dbConnectionFactory.GetSqlConnection())
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await conn.QuerySingleOrDefaultAsync<OutputFileDownloadServiceModel>(sql, new { fileId });
             }
@@ -334,7 +334,7 @@
         {
             var sql = string.Format(FilesSql.RENAME_FILE, FileTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteAsync(sql, new { catId, folderId, fileId, newFileName }) > 0;
             }
@@ -344,7 +344,7 @@
         {
             var sql = string.Format(FilesSql.MOVE_FILE, FileTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteAsync(sql, new { catId, folderId, fileId, newFolderId, fileName }) > 0;
             }
@@ -354,7 +354,7 @@
         {
             var sql = string.Format(FilesSql.SEARCH_FILES, FileTableName, value);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await db.QueryAsync<FileServiceModel>(sql, new { catalogId })).AsList();
             }
@@ -364,7 +364,7 @@
         {
             var sql = string.Format(FilesSql.GET_FILEID_BY_FILENAME, FileTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await db.QuerySingleOrDefaultAsync<int?>(sql, new { catalogId, folderId, fileName, fileType }));
             }
@@ -374,7 +374,7 @@
         {
             var sql = string.Format(FilesSql.COUNT_FILES_FOR_EMPLOYEE, FileTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteScalarAsync<int>(sql, new { employeeId });
             }

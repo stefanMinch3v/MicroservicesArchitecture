@@ -17,7 +17,7 @@
         {
             var token = context.Request.Cookies[InfrastructureConstants.AuthenticationCookieName];
 
-            if (token != null)
+            if (!string.IsNullOrEmpty(token))
             {
                 this.currentToken.Set(token);
 

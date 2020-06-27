@@ -53,5 +53,25 @@
 
             return app;
         }
+
+        public static IApplicationBuilder UseGatewayApiService(
+            this IApplicationBuilder app,
+            IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            
+            app
+                .UseHttpsRedirection()
+                .UseRouting()
+                .UseMiddleware<JwtHeaderAuthenticationMiddleware>()
+                .UseAuthentication()
+                .UseAuthorization()
+                .UseEndpoints(builder => builder.MapControllers());
+
+            return app;
+        }
     }
 }

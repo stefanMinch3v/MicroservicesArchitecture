@@ -19,7 +19,7 @@
         {
             var sql = string.Format(PermissionsSql.ADD_SINGLE, PermissionsTablename);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 await db.ExecuteAsync(sql, new
                 {
@@ -34,7 +34,7 @@
         {
             var sql = string.Format(PermissionsSql.GET_USER_FOLDER_PERMISSIONS, PermissionsTablename);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await db.QueryAsync<int>(sql, new { employeeId, catId })).AsList();
             }
@@ -44,7 +44,7 @@
         {
             var sql = string.Format(PermissionsSql.HAS_USER_PERMISSION_FOR_FOLDER, PermissionsTablename);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.QuerySingleAsync<bool>(sql, new { employeeId, catId, folderId });
             }

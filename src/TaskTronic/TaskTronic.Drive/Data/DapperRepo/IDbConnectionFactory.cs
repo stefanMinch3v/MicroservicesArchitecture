@@ -4,6 +4,6 @@
 
     public interface IDbConnectionFactory
     {
-        SqlConnection GetSqlConnection();
+        SqlConnection GetSqlConnection { get; }
     }
 }

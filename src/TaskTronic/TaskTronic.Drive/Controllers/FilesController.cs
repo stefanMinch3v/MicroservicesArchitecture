@@ -2,8 +2,10 @@
 {
     using Common;
     using Exceptions;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Services.Employees;
     using Services.Files;
     using System;
     using System.Collections.Generic;
@@ -11,9 +13,9 @@
     using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
-    using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Services.Identity;
 
+    [Authorize]
     public class FilesController : ApiController
     {
         private const int MAX_ALLOWED_FILE_SIZE = int.MaxValue; // The data column cannot hold more than 2^31-1 bytes (~2GB)
@@ -31,18 +33,20 @@
             this.currentUser = currentUser;
         }
 
-        [Route(nameof(GetFileById)), HttpGet]
+        [HttpGet]
+        [Route(nameof(GetFileById))]
         public async Task<ActionResult<FileServiceModel>> GetFileById(int catId, int folderId, int fileId)
             => await this.fileService.GetFileByIdAsync(catId, folderId, fileId);
 
-        [Route(nameof(DownloadFile)), HttpGet]
+        [HttpGet]
+        [Route(nameof(DownloadFile))]
         public async Task<ActionResult> DownloadFile(int catId, int folderId, int fileId, bool shouldOpen = false)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             var downloadFile = await this.fileService.GetFileInfoForDownloadAsync(
@@ -67,53 +71,57 @@
             return new EmptyResult();
         }
 
-        [Route(nameof(MoveFile)), HttpPost]
+        [HttpPost]
+        [Route(nameof(MoveFile))]
         public async Task<ActionResult<bool>> MoveFile(int fileId, int catId, int folderId, int newFolderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.fileService.MoveFileAsync(catId, folderId, fileId, newFolderId, employeeId);
         }
 
-        [Route(nameof(RenameFile)), HttpPost]
+        [HttpPost]
+        [Route(nameof(RenameFile))]
         public async Task<ActionResult<bool>> RenameFile(int catId, int folderId, int fileId, string name)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.fileService.RenameFileAsync(catId, folderId, fileId, employeeId, name);
         }
 
-        [Route(nameof(DeleteFile)), HttpDelete]
+        [HttpDelete]
+        [Route(nameof(DeleteFile))]
         public async Task<ActionResult<bool>> DeleteFile(int catId, int folderId, int fileId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.fileService.DeleteFileAsync(employeeId, catId, folderId, fileId);
         }
 
-        [Route(nameof(UploadFileToFolder)), HttpPost]
+        [HttpPost]
+        [Route(nameof(UploadFileToFolder))]
         public async Task<ActionResult<bool>> UploadFileToFolder(IFormFile file)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             if (file.Length > MAX_ALLOWED_FILE_SIZE)
@@ -145,27 +153,29 @@
             return await this.fileService.UploadFileAsync(model);
         }
 
-        [Route(nameof(SearchForFiles)), HttpGet]
+        [HttpGet]
+        [Route(nameof(SearchForFiles))]
         public async Task<ActionResult<IReadOnlyCollection<OutputFileServiceModel>>> SearchForFiles(int catalogId, string value)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return (await this.fileService.SearchFilesAsync(catalogId, employeeId, value)).ToArray();
         }
 
-        [Route(nameof(CreateNewFile)), HttpPost]
+        [HttpPost]
+        [Route(nameof(CreateNewFile))]
         public async Task<ActionResult<bool>> CreateNewFile(int catalogId, int folderId, NewFileType newFileType)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.fileService.CreateNewFileAsync(catalogId, employeeId, folderId, newFileType);

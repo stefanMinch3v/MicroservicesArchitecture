@@ -161,6 +161,10 @@
             public const string COUNT_FOLDERS_FOR_EMPLOYEE = @"
                 SELECT COUNT(*) FROM {0}
                 WHERE EmployeeId = @employeeId";
+
+            public const string FLAT_FOLDERS_FOR_INITIATOR = @"
+                SELECT FolderId, [Name], IsPrivate, CreateDate FROM {0}
+                WHERE EmployeeId = @employeeId";
         }
 
         public class PermissionsSql

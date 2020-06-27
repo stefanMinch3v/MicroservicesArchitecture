@@ -33,5 +33,7 @@
         Task<bool> DeleteAsync(int catId, int folderId);
 
         Task<int> CountFoldersForEmployeeAsync(int employeeId);
+
+        Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllFlatForEmployeeAsync(int employeeId);
     }
 }

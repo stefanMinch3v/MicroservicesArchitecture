@@ -24,5 +24,7 @@
         Task<FolderServiceModel> GetAccessableFolders(int catId, int employeeId);
 
         Task<int> CountFoldersAsync(int employeeId);
+
+        Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllForEmployeeAsync(int employeeId);
     }
 }

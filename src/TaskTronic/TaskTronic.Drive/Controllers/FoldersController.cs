@@ -1,15 +1,17 @@
 ﻿namespace TaskTronic.Drive.Controllers
 {
-    using Drive.Services.Catalogs;
-    using Drive.Services.Files;
-    using Drive.Services.Folders;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Services.Catalogs;
+    using Services.Employees;
+    using Services.Files;
+    using Services.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
-    using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Services.Identity;
 
+    [Authorize]
     public class FoldersController : ApiController
     {
         private readonly IFolderService folderService;
@@ -32,19 +34,20 @@
             this.employeeService = employeeService;
         }
 
-        [Route(nameof(CreateFolder)), HttpPost]
+        [HttpPost]
+        [Route(nameof(CreateFolder))]
         public async Task<ActionResult<bool>> CreateFolder(
-            int catId, 
-            int rootId, 
-            int parentFolderId, 
-            string name, 
+            int catId,
+            int rootId,
+            int parentFolderId,
+            string name,
             bool isPrivate = false)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.folderService.CreateFolderAsync(
@@ -59,67 +62,72 @@
                 });
         }
 
-        [Route(nameof(RenameFolder)), HttpPost]
+        [HttpPost]
+        [Route(nameof(RenameFolder))]
         public async Task<ActionResult<bool>> RenameFolder(int catId, int folderId, string name)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.folderService.RenameFolderAsync(catId, folderId, employeeId, name);
         }
 
-        [Route(nameof(MoveFolder)), HttpPost]
+        [HttpPost]
+        [Route(nameof(MoveFolder))]
         public async Task<ActionResult<bool>> MoveFolder(int catId, int folderId, int newFolderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.folderService.MoveFolderAsync(catId, folderId, employeeId, newFolderId);
         }
 
-        [Route(nameof(GetRootFolder)), HttpGet]
+        [HttpGet]
+        [Route(nameof(GetRootFolder))]
         public async Task<ActionResult<FolderServiceModel>> GetRootFolder(int companyId, int departmentId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             var catalogId = await this.catalogService.GetIdAsync(companyId, departmentId, employeeId);
             return await this.folderService.GetRootFolderByCatIdAsync(catalogId, employeeId);
         }
 
-        [Route(nameof(GetFolderById)), HttpGet]
+        [HttpGet]
+        [Route(nameof(GetFolderById))]
         public async Task<ActionResult<FolderServiceModel>> GetFolderById(int folderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.folderService.GetFolderByIdAsync(folderId, employeeId);
         }
 
-        [Route(nameof(CheckFilesNamesForFolder)), HttpGet]
+        [HttpGet]
+        [Route(nameof(CheckFilesNamesForFolder))]
         public async Task<ActionResult<Dictionary<string, bool>>> CheckFilesNamesForFolder(int catId, int folderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             var fileNames = HttpContext.Request.Query["fileNames"];
@@ -131,17 +139,32 @@
                 fileNames);
         }
 
-        [Route(nameof(DeleteFolder)), HttpDelete]
+        [HttpDelete]
+        [Route(nameof(DeleteFolder))]
         public async Task<ActionResult<bool>> DeleteFolder(int catId, int folderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
             if (employeeId == 0)
             {
-                return BadRequest();
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
             return await this.folderService.DeleteFolderAsync(catId, employeeId, folderId);
+        }
+
+        [HttpGet]
+        [Route(nameof(GetMine))]
+        public async Task<ActionResult<IReadOnlyCollection<OutputFolderFlatServiceModel>>> GetMine()
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
+            }
+
+            return Ok(await this.folderService.GetAllForEmployeeAsync(employeeId));
         }
     }
 }

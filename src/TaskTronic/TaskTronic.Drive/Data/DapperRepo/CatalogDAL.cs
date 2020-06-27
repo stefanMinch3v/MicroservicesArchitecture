@@ -17,7 +17,7 @@
         {
             var sql = this.GenerateSelectSql();
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.QuerySingleOrDefaultAsync<int?>(sql, new { companyId, departmentId });
             }
@@ -27,7 +27,7 @@
         {
             var sql = string.Format(CatalogSql.ADD, CatalogTableName);
 
-            using (var db = this.dbConnectionFactory.GetSqlConnection())
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteScalarAsync<int>(sql, new { companyId, departmentId });
             }
