@@ -8,6 +8,7 @@ import { Folder } from './folder.model';
 import { FileModel } from './file.model';
 import { FolderIdName } from './folder-id-name.model';
 import { environment } from 'src/environments/environment';
+import { StatisticsService } from 'src/app/core/statistics.service';
 
 @Component({
   selector: 'app-drive',
@@ -57,39 +58,37 @@ export class DriveComponent implements OnInit, AfterViewInit {
   public searchResults: FileModel[] = [];
   //
 
-  public hasDokAccess: boolean = true;
-
   public constructor(
-    private driveService: DriveService,
-    private notificationService: NotificationService,
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute) { 
+    private readonly driveService: DriveService,
+    private readonly statisticsService: StatisticsService,
+    private readonly notificationService: NotificationService,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
   public ngOnInit(): void {
     const params = this.route.snapshot;
-    this.companyId = Number.parseInt(params.paramMap.get('companyId'));
-    this.departmentId = Number.parseInt(params.paramMap.get('departmentId'));
-    this.selectedFolderId = Number.parseInt(params.paramMap.get('selectedFolderId'));
-    
+    this.companyId = Number(params.paramMap.get('companyId'));
+    this.departmentId = Number(params.paramMap.get('departmentId'));
+    this.selectedFolderId = Number(params.paramMap.get('selectedFolderId'));
+
     this.route.data.subscribe(data => {
-      switch(data.kind) {
+      switch (data.kind) {
         case 'root':
           this.getRootFolder();
-        break;
+          break;
         case 'folder':
           this.getFolder(this.selectedFolderId);
-        break;
+          break;
       }});
   }
 
   ngAfterViewInit() {
     if (this.uploader) {
       this.uploader.settings.multipart_params = this.getGroupParameters();
-    } 
-    else {
+    } else {
       this.uploader = this.initPlupload();
     }
   }
@@ -103,6 +102,11 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     this.driveService.getRootFolder(this.companyId, this.departmentId)
       .subscribe(folder => {
+        if (folder) {
+          this.statisticsService.addFolderView(folder.folderId)
+            .subscribe();
+        }
+
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
         this.isLoading = false;
@@ -114,24 +118,26 @@ export class DriveComponent implements OnInit, AfterViewInit {
   private getFolder(folderId: number): void {
     this.isLoading = true;
 
-    if (this.hasDokAccess) {
-      this.driveService.getFolder(folderId)
-        .subscribe(folder => {
-          this.folder = folder;
-          this.addFolderToParentFolderChain(folder.folderId, folder.name);
-          this.isLoading = false;
-        }, error => {
-          this.navigateToRoot();
-        });
-    }
+    this.driveService.getFolder(folderId)
+      .subscribe(folder => {
+        if (folder) {
+          this.statisticsService.addFolderView(folder.folderId)
+            .subscribe();
+        }
+
+        this.folder = folder;
+        this.addFolderToParentFolderChain(folder.folderId, folder.name);
+        this.isLoading = false;
+      }, error => {
+        this.navigateToRoot();
+      });
   }
 
   public reloadFolder(): void {
     if (this.folder) {
       if (this.folder.rootId) {
         this.getFolder(this.folder.folderId);
-      } 
-      else {
+      } else {
         this.getRootFolder();
       }
     }
@@ -147,8 +153,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     if (parentIndex >= 0) {
       this.parentFolderChain = this.parentFolderChain.slice(0, parentIndex);
-    } 
-    else {
+    } else {
       this.parentFolderChain = [...this.parentFolderChain];
     }
   }
@@ -192,8 +197,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
         .subscribe(res => {
           if (res) {
             this.reloadFolder();
-          } 
-          else {
+          } else {
             console.log("Could not remove the data.");
           }
         }, error => console.log(error));
@@ -203,11 +207,9 @@ export class DriveComponent implements OnInit, AfterViewInit {
   public createFolder() {
     if (!this.newFolderName || this.newFolderName.length < 1) {
       this.notificationService.errorMessage("Empty name");
-    } 
-    else if (this.newFolderName.length > 50) {
+    } else if (this.newFolderName.length > 50) {
       this.notificationService.errorMessage("The name is too long");
-    } 
-    else {
+    } else {
       this.creatingFolder = true;
       this.driveService.createFolder(this.folder, this.newFolderName)
         .subscribe(response => {
@@ -222,11 +224,9 @@ export class DriveComponent implements OnInit, AfterViewInit {
   public renameFolder() {
     if (!this.newFolderName || this.newFolderName.length < 1) {
       this.notificationService.errorMessage("Empty name");
-    } 
-    else if (this.newFolderName.length > 50) {
+    } else if (this.newFolderName.length > 50) {
       this.notificationService.errorMessage("The name is too long");
-    } 
-    else {
+    } else {
       this.creatingFolder = true;
       this.driveService.renameFolder(this.selectedFolder, this.newFolderName)
         .subscribe(response => {
@@ -257,8 +257,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
         .subscribe(res => {
           if (res) {
             this.reloadFolder();
-          } 
-          else {
+          } else {
             console.log("Could not remove the data");
           }
       }, error => console.log(error));
@@ -274,11 +273,9 @@ export class DriveComponent implements OnInit, AfterViewInit {
   public renameFile() {
     if (!this.newFileName || this.newFileName.length < 1) {
       this.notificationService.errorMessage("Empty file name");
-    } 
-    else if (this.newFileName.length > 50) {
+    } else if (this.newFileName.length > 50) {
       this.notificationService.errorMessage("The file name is too long");
-    } 
-    else {
+    } else {
       this.creatingFile = true;
       this.driveService.renameFile(this.selectedFile, this.newFileName)
         .subscribe(response => {
@@ -321,7 +318,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
         if (element.size > this.FILE_MAX_SIZE) {
           up.removeFile(element);
 
-          if(up.state == plupload.STARTED && element.status == plupload.UPLOADING)
+          if(up.state === plupload.STARTED && element.status === plupload.UPLOADING)
           {
             up.stop();
             up.start();
@@ -340,13 +337,13 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
           for (const key in response) {
             const value = response[key];
-            if (value === true) {
+            if (value) {
               fileNamesToBeRenamed.push(key);
             }
           }
 
           if (fileNamesToBeRenamed.length > 0) {
-            let confirmation = confirm("Some files already exist in the folder, do you want to replace them?");
+            const confirmation = confirm("Some files already exist in the folder, do you want to replace them?");
             if (confirmation) {
                 uploader.settings.multipart_params.replaceExistingFiles = true;
                 document.getElementById('upload-overlay').style.width = '100%';
@@ -361,8 +358,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
             // end with this
             // document.getElementById('upload-overlay').style.width = '100%';
             // uploader.start();
-          } 
-          else {
+          } else {
             document.getElementById('upload-overlay').style.width = '100%';
             uploader.start();
           }
@@ -403,25 +399,24 @@ export class DriveComponent implements OnInit, AfterViewInit {
   searchForFiles(e){
     e.preventDefault();
 
-    let val = this.searchValue.nativeElement.value;
+    const val = this.searchValue.nativeElement.value;
     if (val.length > 0) {
       this.driveService.searchForFile(this.folder.catalogId, val)
         .subscribe(result => {
-          if(!result.length){
+          if (!result.length) {
             this.hasSearchResult = false;
             this.searchResults = result;
-          }
-          else{
+          } else {
             this.hasSearchResult = true;
             this.searchResults = result;
           }
-        } );
+        });
     }
   }
 
-  updateSearch(){
+  updateSearch() {
     const val = this.searchValue.nativeElement.value;
-    if(val.length === 0){
+    if (val.length === 0) {
       this.hasSearchResult = false;
     }
   }

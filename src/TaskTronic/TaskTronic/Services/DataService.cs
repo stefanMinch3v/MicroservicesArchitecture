@@ -16,10 +16,7 @@
 
         public async Task Save(TEntity entity)
         {
-            //this.Data.Update(entity);
-            this.Data.Attach(entity);
-            this.Data.Entry(entity).State = EntityState.Modified;
-
+            this.Data.Update(entity);
             await this.Data.SaveChangesAsync();
         }
     }

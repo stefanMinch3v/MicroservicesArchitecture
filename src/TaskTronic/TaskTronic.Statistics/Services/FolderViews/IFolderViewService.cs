@@ -9,5 +9,7 @@
         Task<int> GetTotalViews(int folderId);
 
         Task<IReadOnlyCollection<FolderViewOutputModel>> GetTotalViews(IEnumerable<int> ids);
+
+        Task AddViewAsync(int folderId, string userId);
     }
 }

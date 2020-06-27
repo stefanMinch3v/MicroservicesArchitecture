@@ -6,11 +6,12 @@ export const environment = {
   production: false,
   identityUrl: 'https://localhost:5001/api',
   driveUrl: 'https://localhost:5003/api',
+  statisticsUrl: 'https://localhost:5005/api',
   toastr: {
     timeOut: 3000,
     positionClass: 'toast-top-right',
     preventDuplicates: true
-  } 
+  }
 };
 
 /*

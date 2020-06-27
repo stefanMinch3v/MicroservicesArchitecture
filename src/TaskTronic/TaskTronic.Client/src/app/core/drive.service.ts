@@ -26,7 +26,7 @@ export class DriveService {
                 parentFolderId: folder.folderId.toString(),
                 name: folderName
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("Folder created");
+                this.notificationService.successMessage('Folder created');
                 return response;
             }));
     }
@@ -41,7 +41,7 @@ export class DriveService {
                 name: newFolderName
             }
             }).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("Folder renamed");
+                this.notificationService.successMessage('Folder renamed');
                 return response;
             }));
     }
@@ -56,7 +56,7 @@ export class DriveService {
                 fileId: file.fileId.toString(),
                 name: newFileName
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("File renamed");
+                this.notificationService.successMessage('File renamed');
                 return response;
             }));
     }
@@ -67,7 +67,7 @@ export class DriveService {
         return this.http.get(url, {
             params: {
                 companyId: companyId.toString(),
-                departmentId: departmentId.toString() 
+                departmentId: departmentId.toString()
             }}).pipe(map((response: Folder) => response));
     }
 
@@ -90,7 +90,7 @@ export class DriveService {
                 folderId: file.folderId.toString(),
                 newFolderId: newFolderId.toString()
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("File moved");
+                this.notificationService.successMessage('File moved');
                 return response;
             }));
     }
@@ -104,20 +104,20 @@ export class DriveService {
                 folderId: folderId.toString(),
                 newFolderId: newFolderId.toString()
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("Folder moved");
+                this.notificationService.successMessage('Folder moved');
                 return response;
             }));
     }
 
     deleteFolder(catalogId: number, folderId: number): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}DeleteFolder`;
-        
+
         return this.http.delete(url, {
             params: {
                 catalogId: catalogId.toString(),
                 folderId: folderId.toString()
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("Folder deleted");
+                this.notificationService.successMessage('Folder deleted');
                 return response;
             }));
     }
@@ -144,7 +144,7 @@ export class DriveService {
                 folderId: folderId.toString(),
                 fileId: fileId.toString()
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage("File deleted");
+                this.notificationService.successMessage('File deleted');
                 return response;
             }));
     }
@@ -167,12 +167,11 @@ export class DriveService {
         return this.http.get(url, {
             params: {
                 catalogId: catalogId.toString(),
-                value: value
+                searchValue: value
             }}).pipe(map((response: Array<FileModel>) => response));
     }
 
-    checkFilesNamesForFolder(catalogId: number, folderId: number, fileNames: string[]) : Observable<Map<string, boolean>>
-    {
+    checkFilesNamesForFolder(catalogId: number, folderId: number, fileNames: string[]): Observable<Map<string, boolean>> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}CheckFilesNamesForFolder`;
 
         return this.http.get(url, {

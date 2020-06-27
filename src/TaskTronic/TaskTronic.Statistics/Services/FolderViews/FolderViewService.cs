@@ -15,6 +15,17 @@
             : base(dbContext)
         { }
 
+        public async Task AddViewAsync(int folderId, string userId)
+        {
+            if (folderId < 1 || string.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+
+            var folderView = new FolderView { UserId = userId, FolderId = folderId };
+            await base.Save(folderView);
+        }
+
         public async Task<int> GetTotalViews(int folderId)
             => await base.All()
                 .CountAsync(v => v.FolderId == folderId);

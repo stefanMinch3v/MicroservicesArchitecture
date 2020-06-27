@@ -155,7 +155,7 @@
 
         [HttpGet]
         [Route(nameof(SearchForFiles))]
-        public async Task<ActionResult<IReadOnlyCollection<OutputFileServiceModel>>> SearchForFiles(int catalogId, string value)
+        public async Task<ActionResult<IReadOnlyCollection<OutputFileServiceModel>>> SearchForFiles(int catalogId, string searchValue)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -164,7 +164,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return (await this.fileService.SearchFilesAsync(catalogId, employeeId, value)).ToArray();
+            return (await this.fileService.SearchFilesAsync(catalogId, employeeId, searchValue)).ToArray();
         }
 
         [HttpPost]
