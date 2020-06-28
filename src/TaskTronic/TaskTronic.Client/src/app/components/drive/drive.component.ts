@@ -8,7 +8,6 @@ import { Folder } from './folder.model';
 import { FileModel } from './file.model';
 import { FolderIdName } from './folder-id-name.model';
 import { environment } from 'src/environments/environment';
-import { StatisticsService } from 'src/app/core/statistics.service';
 
 @Component({
   selector: 'app-drive',
@@ -21,7 +20,6 @@ export class DriveComponent implements OnInit, AfterViewInit {
   // PLUPLOAD
   @ViewChild('pluploader') element: ElementRef;
   @ViewChild('pluploadcontainer') containerElement: ElementRef;
-  public fileUploadText = 'Upload';
   public dropElement: any;
   public uploader: plupload.Uploader;
   parameters: object;
@@ -60,7 +58,6 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
   public constructor(
     private readonly driveService: DriveService,
-    private readonly statisticsService: StatisticsService,
     private readonly notificationService: NotificationService,
     private readonly authService: AuthService,
     private readonly router: Router,
@@ -102,11 +99,6 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     this.driveService.getRootFolder(this.companyId, this.departmentId)
       .subscribe(folder => {
-        if (folder) {
-          this.statisticsService.addFolderView(folder.folderId)
-            .subscribe();
-        }
-
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
         this.isLoading = false;
@@ -120,15 +112,11 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     this.driveService.getFolder(folderId)
       .subscribe(folder => {
-        if (folder) {
-          this.statisticsService.addFolderView(folder.folderId)
-            .subscribe();
-        }
-
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
         this.isLoading = false;
       }, error => {
+        this.isLoading = false;
         this.navigateToRoot();
       });
   }

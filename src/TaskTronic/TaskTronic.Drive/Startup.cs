@@ -32,7 +32,8 @@ namespace TaskTronic.Drive
                 .AddTransient<IPermissionsDAL, PermissionsDAL>()
                 .AddTransient<IFileDAL, FileDAL>()
                 .AddTransient<ICatalogDAL, CatalogDAL>()
-                .AddTransient<IFolderDAL, FolderDAL>();
+                .AddTransient<IFolderDAL, FolderDAL>()
+                .AddMessaging();
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app

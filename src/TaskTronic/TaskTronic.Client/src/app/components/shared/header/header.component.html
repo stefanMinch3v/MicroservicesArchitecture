@@ -1,22 +1,7 @@
-<div>
-    <nav class="menu">
-        <li class="menu-item" *ngIf="!isUserAuth()">
-            <ol class="sub-menu">
-                <li class="menu-item">
-                    <a routerLink="/identity/login">Sign in</a>
-                </li>
-                <li class="menu-item">
-                    <a routerLink="/identity/register">Sign up</a>
-                </li>
-            </ol>
-        </li>
-        <li class="menu-item" *ngIf="isUserAuth()">
-            <a class="non-link">Hello, {{authService.getUser()}}</a>
-            <ol class="sub-menu">
-                <li class="menu-item">
-                    <a (click)="logout()" routerLink="">Logout</a>
-                </li>
-            </ol>
-        </li>
-    </nav>
+<div class="navbar">
+    <a routerLink="/drive/1/1"><i class="fa fa-fw fa-home"></i> Drive</a>
+    <a routerLink="/identity/login" *ngIf="!isUserAuth()"><i class="fa fa-fw fa-user"></i> Sign in</a>
+    <a routerLink="/identity/register" *ngIf="!isUserAuth()"><i class="fa fa-fw fa-user"></i> Sign up</a>
+    <a href="#" *ngIf="isUserAuth()"><i class="fa fa-fw fa-user"></i> Hello, {{authService.getUser()}}</a>
+    <a (click)="logout()" routerLink="" *ngIf="isUserAuth()"><i class="fa fa-fw fa-user"></i> Logout</a>
 </div>

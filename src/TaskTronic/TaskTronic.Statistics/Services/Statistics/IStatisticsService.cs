@@ -6,5 +6,9 @@
     public interface IStatisticsService
     {
         Task<StatisticsOutputModel> FullStatsAsync();
+
+        Task AddFolderAsync();
+
+        Task AddFileAsync();
     }
 }

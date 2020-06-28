@@ -102,7 +102,7 @@
             }
 
             var catalogId = await this.catalogService.GetIdAsync(companyId, departmentId, employeeId);
-            return await this.folderService.GetRootFolderByCatIdAsync(catalogId, employeeId);
+            return await this.folderService.GetRootFolderByCatalogIdAsync(catalogId, employeeId);
         }
 
         [HttpGet]

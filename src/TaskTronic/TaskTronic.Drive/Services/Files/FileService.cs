@@ -4,6 +4,7 @@
     using DocumentFormat.OpenXml.Packaging;
     using DocumentFormat.OpenXml.Spreadsheet;
     using Exceptions;
+    using MassTransit;
     using Services.Folders;
     using System;
     using System.Collections.Generic;
@@ -13,6 +14,7 @@
     using System.Threading.Tasks;
     using TaskTronic.Common;
     using TaskTronic.Drive.Services.Employees;
+    using TaskTronic.Messages.Drive.Files;
 
     public class FileService : IFileService
     {
@@ -20,21 +22,24 @@
         private readonly IPermissionsDAL permissionsDAL;
         private readonly IFolderService folderService;
         private readonly IEmployeeService employeeService;
+        private readonly IBus publisher;
 
         public FileService(
             IFileDAL fileDAL,
             IPermissionsDAL permissionsDAL,
             IFolderService folder,
-            IEmployeeService employeeService)
+            IEmployeeService employeeService,
+            IBus publisher)
         {
             this.fileDAL = fileDAL;
             this.permissionsDAL = permissionsDAL;
             this.folderService = folder;
             this.employeeService = employeeService;
+            this.publisher = publisher;
         }
 
         public async Task<IReadOnlyCollection<FileServiceModel>> GetFilesByFolderIdAsync(
-            int catId, 
+            int catalogId, 
             int folderId, 
             int employeeId)
         {
@@ -42,7 +47,7 @@
 
             if (isPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, folderId, employeeId);
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
                 if (!hasPermission)
                 {
                     throw new PermissionException { Message = "You do not have access to this folder." };
@@ -52,19 +57,19 @@
             return (await this.fileDAL.GetFilesByFolderIdAsync(folderId)).ToList();
         }
 
-        public async Task<bool> DeleteFileAsync(int employeeId, int catId, int folderId, int fileId)
+        public async Task<bool> DeleteFileAsync(int employeeId, int catalogId, int folderId, int fileId)
         {
             var isPrivate = await this.folderService.IsFolderPrivateAsync(folderId);
             if (isPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, folderId, employeeId);
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
                 if (!hasPermission)
                 {
                     throw new PermissionException { Message = "You do not have access to this folder." };
                 }
             }
 
-            var file = await this.fileDAL.GetFileByIdAsync(catId, folderId, fileId);
+            var file = await this.fileDAL.GetFileByIdAsync(catalogId, folderId, fileId);
             if (file is null)
             {
                 throw new FileException { Message = "File not found." };
@@ -73,12 +78,12 @@
             return await this.fileDAL.DeleteFileAsync(file.CatalogId, file.FolderId, file.FileId, file.BlobId);
         }
 
-        public async Task<bool> RenameFileAsync(int catId, int folderId, int fileId, int employeeId, string newFileName)
+        public async Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, int employeeId, string newFileName)
         {
             Guard.AgainstEmptyString<FileException>(newFileName, nameof(newFileName));
             Guard.AgainstInvalidWindowsCharacters<FileException>(newFileName, nameof(newFileName));
 
-            var file = await this.fileDAL.GetFileByIdAsync(catId, folderId, fileId);
+            var file = await this.fileDAL.GetFileByIdAsync(catalogId, folderId, fileId);
             if (file is null)
             {
                 throw new FileException { Message = "File not found." };
@@ -92,14 +97,14 @@
 
             if (folder.IsPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, folderId, employeeId);
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
                 if (!hasPermission)
                 {
                     throw new PermissionException { Message = "You dont have access to this folder." };
                 }
             }
 
-            return await this.fileDAL.RenameFileAsync(catId, folderId, fileId, newFileName);
+            return await this.fileDAL.RenameFileAsync(catalogId, folderId, fileId, newFileName);
         }
 
         public async Task<bool> UploadFileAsync(InputFileServiceModel file)
@@ -136,7 +141,12 @@
             }
 
             var insertedId = 0;
-            var existingFileId = await this.fileDAL.DoesFileWithSameNameExistInFolder(file.CatalogId, file.FolderId, file.FileName, file.FileType);
+            var existingFileId = await this.fileDAL.DoesFileWithSameNameExistInFolder(
+                file.CatalogId, 
+                file.FolderId, 
+                file.FileName, 
+                file.FileType);
+
             if (existingFileId.HasValue && existingFileId.Value > 0)
             {
                 // file with name does exist in folder
@@ -180,10 +190,18 @@
                 }
             }
 
+            // send message to all subscribers
+            await this.publisher.Publish(new FileUploadedMessage
+            {
+                FileId = insertedId,
+                Name = file.FileName,
+                Type = file.ContentType
+            });
+
             return true;
         }
 
-        public async Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(int catId, int employeeId, int folderId, string[] fileNames)
+        public async Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(int catalogId, int employeeId, int folderId, string[] fileNames)
         {
             var result = new Dictionary<string, bool>();
 
@@ -198,7 +216,7 @@
 
                 if (folder.IsPrivate)
                 {
-                    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, folderId, employeeId);
+                    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
 
                     if (!hasPermission)
                     {
@@ -230,7 +248,7 @@
             => this.fileDAL.ReadStreamFromFileAsync(blobId, stream);
 
         public async Task<OutputFileDownloadServiceModel> GetFileInfoForDownloadAsync(
-            int catId, 
+            int catalogId, 
             int employeeId, 
             int folderId, 
             int fileId)
@@ -239,7 +257,7 @@
 
             if (isPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, folderId, employeeId);
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
                 if (!hasPermission)
                 {
                     throw new PermissionException { Message = "The folder is private." };
@@ -249,7 +267,7 @@
             return await this.fileDAL.GetFileInfoForDownloadAsync(fileId);
         }
 
-        public async Task<bool> MoveFileAsync(int catId, int folderId, int fileId, int newFolderId, int employeeId)
+        public async Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, int employeeId)
         {
             var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
 
@@ -260,7 +278,7 @@
 
             if (folder.IsPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, folderId, employeeId);
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
                 if (!hasPermission)
                 {
                     throw new PermissionException { Message = "The folder is private." };
@@ -278,7 +296,7 @@
 
             if (newFolder.IsPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catId, newFolderId, employeeId);
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, newFolderId, employeeId);
 
                 if (!hasPermission)
                 {
@@ -287,21 +305,21 @@
             }
 
             // check if we need to change filename
-            var filesInFolder = await this.GetFilesByFolderIdAsync(catId, newFolderId, employeeId);
+            var filesInFolder = await this.GetFilesByFolderIdAsync(catalogId, newFolderId, employeeId);
 
-            var file = await this.GetFileByIdAsync(catId, folderId, fileId);
+            var file = await this.GetFileByIdAsync(catalogId, folderId, fileId);
 
             if (filesInFolder != null && filesInFolder.Any(f => f.FileName.Equals(file.FileName)))
             {
                 this.RenameFileName(filesInFolder, fileModel: file);
             }
 
-            return await this.fileDAL.MoveFileAsync(catId, folderId, file.FileId, newFolderId, file.FileName);
+            return await this.fileDAL.MoveFileAsync(catalogId, folderId, file.FileId, newFolderId, file.FileName);
         }
 
-        public async Task<FileServiceModel> GetFileByIdAsync(int catId, int folderId, int fileId)
+        public async Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId)
         {
-            var file = await this.fileDAL.GetFileByIdAsync(catId, folderId, fileId);
+            var file = await this.fileDAL.GetFileByIdAsync(catalogId, folderId, fileId);
 
             if (file is null)
             {
@@ -363,9 +381,9 @@
             }
         }
 
-        private async Task<List<int>> FindAccessibleFolderIds(int employeeId, int catId)
+        private async Task<List<int>> FindAccessibleFolderIds(int employeeId, int catalogId)
         {
-            var acessibleFolders = await this.folderService.GetAccessableFolders(catId, employeeId);
+            var acessibleFolders = await this.folderService.GetAccessableFolders(catalogId, employeeId);
 
             var folderIds = new List<int>
             {
@@ -398,10 +416,10 @@
         }
 
 
-        public async Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catId, int employeeId, string value)
+        public async Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catalogId, int employeeId, string value)
         {
-            var matchedFilesTask = this.fileDAL.SearchFilesAsync(catId, value);
-            var folderIdsTask = this.FindAccessibleFolderIds(employeeId, catId);
+            var matchedFilesTask = this.fileDAL.SearchFilesAsync(catalogId, value);
+            var folderIdsTask = this.FindAccessibleFolderIds(employeeId, catalogId);
 
             await Task.WhenAll(matchedFilesTask, folderIdsTask);
 
@@ -414,15 +432,15 @@
                 .ToArray();
         }
 
-        public async Task<bool> CreateNewFileAsync(int catId, int employeeId, int folderId, NewFileType fileType)
+        public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType)
             => fileType switch
             {
-                NewFileType.Word => await this.CreateEmptyWordDocAsync(catId, employeeId, folderId),
-                NewFileType.Excel => await this.CreateEmptyExcelDocAsync(catId, employeeId, folderId),
+                NewFileType.Word => await this.CreateEmptyWordDocAsync(catalogId, employeeId, folderId),
+                NewFileType.Excel => await this.CreateEmptyExcelDocAsync(catalogId, employeeId, folderId),
                 _ => throw new InvalidOperationException($"Unsupported file type: {fileType}"),
             };
 
-        private async Task<bool> CreateEmptyWordDocAsync(int catId, int employeeId, int folderId)
+        private async Task<bool> CreateEmptyWordDocAsync(int catalogId, int employeeId, int folderId)
         {
             using (var ms = new MemoryStream())
             {
@@ -433,7 +451,7 @@
                     FileName = $"Document",
                     FileType = ".docx",
                     Filesize = 0,
-                    CatalogId = catId,
+                    CatalogId = catalogId,
                     EmployeeId = employeeId,
                     FolderId = folderId,
                     ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -443,7 +461,7 @@
             }
         }
 
-        public async Task<bool> CreateEmptyExcelDocAsync(int catId, int employeeId, int folderId)
+        public async Task<bool> CreateEmptyExcelDocAsync(int catalogId, int employeeId, int folderId)
         {
             using (var ms = this.GenerateEmptyExcelFileInStream())
             {
@@ -454,7 +472,7 @@
                     FileName = $"Excel",
                     FileType = ".xlsx",
                     Filesize = ms.Length,
-                    CatalogId = catId,
+                    CatalogId = catalogId,
                     EmployeeId = employeeId,
                     FolderId = folderId,
                     ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

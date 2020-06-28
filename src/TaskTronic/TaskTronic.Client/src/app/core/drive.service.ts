@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NotificationService } from './notification.service';
 import { Folder } from '../components/drive/folder.model';
 import { FileModel } from '../components/drive/file.model';
 import { environment } from 'src/environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class DriveService {
@@ -13,8 +14,9 @@ export class DriveService {
   private readonly DRIVE_FILES = '/files/';
 
   constructor(
-    private http: HttpClient,
-    private notificationService: NotificationService) { }
+    private readonly http: HttpClient,
+    private readonly notificationService: NotificationService,
+    private readonly authService: AuthService) { }
 
     createFolder(folder: Folder, folderName: string): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}CreateFolder`;
@@ -124,15 +126,29 @@ export class DriveService {
 
     downloadFile(catalogId: number, folderId: number, fileId: number, shouldOpen: boolean): string {
         const url = environment.driveUrl + `${this.DRIVE_FILES}DownloadFile`;
+
         const parameters = {
             catalogId: catalogId.toString(),
             folderId: folderId.toString(),
             fileId: fileId.toString(),
-            shouldOpen: String(shouldOpen)
+            shouldOpen: String(shouldOpen),
+            access_token: this.authService.getToken()
         };
 
         const options = new HttpParams({ fromObject: parameters });
         return `${url}?${options.toString()}`;
+    }
+
+    downloadFileWithoutUrlToken(catalogId: number, folderId: number, fileId: number, shouldOpen: boolean): Observable<Blob> {
+        const url = environment.driveUrl + `${this.DRIVE_FILES}DownloadFile`;
+
+        return this.http.get(url, {
+            params: {
+                catalogId: catalogId.toString(),
+                folderId: folderId.toString(),
+                fileId: fileId.toString(),
+                shouldOpen: String(shouldOpen)
+            }}).pipe(map((response: Blob) => response));
     }
 
     deleteFile(catalogId: number, folderId: number, fileId: number): Observable<boolean> {

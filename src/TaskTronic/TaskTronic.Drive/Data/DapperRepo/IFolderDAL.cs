@@ -8,13 +8,13 @@
     {
         Task<int> CreateFolderAsync(InputFolderServiceModel inputModel);
 
-        Task<bool> RenameFolderAsync(int catId, int folderId, string newFolderName);
+        Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName);
 
         Task<FolderServiceModel> GetFolderByIdAsync(int folderId);
 
-        Task<IEnumerable<FolderServiceModel>> GetFoldersByCatIdAsync(int catId);
+        Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catalogId);
 
-        Task<FolderServiceModel> GetRootFolderByCatIdAsync(int catId);
+        Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId);
 
         Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId);
 
@@ -26,11 +26,11 @@
 
         Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, int employeeId);
 
-        Task<bool> MoveFolderToNewParentAsync(int catId, int folderToMoveId, int newFolderParentId, string folderName);
+        Task<bool> MoveFolderToNewParentAsync(int catalogId, int folderToMoveId, int newFolderParentId, string folderName);
 
         Task<bool> CheckForFolderWithSameNameAsync(string name, int parentFolderId);
 
-        Task<bool> DeleteAsync(int catId, int folderId);
+        Task<bool> DeleteAsync(int catalogId, int folderId);
 
         Task<int> CountFoldersForEmployeeAsync(int employeeId);
 

@@ -28,11 +28,6 @@
         public async Task<int> TotalViews(int id)
             => await this.folderViewService.GetTotalViews(id);
 
-        [HttpPost]
-        [Route(nameof(AddView))]
-        public async Task AddView(int folderId)
-            => await this.folderViewService.AddViewAsync(folderId, this.currentUser.UserId);
-
         [HttpGet]
         public async Task<IReadOnlyCollection<FolderViewOutputModel>> TotalViews([FromQuery] IEnumerable<int> ids)
             => await this.folderViewService.GetTotalViews(ids);

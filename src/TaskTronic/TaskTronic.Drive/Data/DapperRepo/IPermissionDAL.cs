@@ -8,8 +8,8 @@
     {
         Task CreateFolderPermissionsAsync(int folderId, InputFolderServiceModel inputModel);
 
-        Task<IEnumerable<int>> GetUserFolderPermissionsAsync(int catId, int employeeId);
+        Task<IEnumerable<int>> GetUserFolderPermissionsAsync(int catalogId, int employeeId);
 
-        Task<bool> HasUserPermissionForFolderAsync(int catId, int folderId, int employeeId);
+        Task<bool> HasUserPermissionForFolderAsync(int catalogId, int folderId, int employeeId);
     }
 }

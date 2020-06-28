@@ -88,7 +88,7 @@
             }
         }
 
-        public async Task<IEnumerable<FolderServiceModel>> GetFoldersByCatIdAsync(int catId)
+        public async Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catId)
         {
             var sql = string.Format(FolderSql.GET_FOLDERS_BY_CATID, FolderTableName);
 
@@ -98,7 +98,7 @@
             }
         }
 
-        public async Task<FolderServiceModel> GetRootFolderByCatIdAsync(int catalogId)
+        public async Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId)
         {
             var sql = string.Format(FolderSql.GET_ROOT_FOLDER_BY_CATID, FolderTableName);
 

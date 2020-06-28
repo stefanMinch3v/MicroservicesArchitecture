@@ -20,5 +20,7 @@
         Task<Employee> FindByIdAsync(int employeeId);
 
         Task<Employee> FindByUserAsync(string userId);
+
+        Task<string> GetUserIdByEmployeeAsync(int employeeId);
     }
 }

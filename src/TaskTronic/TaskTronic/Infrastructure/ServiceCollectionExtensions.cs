@@ -1,6 +1,7 @@
 ﻿namespace TaskTronic.Infrastructure
 {
     using AutoMapper;
+    using MassTransit;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -88,5 +89,29 @@
                 .AddAutoMapper(
                     (_, config) => config.AddProfile(new MappingProfile(assembly)),
                     Array.Empty<Assembly>());
+
+        public static IServiceCollection AddMessaging(
+            this IServiceCollection services,
+            params Type[] consumers)
+        {
+            services
+                .AddMassTransit(mt => // config the services before running
+                {
+                    consumers.ForEach(consumer => mt.AddConsumer(consumer));
+
+                    mt.AddBus(bus => Bus.Factory.CreateUsingRabbitMq(rmq =>
+                    {
+                        rmq.Host("localhost"); // should come from app config
+
+                        consumers.ForEach(consumer => rmq.ReceiveEndpoint(consumer.FullName, endpoint =>
+                        {
+                            endpoint.ConfigureConsumer(bus, consumer);
+                        }));
+                    }));
+                })
+                .AddMassTransitHostedService(); // starts the services
+
+            return services;
+        }
     }
 }

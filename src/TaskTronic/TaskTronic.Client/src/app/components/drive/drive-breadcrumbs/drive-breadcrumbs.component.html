@@ -1,14 +1,14 @@
 <div class="breadcrumbs-container">
     <span *ngFor="let parentFolder of parentFolderChain">
         <span *ngIf="parentFolder === parentFolderChain[0]">
-            <button class="btn btn-default" (click)="rootFolderClicked.emit(parentFolder)">
-                Home
+            <button class="btn btn-sm btn-default" (click)="rootFolderClicked.emit(parentFolder)">
+                Root
             </button>
         </span>
 
-        <span *ngIf="parentFolder !== parentFolderChain[0]">
+        <span *ngIf="parentFolder === parentFolderChain[0]">
             <span class="breadcrumb-separator">&gt;</span>
-            <button class="btn btn-default" (click)="otherFolderClicked.emit(parentFolder)">{{parentFolder.name}}</button>
+            <button class="btn btn-sm btn-default" (click)="otherFolderClicked.emit(parentFolder)">{{parentFolder.name}}</button>
         </span>
     </span>
 </div>

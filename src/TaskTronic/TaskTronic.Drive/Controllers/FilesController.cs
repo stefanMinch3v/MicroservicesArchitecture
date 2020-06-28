@@ -101,7 +101,7 @@
 
         [HttpDelete]
         [Route(nameof(DeleteFile))]
-        public async Task<ActionResult<bool>> DeleteFile(int catId, int folderId, int fileId)
+        public async Task<ActionResult<bool>> DeleteFile(int catalogId, int folderId, int fileId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -110,7 +110,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.fileService.DeleteFileAsync(employeeId, catId, folderId, fileId);
+            return await this.fileService.DeleteFileAsync(employeeId, catalogId, folderId, fileId);
         }
 
         [HttpPost]

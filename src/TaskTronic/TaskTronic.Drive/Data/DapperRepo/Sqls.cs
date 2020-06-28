@@ -311,7 +311,7 @@
             public const string GET_FILE_BY_ID = @"
                 SELECT * FROM {0}
                 WHERE 
-                      CatalogId = @CatalogId                   
+                      CatalogId = @catalogId                   
                       AND FolderId = @folderId
                       AND FileId = @fileId";
 

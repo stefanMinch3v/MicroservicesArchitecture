@@ -9,6 +9,7 @@ namespace TaskTronic.Statistics
     using Services.Statistics;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
+    using TaskTronic.Statistics.Messages;
 
     public class Startup
     {
@@ -22,7 +23,11 @@ namespace TaskTronic.Statistics
                 .AddApiService<StatisticsDbContext>(this.Configuration)
                 .AddTransient<IDbSeeder, StatisticsDbSeeder>()
                 .AddTransient<IStatisticsService, StatisticsService>()
-                .AddTransient<IFolderViewService, FolderViewService>();
+                .AddTransient<IFolderViewService, FolderViewService>()
+                .AddMessaging(
+                    typeof(FileUploadedConsumer),
+                    typeof(FolderCreatedConsumer),
+                    typeof(FolderOpenedConsumer));
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app

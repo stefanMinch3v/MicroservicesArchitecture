@@ -79,6 +79,12 @@
                     .Where(d => d.EmployeeId == employeeId))
                 .FirstOrDefaultAsync();
 
+        public async Task<string> GetUserIdByEmployeeAsync(int employeeId)
+            => await base.All()
+                .Where(e => e.EmployeeId == employeeId)
+                .Select(e => e.UserId)
+                .FirstOrDefaultAsync();
+
         private async Task<T> FindByUserAsync<T>(
             string userId,
             Expression<Func<Employee, T>> selectorExpression)

@@ -16,6 +16,24 @@
             : base(dbContext) 
             => this.mapper = mapper;
 
+        public async Task AddFileAsync()
+        {
+            var statistics = await base.All().SingleOrDefaultAsync();
+
+            statistics.TotalFiles++;
+
+            await base.Save(statistics);
+        }
+
+        public async Task AddFolderAsync()
+        {
+            var statistics = await base.All().SingleOrDefaultAsync();
+
+            statistics.TotalFolders++;
+
+            await base.Save(statistics);
+        }
+
         public async Task<StatisticsOutputModel> FullStatsAsync()
             => await this.mapper
                 .ProjectTo<StatisticsOutputModel>(base.All())

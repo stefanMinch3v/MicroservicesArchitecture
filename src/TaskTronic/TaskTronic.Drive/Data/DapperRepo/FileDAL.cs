@@ -238,17 +238,17 @@
             }
         }
 
-        public async Task<FileServiceModel> GetFileByIdAsync(int catId, int folderId, int fileId)
+        public async Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId)
         {
             var sql = string.Format(FilesSql.GET_FILE_BY_ID, FileTableName);
 
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
-                return (await conn.QueryFirstOrDefaultAsync<FileServiceModel>(sql, new { catId, folderId, fileId }));
+                return (await conn.QueryFirstOrDefaultAsync<FileServiceModel>(sql, new { catalogId, folderId, fileId }));
             }
         }
 
-        public async Task<bool> DeleteFileAsync(int catId, int folderId, int fileId, int blobId)
+        public async Task<bool> DeleteFileAsync(int catalogId, int folderId, int fileId, int blobId)
         {
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
@@ -269,7 +269,7 @@
                     var deletedFile = (await conn.ExecuteAsync(sqlDeleteFileObj, new
                     {
                         fileId,
-                        catId,
+                        catalogId,
                         folderId
                     }, transaction)) == 1;
 
@@ -330,23 +330,23 @@
             }
         }
 
-        public async Task<bool> RenameFileAsync(int catId, int folderId, int fileId, string newFileName)
+        public async Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, string newFileName)
         {
             var sql = string.Format(FilesSql.RENAME_FILE, FileTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.ExecuteAsync(sql, new { catId, folderId, fileId, newFileName }) > 0;
+                return await db.ExecuteAsync(sql, new { catalogId, folderId, fileId, newFileName }) > 0;
             }
         }
 
-        public async Task<bool> MoveFileAsync(int catId, int folderId, int fileId, int newFolderId, string fileName)
+        public async Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, string fileName)
         {
             var sql = string.Format(FilesSql.MOVE_FILE, FileTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.ExecuteAsync(sql, new { catId, folderId, fileId, newFolderId, fileName }) > 0;
+                return await db.ExecuteAsync(sql, new { catalogId, folderId, fileId, newFolderId, fileName }) > 0;
             }
         }
 
