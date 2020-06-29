@@ -37,7 +37,7 @@
         [HttpPost]
         [Route(nameof(CreateFolder))]
         public async Task<ActionResult<bool>> CreateFolder(
-            int catId,
+            int catalogId,
             int rootId,
             int parentFolderId,
             string name,
@@ -53,7 +53,7 @@
             return await this.folderService.CreateFolderAsync(
                 new InputFolderServiceModel
                 {
-                    CatalogId = catId,
+                    CatalogId = catalogId,
                     Name = name,
                     ParentId = parentFolderId,
                     RootId = rootId,

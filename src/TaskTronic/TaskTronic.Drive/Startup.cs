@@ -22,7 +22,7 @@ namespace TaskTronic.Drive
 
         public void ConfigureServices(IServiceCollection services)
             => services
-                .AddApiService<DriveDbContext>(this.Configuration)
+                .AddApiService<DriveDbContext>(this.Configuration, "/api/files/DownloadFile")
                 .AddSingleton<IDbConnectionFactory, DbConnectionFactory>()
                 .AddTransient<IDbSeeder, DriveDbSeeder>()
                 .AddTransient<IFileService, FileService>()

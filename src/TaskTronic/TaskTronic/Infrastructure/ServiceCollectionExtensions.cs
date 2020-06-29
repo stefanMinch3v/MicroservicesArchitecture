@@ -15,15 +15,26 @@
 
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <param name="allowedJwtInUrlAt">The url where jwt will be parsed from. Use it sparingly</param>
+        /// <returns></returns>
         public static IServiceCollection AddApiService<TDbContext>(
             this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            string allowedJwtInUrlAt = null)
             where TDbContext : DbContext
         {
             services
                 .AddDatabase<TDbContext>(configuration)
                 .AddApplicationSettings(configuration)
-                .AddTokenAuthentication(configuration)
+                .AddTokenAuthentication(
+                    configuration,
+                    allowedJwtInUrlAt != null ? JwtConfiguration.BearerEvents(allowedJwtInUrlAt) : null)
                 .AddAutoMapperProfile(Assembly.GetCallingAssembly())
                 .AddControllers();
 
@@ -49,7 +60,8 @@
 
         public static IServiceCollection AddTokenAuthentication(
             this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            JwtBearerEvents events = null)
         {
             var secret = configuration
                 .GetSection(nameof(ApplicationSettings))
@@ -74,6 +86,12 @@
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
+
+                    // attaches the custom jwt event where we take the token from query
+                    if (events != null)
+                    {
+                        bearer.Events = events;
+                    }
                 });
 
             services.AddHttpContextAccessor();

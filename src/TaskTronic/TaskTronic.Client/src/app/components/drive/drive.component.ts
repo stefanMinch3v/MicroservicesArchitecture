@@ -8,6 +8,7 @@ import { Folder } from './folder.model';
 import { FileModel } from './file.model';
 import { FolderIdName } from './folder-id-name.model';
 import { environment } from 'src/environments/environment';
+import { SignalRService } from 'src/app/core/signalR.service';
 
 @Component({
   selector: 'app-drive',
@@ -61,7 +62,8 @@ export class DriveComponent implements OnInit, AfterViewInit {
     private readonly notificationService: NotificationService,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute) {
+    private readonly route: ActivatedRoute,
+    private readonly signalRService: SignalRService) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
@@ -70,6 +72,8 @@ export class DriveComponent implements OnInit, AfterViewInit {
     this.companyId = Number(params.paramMap.get('companyId'));
     this.departmentId = Number(params.paramMap.get('departmentId'));
     this.selectedFolderId = Number(params.paramMap.get('selectedFolderId'));
+
+    this.signalRService.subscribe();
 
     this.route.data.subscribe(data => {
       switch (data.kind) {
