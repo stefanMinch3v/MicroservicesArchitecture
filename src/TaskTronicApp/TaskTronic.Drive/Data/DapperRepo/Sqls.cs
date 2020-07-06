@@ -53,6 +53,12 @@
 
         public class FolderSql
         {
+            public const string GET_ALL_FLAT_FOR_SEARCH = @"
+                SELECT * FROM {0}
+                WHERE CatalogId = @catalogId
+                    AND (RootId = @rootFolderId OR RootId IS NULL)
+                ORDER BY FolderId ASC";
+
             public const string ADD = @"
                 INSERT INTO {0}
                 (
@@ -148,6 +154,10 @@
                     WHERE CatalogId = @CatalogId
                         AND ParentId IS NULL
                         AND RootId IS NULL";
+
+            public const string GET_ROOT_FOLDER_ID = @"
+                SELECT RootId FROM {0}
+                WHERE FolderId = @folderId";
 
             public const string CHECK_IF_FOLDER_IS_PRIVATE = @"
                  SELECT IsPrivate FROM {0}
@@ -351,8 +361,9 @@
 
             public const string SEARCH_FILES = @"
                 SELECT * FROM {0}
-                    WHERE CHARINDEX('{1}', Filename) > 0 
-                        OR CHARINDEX('{1}', FileType) > 0
+                WHERE FolderId IN @accessibleFolders
+                    AND CHARINDEX('{1}', Filename) > 0 
+                    OR CHARINDEX('{1}', FileType) > 0
                     AND CatalogId = @CatalogId";
 
             public const string COUNT_FILES_FOR_EMPLOYEE = @"

@@ -1,8 +1,8 @@
 ﻿namespace TaskTronic.Drive.Data.DapperRepo
 {
+    using Services.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using TaskTronic.Drive.Services.Folders;
 
     public interface IFolderDAL
     {
@@ -15,6 +15,8 @@
         Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catalogId);
 
         Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId);
+
+        Task<int?> GetRootFolderIdAsync(int folderId);
 
         Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId);
 
@@ -35,5 +37,7 @@
         Task<int> CountFoldersForEmployeeAsync(int employeeId);
 
         Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllFlatForEmployeeAsync(int employeeId);
+
+        Task<IList<FolderSearchServiceModel>> GetAllForSearchAsync(int catalogId, int? rootFolderId);
     }
 }

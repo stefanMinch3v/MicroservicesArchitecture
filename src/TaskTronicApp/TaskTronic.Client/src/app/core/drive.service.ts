@@ -177,12 +177,13 @@ export class DriveService {
     }
 
 
-    searchForFile(catalogId: number, value: string): Observable<Array<FileModel>> {
-        const url = environment.driveUrl + `${this.DRIVE_FILES}SearchForFiles`;
+    searchForFile(catalogId: number, currentFolderId: number, value: string): Observable<Array<FileModel>> {
+        const url = environment.driveUrl + `${this.DRIVE_FOLDERS}SearchForFiles`;
 
         return this.http.get(url, {
             params: {
                 catalogId: catalogId.toString(),
+                currentFolderId: currentFolderId.toString(),
                 searchValue: value
             }}).pipe(map((response: Array<FileModel>) => response));
     }

@@ -10,5 +10,6 @@ export interface FileModel {
     createDate: Date;
     updateDate: Date;
     updaterUsername: string;
+    searchFolderNamesPath: string[];
     updaterId?: number;
 }

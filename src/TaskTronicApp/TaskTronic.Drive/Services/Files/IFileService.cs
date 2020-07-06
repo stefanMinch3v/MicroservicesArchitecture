@@ -24,8 +24,6 @@
 
         Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, int employeeId);
 
-        Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catalogId, int employeeId, string value);
-
         Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType);
 
         Task<int> CountFilesAsync(int employeeId);

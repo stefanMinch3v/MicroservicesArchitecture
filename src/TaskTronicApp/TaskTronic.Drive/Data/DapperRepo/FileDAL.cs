@@ -350,13 +350,16 @@
             }
         }
 
-        public async Task<IEnumerable<FileServiceModel>> SearchFilesAsync(int catalogId, string value)
+        public async Task<IEnumerable<FileServiceModel>> SearchFilesAsync(
+            int catalogId, 
+            string value, 
+            IEnumerable<int> accessibleFolders)
         {
             var sql = string.Format(FilesSql.SEARCH_FILES, FileTableName, value);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return (await db.QueryAsync<FileServiceModel>(sql, new { catalogId })).AsList();
+                return (await db.QueryAsync<FileServiceModel>(sql, new { catalogId, accessibleFolders })).AsList();
             }
         }
 

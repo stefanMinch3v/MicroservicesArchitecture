@@ -415,23 +415,6 @@
             return folderIds;
         }
 
-
-        public async Task<IReadOnlyCollection<OutputFileServiceModel>> SearchFilesAsync(int catalogId, int employeeId, string value)
-        {
-            var matchedFilesTask = this.fileDAL.SearchFilesAsync(catalogId, value);
-            var folderIdsTask = this.FindAccessibleFolderIds(employeeId, catalogId);
-
-            await Task.WhenAll(matchedFilesTask, folderIdsTask);
-
-            var matchedFilesResult = await matchedFilesTask;
-            var folderIdsResult = await folderIdsTask;
-
-            matchedFilesResult = matchedFilesResult.Where(x => folderIdsResult.Contains(x.FolderId));
-            return matchedFilesResult
-                .Select(this.MapToOutputModel)
-                .ToArray();
-        }
-
         public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType)
             => fileType switch
             {

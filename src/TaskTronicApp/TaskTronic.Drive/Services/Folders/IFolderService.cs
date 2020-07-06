@@ -1,5 +1,6 @@
 ﻿namespace TaskTronic.Drive.Services.Folders
 {
+    using Services.Files;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -29,5 +30,11 @@
         Task<int> CountFoldersAsync(int employeeId);
 
         Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllForEmployeeAsync(int employeeId);
+
+        Task<IEnumerable<FileServiceModel>> SearchFilesAsync(
+            int catalogId,
+            int employeeId,
+            int currentFolderId,
+            string searchValue);
     }
 }

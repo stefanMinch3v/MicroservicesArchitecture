@@ -27,7 +27,7 @@
 
         Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, string fileName);
 
-        Task<IEnumerable<FileServiceModel>> SearchFilesAsync(int catalogId, string value);
+        Task<IEnumerable<FileServiceModel>> SearchFilesAsync(int catalogId, string value, IEnumerable<int> accessibleFiles);
 
         Task<int> CountFilesForEmployeeAsync(int employeeId);
 

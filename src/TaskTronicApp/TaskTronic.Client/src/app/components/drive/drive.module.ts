@@ -6,13 +6,15 @@ import { DriveService } from 'src/app/core/drive.service';
 import { DriveBreadcrumbs } from './drive-breadcrumbs/drive-breadcrumbs.component';
 import { FileSizeDisplayPipe } from 'src/app/core/file-size-display.pipe';
 import { FaIconPipe } from 'src/app/core/fa-icons.pipe';
+import { AppendFolderPath } from 'src/app/core/append-folder-path.pipe';
 
 @NgModule({
   declarations: [
     DriveComponent,
     DriveBreadcrumbs,
     FileSizeDisplayPipe,
-    FaIconPipe
+    FaIconPipe,
+    AppendFolderPath
   ],
   imports: [CommonModule],
   providers: [DriveService, AuthService]

@@ -1,9 +1,9 @@
 ﻿namespace TaskTronic.Drive.Data.DapperRepo
 {
     using Dapper;
+    using Services.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using TaskTronic.Drive.Services.Folders;
 
     using static Sqls;
 
@@ -166,6 +166,30 @@
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return (await db.QueryAsync<OutputFolderFlatServiceModel>(sql, new { employeeId })).AsList();
+            }
+        }
+
+        public async Task<int?> GetRootFolderIdAsync(int folderId)
+        {
+            var sql = string.Format(FolderSql.GET_ROOT_FOLDER_ID, FolderTableName);
+
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
+            {
+                return await conn.QuerySingleOrDefaultAsync<int?>(sql, new { folderId });
+            }
+        }
+
+        public async Task<IList<FolderSearchServiceModel>> GetAllForSearchAsync(int catalogId, int? rootFolderId)
+        {
+            var sql = string.Format(FolderSql.GET_ALL_FLAT_FOR_SEARCH, FolderTableName);
+
+            using (var conn = this.dbConnectionFactory.GetSqlConnection)
+            {
+                return (await conn.QueryAsync<FolderSearchServiceModel>(sql, new
+                {
+                    catalogId,
+                    rootFolderId
+                })).AsList();
             }
         }
     }

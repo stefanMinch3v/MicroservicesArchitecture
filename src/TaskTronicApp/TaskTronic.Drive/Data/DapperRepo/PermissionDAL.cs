@@ -30,23 +30,23 @@
             }
         }
 
-        public async Task<IEnumerable<int>> GetUserFolderPermissionsAsync(int catId, int employeeId)
+        public async Task<IEnumerable<int>> GetUserFolderPermissionsAsync(int catalogId, int employeeId)
         {
             var sql = string.Format(PermissionsSql.GET_USER_FOLDER_PERMISSIONS, PermissionsTablename);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return (await db.QueryAsync<int>(sql, new { employeeId, catId })).AsList();
+                return (await db.QueryAsync<int>(sql, new { employeeId, catalogId })).AsList();
             }
         }
 
-        public async Task<bool> HasUserPermissionForFolderAsync(int catId, int folderId, int employeeId)
+        public async Task<bool> HasUserPermissionForFolderAsync(int catalogId, int folderId, int employeeId)
         {
             var sql = string.Format(PermissionsSql.HAS_USER_PERMISSION_FOR_FOLDER, PermissionsTablename);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.QuerySingleAsync<bool>(sql, new { employeeId, catId, folderId });
+                return await db.QuerySingleAsync<bool>(sql, new { employeeId, catalogId, folderId });
             }
         }
     }

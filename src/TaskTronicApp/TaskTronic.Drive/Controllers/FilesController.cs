@@ -153,20 +153,6 @@
             return await this.fileService.UploadFileAsync(model);
         }
 
-        [HttpGet]
-        [Route(nameof(SearchForFiles))]
-        public async Task<ActionResult<IReadOnlyCollection<OutputFileServiceModel>>> SearchForFiles(int catalogId, string searchValue)
-        {
-            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
-
-            if (employeeId == 0)
-            {
-                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
-            }
-
-            return (await this.fileService.SearchFilesAsync(catalogId, employeeId, searchValue)).ToArray();
-        }
-
         [HttpPost]
         [Route(nameof(CreateNewFile))]
         public async Task<ActionResult<bool>> CreateNewFile(int catalogId, int folderId, NewFileType newFileType)

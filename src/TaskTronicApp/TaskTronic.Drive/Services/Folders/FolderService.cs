@@ -3,13 +3,14 @@
     using Data.DapperRepo;
     using Exceptions;
     using MassTransit;
+    using Services.Employees;
+    using Services.Files;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using TaskTronic.Common;
-    using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Messages.Drive.Folders;
 
     public class FolderService : IFolderService
@@ -295,6 +296,144 @@
 
         public Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllForEmployeeAsync(int employeeId)
             => this.folderDAL.GetAllFlatForEmployeeAsync(employeeId);
+
+        public async Task<IEnumerable<FileServiceModel>> SearchFilesAsync(
+            int catalogId,
+            int employeeId, 
+            int currentFolderId, 
+            string searchValue)
+        {
+            var rootFolderId = await this.folderDAL.GetRootFolderIdAsync(currentFolderId);
+
+            if (rootFolderId is null)
+            {
+                rootFolderId = currentFolderId;
+            }
+
+            var folders = await this.folderDAL.GetAllForSearchAsync(catalogId, rootFolderId);
+
+            if (!folders.Any())
+            {
+                return Enumerable.Empty<FileServiceModel>();
+            }
+
+            var currentFolder = folders.FirstOrDefault(f => f.FolderId == currentFolderId);
+            if (currentFolder is null)
+            {
+                return Enumerable.Empty<FileServiceModel>();
+            }
+
+            var folderTree = await this.AttachSubFoldersForSearchAsync(catalogId, employeeId, currentFolder, folders);
+
+            var accessibleFolderIdsToLookAt = this.GetFolderIdsFromCurrentFolder(folderTree, new List<int>())
+                .Distinct();
+
+            var foundFiles = await this.fileDAL.SearchFilesAsync(
+                catalogId, 
+                searchValue,
+                accessibleFolderIdsToLookAt);
+
+            this.AddFolerNameToSearchFiles(foundFiles, folders);
+
+            await this.AddUpdatersUsernamesAsync(foundFiles);
+
+            return foundFiles
+                .OrderByDescending(f => f.CreateDate)
+                .ThenBy(f => f.SearchFolderNamesPath.Count);
+        }
+
+        private async Task AddUpdatersUsernamesAsync(IEnumerable<FileServiceModel> foundFiles)
+        {
+            foreach (var file in foundFiles)
+            {
+                file.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
+            }
+        }
+
+        private async Task<FolderSearchServiceModel> AttachSubFoldersForSearchAsync(
+            int catalogId,
+            int userId,
+            FolderSearchServiceModel currentFolder,
+            IList<FolderSearchServiceModel> allFolders)
+        {
+            currentFolder.SubFolders = allFolders
+                .Where(f => f.ParentId == currentFolder.FolderId)
+                .ToList();
+
+            var userPermissions = await this.permissionsDAL.GetUserFolderPermissionsAsync(catalogId, userId);
+
+            await this.AttachSubFoldersRecursivelyForSearchAsync(
+                catalogId, 
+                userId, 
+                currentFolder.SubFolders,
+                allFolders,
+                userPermissions);
+
+            return currentFolder;
+        }
+
+        private async Task AttachSubFoldersRecursivelyForSearchAsync(
+            int catalogId,
+            int userId,
+            IList<FolderSearchServiceModel> folders,
+            IList<FolderSearchServiceModel> allFolders,
+            IEnumerable<int> userPermissions)
+        {
+            foreach (var folder in folders)
+            {
+                if (folder.IsPrivate)
+                {
+                    var hasPermission = userPermissions.Any(p => p == folder.FolderId);
+                    if (!hasPermission)
+                    {
+                        continue;
+                    }
+                }
+
+                folder.SubFolders = allFolders
+                    .Where(f => f.ParentId == folder.FolderId)
+                    .ToList();
+
+                await this.AttachSubFoldersRecursivelyForSearchAsync(catalogId, userId, folder.SubFolders, allFolders, userPermissions).ConfigureAwait(false);
+            }
+        }
+
+        private List<int> GetFolderIdsFromCurrentFolder(FolderSearchServiceModel folder, List<int> savedIds)
+        {
+            if (folder is null)
+            {
+                return savedIds;
+            }
+
+            savedIds.Add(folder.FolderId);
+
+            foreach (var subFolder in folder.SubFolders)
+            {
+                savedIds.Add(subFolder.FolderId);
+                savedIds = this.GetFolderIdsFromCurrentFolder(subFolder, savedIds);
+            }
+
+            return savedIds;
+        }
+
+        private void AddFolerNameToSearchFiles(IEnumerable<FileServiceModel> files, IEnumerable<FolderSearchServiceModel> folders)
+        {
+            foreach (var file in files)
+            {
+                var folderPathList = new List<string>();
+
+                var folder = folders.FirstOrDefault(f => f.FolderId == file.FolderId);
+                while (folder.ParentId != null)
+                {
+                    folderPathList.Add(folder.Name);
+                    folder = folders.FirstOrDefault(f => f.FolderId == folder.ParentId);
+                }
+
+                folderPathList.Add(folder?.Name);
+                folderPathList.Reverse();
+                file.SearchFolderNamesPath = folderPathList;
+            }
+        }
 
         private async Task<bool> DeleteFolderOperationsAsync(int catalogId, int employeeId, FolderServiceModel existingFolder)
         {

@@ -189,7 +189,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
   }
 
   public openDeleteFolder(folder: Folder) {
-    let confirmation = confirm("Confirm delete of " + folder.name);
+    let confirmation = confirm('Confirm delete of ' + folder.name);
 
     if (confirmation) {
       this.driveService.deleteFolder(folder.catalogId, folder.folderId)
@@ -197,7 +197,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
           if (res) {
             this.reloadFolder();
           } else {
-            console.log("Could not remove the data.");
+            console.log('Could not remove the data.');
           }
         }, error => console.log(error));
     }
@@ -205,9 +205,9 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
   public createFolder() {
     if (!this.newFolderName || this.newFolderName.length < 1) {
-      this.notificationService.errorMessage("Empty name");
+      this.notificationService.errorMessage('Empty name');
     } else if (this.newFolderName.length > 50) {
-      this.notificationService.errorMessage("The name is too long");
+      this.notificationService.errorMessage('The name is too long');
     } else {
       this.creatingFolder = true;
       this.driveService.createFolder(this.folder, this.newFolderName)
@@ -222,9 +222,9 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
   public renameFolder() {
     if (!this.newFolderName || this.newFolderName.length < 1) {
-      this.notificationService.errorMessage("Empty name");
+      this.notificationService.errorMessage('Empty name');
     } else if (this.newFolderName.length > 50) {
-      this.notificationService.errorMessage("The name is too long");
+      this.notificationService.errorMessage('The name is too long');
     } else {
       this.creatingFolder = true;
       this.driveService.renameFolder(this.selectedFolder, this.newFolderName)
@@ -249,7 +249,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
   }
 
   public deleteFile(file: FileModel) {
-    let confirmation = confirm("Confirm delete of " + file.fileName);
+    let confirmation = confirm('Confirm delete of ' + file.fileName);
 
     if (confirmation) {
       this.driveService.deleteFile(file.catalogId, file.folderId, file.fileId)
@@ -257,7 +257,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
           if (res) {
             this.reloadFolder();
           } else {
-            console.log("Could not remove the data");
+            console.log('Could not remove the data');
           }
       }, error => console.log(error));
     }
@@ -271,9 +271,9 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
   public renameFile() {
     if (!this.newFileName || this.newFileName.length < 1) {
-      this.notificationService.errorMessage("Empty file name");
+      this.notificationService.errorMessage('Empty file name');
     } else if (this.newFileName.length > 50) {
-      this.notificationService.errorMessage("The file name is too long");
+      this.notificationService.errorMessage('The file name is too long');
     } else {
       this.creatingFile = true;
       this.driveService.renameFile(this.selectedFile, this.newFileName)
@@ -323,7 +323,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
             up.start();
           }
 
-          this.notificationService.errorMessage("File max size is 2GB");
+          this.notificationService.errorMessage('File max size is 2GB');
           return;
         }
 
@@ -342,7 +342,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
           }
 
           if (fileNamesToBeRenamed.length > 0) {
-            const confirmation = confirm("Some files already exist in the folder, do you want to replace them?");
+            const confirmation = confirm('Some files already exist in the folder, do you want to replace them?');
             if (confirmation) {
                 uploader.settings.multipart_params.replaceExistingFiles = true;
                 document.getElementById('upload-overlay').style.width = '100%';
@@ -394,16 +394,13 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     const val = this.searchValue.nativeElement.value;
     if (val.length > 0) {
-      this.driveService.searchForFile(this.folder.catalogId, val)
+      this.driveService.searchForFile(this.folder.catalogId, this.folder.folderId, val)
         .subscribe(result => {
-          if (!result.length) {
-            this.hasSearchResult = false;
-            this.searchResults = result;
-          } else {
-            this.hasSearchResult = true;
-            this.searchResults = result;
-          }
+          this.hasSearchResult = true;
+          this.searchResults = result;
         });
+    } else {
+      this.hasSearchResult = false;
     }
   }
 

@@ -7,6 +7,7 @@
     using Services.Files;
     using Services.Folders;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
     using TaskTronic.Services.Identity;
@@ -165,6 +166,23 @@
             }
 
             return Ok(await this.folderService.GetAllForEmployeeAsync(employeeId));
+        }
+
+        [HttpGet]
+        [Route(nameof(SearchForFiles))]
+        public async Task<ActionResult<IReadOnlyCollection<FileServiceModel>>> SearchForFiles(
+            int catalogId,
+            int currentFolderId,
+            string searchValue)
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
+            }
+
+            return (await this.folderService.SearchFilesAsync(catalogId, employeeId, currentFolderId, searchValue)).ToArray();
         }
     }
 }

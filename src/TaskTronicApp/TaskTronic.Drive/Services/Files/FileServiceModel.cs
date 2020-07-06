@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace TaskTronic.Drive.Services.Files
+﻿namespace TaskTronic.Drive.Services.Files
 {
+    using System;
+    using System.Collections.Generic;
+
     public class FileServiceModel : IFileContract
     {
         public int FileId { get; set; }
@@ -15,5 +16,6 @@ namespace TaskTronic.Drive.Services.Files
         public string UpdaterUsername { get; set; }
         public int EmployeeId { get; set; }
         public DateTimeOffset CreateDate { get; set; }
+        public List<string> SearchFolderNamesPath { get; set; }
     }
 }

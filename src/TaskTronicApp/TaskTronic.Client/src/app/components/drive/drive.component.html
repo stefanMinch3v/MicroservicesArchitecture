@@ -26,14 +26,14 @@
         </form>
       </div>
   
-      <drive-breadcrumbs
+      <drive-breadcrumbs *ngIf="!hasSearchResult"
         [parentFolderChain]="parentFolderChain"
         (rootFolderClicked)="navigateToRoot()"
         (otherFolderClicked)="openFolder($event.id)"
       ></drive-breadcrumbs>
     </div>
 
-    <table *ngIf="hasSearchResult" class="table table-borderless">
+    <table *ngIf="hasSearchResult && searchResults.length > 0" class="table table-borderless">
       <thead>
         <tr>
           <th scope="col"></th>
@@ -45,15 +45,42 @@
           <th scope="col">Updater</th>
         </tr>
       </thead>
-      <tbody *ngFor="let file of searchResults">
+      <tbody *ngFor="let file of searchResults; else loading">
         <tr class="file-row">
           <td></td>
-          <td>{{file.fileName}}</td>
-          <td><button class="btn btn-primary">Dropdown</button></td>
-          <td>{{file.createDate}}</td>
+          <td>
+            <i [ngClass]="getFontAwesomeIconName(file.fileType)"></i>
+            <span title="{{file.fileName}}">{{file.fileName | appendFolderPath:file.searchFolderNamesPath }}</span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
+            |
+            <button class="btn btn-sm btn-danger" (click)="deleteFile(file)">Delete</button>
+          </td>
+          <td>{{file.createDate | date : 'EEEEEE dd-MM-yyyy HH:mm:ss'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
           <td>{{file.updaterUsername}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table *ngIf="hasSearchResult && searchResults.length === 0" class="table table-borderless">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Name</th>
+          <th scope="col"></th>
+          <th scope="col">Date</th>
+          <th scope="col">Type</th>
+          <th scope="col">Size</th>
+          <th scope="col">Updater</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="file-row">
+          <td></td>
+          <td>0 results found.</td>
         </tr>
       </tbody>
     </table>
