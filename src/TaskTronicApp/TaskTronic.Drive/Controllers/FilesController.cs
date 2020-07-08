@@ -40,7 +40,7 @@
 
         [HttpGet]
         [Route(nameof(DownloadFile))]
-        public async Task<ActionResult> DownloadFile(int catId, int folderId, int fileId, bool shouldOpen = true)
+        public async Task<ActionResult> DownloadFile(int catId, int folderId, int fileId, bool shouldOpen)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 

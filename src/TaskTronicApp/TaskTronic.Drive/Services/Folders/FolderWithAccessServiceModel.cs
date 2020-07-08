@@ -1,5 +1,7 @@
 ﻿namespace TaskTronic.Drive.Services.Folders
 {
+    using System;
+
     public class FolderWithAccessServiceModel
     {
         public int FolderId { get; set; }
@@ -13,5 +15,6 @@
         public bool HasAccess { get; set; }
         public int FileCount { get; set; }
         public int FolderCount { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
     }
 }

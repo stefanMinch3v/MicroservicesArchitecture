@@ -1,5 +1,5 @@
 import { Router, ActivatedRoute } from '@angular/router';
-import { Component, Input, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { DriveService } from 'src/app/core/drive.service';
 import { NotificationService } from 'src/app/core/notification.service';
 import { AuthService } from 'src/app/core/auth.service';
@@ -31,15 +31,10 @@ export class DriveComponent implements OnInit, AfterViewInit {
   public companyId: number = 1;
   public departmentId: number = 1;
   public selectedFolderId: number;
-
   public folder: Folder;
-  public createFolderFlyoutOpen: boolean;
-  public moveFileFlyoutOpen: boolean;
-  public moveFolderFlyoutOpen: boolean;
   public newFolderName: string;
   public creatingFolder: boolean;
   public creatingFile: boolean;
-  public renameFolderFlyoutOpen: boolean;
   public selectedFolder: Folder;
   public folderToMove: Folder;
   public selectedFile: FileModel;
@@ -47,9 +42,6 @@ export class DriveComponent implements OnInit, AfterViewInit {
   public moveFileFolders: Map<string, number>[] = [];
   public moveFileToFolder: number;
   public fileToMove: FileModel;
-  public renameFileFlyoutOpen: boolean;
-  public folderDetailsFlyoutOpen: boolean;
-  public fileDetailsFlyoutOpen: boolean;
   public parentFolderChain: FolderIdName[] = [];
   public isLoading = true;
 
@@ -163,78 +155,39 @@ export class DriveComponent implements OnInit, AfterViewInit {
     this.router.navigate(['drive', this.companyId, this.departmentId, this.selectedFolderId]);
   }
 
-  public openCreateFolder() {
-    this.newFolderName = '';
-    this.createFolderFlyoutOpen = true;
-  }
-
   public stopPropagation(event: MouseEvent) {
     event.stopPropagation();
   }
 
-  public openRenameFolder(folder: Folder) {
-    this.selectedFolder = folder;
-    this.newFolderName = folder.name;
-    this.renameFolderFlyoutOpen = true;
-  }
-
-  public seeFolderDetails(folder: Folder) {
-    this.folderDetailsFlyoutOpen = true;
-    this.selectedFolder = folder;
-  }
-
-  public openMoveFolder(folder: Folder) {
-    this.folderToMove = folder;
-    this.moveFolderFlyoutOpen = true;
-  }
-
-  public openDeleteFolder(folder: Folder) {
-    let confirmation = confirm('Confirm delete of ' + folder.name);
+  public deleteFolder(folder: Folder) {
+    const confirmation = confirm('Confirm delete of ' + folder.name);
 
     if (confirmation) {
       this.driveService.deleteFolder(folder.catalogId, folder.folderId)
         .subscribe(res => {
           if (res) {
             this.reloadFolder();
-          } else {
-            console.log('Could not remove the data.');
           }
         }, error => console.log(error));
     }
   }
 
   public createFolder() {
-    if (!this.newFolderName || this.newFolderName.length < 1) {
-      this.notificationService.errorMessage('Empty name');
-    } else if (this.newFolderName.length > 50) {
-      this.notificationService.errorMessage('The name is too long');
-    } else {
-      this.creatingFolder = true;
-      this.driveService.createFolder(this.folder, this.newFolderName)
-        .subscribe(response => {
-          this.reloadFolder();
-          this.newFolderName = '';
-          this.createFolderFlyoutOpen = false;
-          this.creatingFolder = false;
-        }, error => this.creatingFolder = false);
-    }
-  }
+    this.creatingFolder = true;
+    this.newFolderName = 'Default folder';
 
-  public renameFolder() {
-    if (!this.newFolderName || this.newFolderName.length < 1) {
-      this.notificationService.errorMessage('Empty name');
-    } else if (this.newFolderName.length > 50) {
-      this.notificationService.errorMessage('The name is too long');
-    } else {
-      this.creatingFolder = true;
-      this.driveService.renameFolder(this.selectedFolder, this.newFolderName)
-        .subscribe(response => {
-          this.newFolderName = '';
-          this.renameFolderFlyoutOpen = false;
-          this.creatingFolder = false;
-          this.reloadFolder();
-        }, error => this.creatingFolder = false);
-    }
+    this.driveService.createFolder(this.folder, this.newFolderName)
+      .subscribe(_ => {
+        this.reloadFolder();
+        this.newFolderName = '';
+        this.creatingFolder = false;
+      }, error => this.creatingFolder = false);
+    // if (!this.newFolderName || this.newFolderName.length < 1) {
+    //   this.notificationService.errorMessage('Empty name');
+    // } else if (this.newFolderName.length > 50) {
+    //   this.notificationService.errorMessage('The name is too long');
+    // } else {
+    // }
   }
 
   // FILE ACTIONS
@@ -243,13 +196,8 @@ export class DriveComponent implements OnInit, AfterViewInit {
     window.open(downloadUrl);
   }
 
-  public openMoveFile(file: FileModel) {
-    this.fileToMove = file;
-    this.moveFileFlyoutOpen = true;
-  }
-
   public deleteFile(file: FileModel) {
-    let confirmation = confirm('Confirm delete of ' + file.fileName);
+    const confirmation = confirm('Confirm delete of ' + file.fileName);
 
     if (confirmation) {
       this.driveService.deleteFile(file.catalogId, file.folderId, file.fileId)
@@ -261,34 +209,6 @@ export class DriveComponent implements OnInit, AfterViewInit {
           }
       }, error => console.log(error));
     }
-  }
-
-  public openRenameFile(file: FileModel) {
-    this.selectedFile = file;
-    this.newFileName = file.fileName;
-    this.renameFileFlyoutOpen = true;
-  }
-
-  public renameFile() {
-    if (!this.newFileName || this.newFileName.length < 1) {
-      this.notificationService.errorMessage('Empty file name');
-    } else if (this.newFileName.length > 50) {
-      this.notificationService.errorMessage('The file name is too long');
-    } else {
-      this.creatingFile = true;
-      this.driveService.renameFile(this.selectedFile, this.newFileName)
-        .subscribe(response => {
-          this.newFileName = '';
-          this.renameFileFlyoutOpen = false;
-          this.creatingFile = false;
-          this.reloadFolder();
-        }, error => this.creatingFile = false);
-    }
-  }
-
-  public fileDetails(file: FileModel) {
-    this.fileDetailsFlyoutOpen = true;
-    this.selectedFile = file;
   }
 
   // PLUPLOAD
@@ -317,8 +237,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
         if (element.size > this.FILE_MAX_SIZE) {
           up.removeFile(element);
 
-          if(up.state === plupload.STARTED && element.status === plupload.UPLOADING)
-          {
+          if (up.state === plupload.STARTED && element.status === plupload.UPLOADING) {
             up.stop();
             up.start();
           }
@@ -389,7 +308,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
     }
   }
 
-  searchForFiles(e){
+  searchForFiles(e) {
     e.preventDefault();
 
     const val = this.searchValue.nativeElement.value;
@@ -408,6 +327,20 @@ export class DriveComponent implements OnInit, AfterViewInit {
     const val = this.searchValue.nativeElement.value;
     if (val.length === 0) {
       this.hasSearchResult = false;
+    }
+  }
+
+  createNewDocumentFile(isWord: boolean) {
+    if (isWord) {
+      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 1)
+        .subscribe(_ => {
+          this.reloadFolder();
+        });
+    } else {
+      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 2)
+        .subscribe(_ => {
+          this.reloadFolder();
+        });
     }
   }
 }

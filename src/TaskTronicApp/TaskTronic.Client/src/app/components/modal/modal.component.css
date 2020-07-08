@@ -1,0 +1,27 @@
+/* Make the modal a three-row grid */
+#modal-content-wrapper {
+    width: 50%;
+    left: 35%;
+    position: absolute;
+    top: 55%;
+    grid-template-rows: repeat(1fr, 3);
+    background-color: silver;
+}
+
+#modal-title {
+    font-size: 22px;
+}
+
+#modal-footer {
+    justify-self: right;
+    align-self: center;
+}
+
+#modal-action-button {
+    margin-right: 30px;
+    background-color:#3b3b3b;
+}
+
+#modal-cancel-button {
+    background-color: #4e4e4e;
+}

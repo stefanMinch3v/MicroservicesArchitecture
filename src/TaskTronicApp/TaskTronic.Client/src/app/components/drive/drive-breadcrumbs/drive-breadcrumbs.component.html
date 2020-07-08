@@ -2,7 +2,7 @@
     <span *ngFor="let parentFolder of parentFolderChain">
         <span *ngIf="parentFolder === parentFolderChain[0]">
             <button class="btn btn-sm btn-default" (click)="rootFolderClicked.emit(parentFolder)">
-                Root
+                <i class="fa fa-home"></i>
             </button>
         </span>
 

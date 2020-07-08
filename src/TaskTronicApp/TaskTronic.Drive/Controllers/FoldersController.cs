@@ -59,13 +59,14 @@
                     ParentId = parentFolderId,
                     RootId = rootId,
                     IsPrivate = isPrivate,
-                    EmployeeId = employeeId
+                    EmployeeId = employeeId,
+                    CreateDate = System.DateTime.UtcNow
                 });
         }
 
         [HttpPost]
         [Route(nameof(RenameFolder))]
-        public async Task<ActionResult<bool>> RenameFolder(int catId, int folderId, string name)
+        public async Task<ActionResult<bool>> RenameFolder(int catalogId, int folderId, string name)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -74,12 +75,12 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.folderService.RenameFolderAsync(catId, folderId, employeeId, name);
+            return await this.folderService.RenameFolderAsync(catalogId, folderId, employeeId, name);
         }
 
         [HttpPost]
         [Route(nameof(MoveFolder))]
-        public async Task<ActionResult<bool>> MoveFolder(int catId, int folderId, int newFolderId)
+        public async Task<ActionResult<bool>> MoveFolder(int catalogId, int folderId, int newFolderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -88,7 +89,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.folderService.MoveFolderAsync(catId, folderId, employeeId, newFolderId);
+            return await this.folderService.MoveFolderAsync(catalogId, folderId, employeeId, newFolderId);
         }
 
         [HttpGet]
@@ -122,7 +123,7 @@
 
         [HttpGet]
         [Route(nameof(CheckFilesNamesForFolder))]
-        public async Task<ActionResult<Dictionary<string, bool>>> CheckFilesNamesForFolder(int catId, int folderId)
+        public async Task<ActionResult<Dictionary<string, bool>>> CheckFilesNamesForFolder(int catalogId, int folderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -134,7 +135,7 @@
             var fileNames = HttpContext.Request.Query["fileNames"];
 
             return await this.fileService.CheckFilesInFolderForCollisions(
-                catId,
+                catalogId,
                 employeeId,
                 folderId,
                 fileNames);
@@ -142,7 +143,7 @@
 
         [HttpDelete]
         [Route(nameof(DeleteFolder))]
-        public async Task<ActionResult<bool>> DeleteFolder(int catId, int folderId)
+        public async Task<ActionResult<bool>> DeleteFolder(int catalogId, int folderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -151,7 +152,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.folderService.DeleteFolderAsync(catId, employeeId, folderId);
+            return await this.folderService.DeleteFolderAsync(catalogId, employeeId, folderId);
         }
 
         [HttpGet]

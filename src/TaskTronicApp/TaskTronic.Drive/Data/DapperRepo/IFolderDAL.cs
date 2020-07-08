@@ -30,7 +30,7 @@
 
         Task<bool> MoveFolderToNewParentAsync(int catalogId, int folderToMoveId, int newFolderParentId, string folderName);
 
-        Task<bool> CheckForFolderWithSameNameAsync(string name, int parentFolderId);
+        Task<int> GetFolderNumbersWithExistingNameAsync(string name, int parentFolderId);
 
         Task<bool> DeleteAsync(int catalogId, int folderId);
 

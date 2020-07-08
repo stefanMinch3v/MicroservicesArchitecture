@@ -11,5 +11,5 @@ export interface FileModel {
     updateDate: Date;
     updaterUsername: string;
     searchFolderNamesPath: string[];
-    updaterId?: number;
+    employeeId: number;
 }

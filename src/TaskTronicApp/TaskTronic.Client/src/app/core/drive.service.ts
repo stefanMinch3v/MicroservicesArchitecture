@@ -119,7 +119,12 @@ export class DriveService {
                 catalogId: catalogId.toString(),
                 folderId: folderId.toString()
             }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage('Folder deleted');
+                if (!response) {
+                    this.notificationService.errorMessage('Could not remove the data.');
+                } else {
+                    this.notificationService.successMessage('Folder deleted');
+                }
+
                 return response;
             }));
     }
@@ -139,17 +144,17 @@ export class DriveService {
         return `${url}?${options.toString()}`;
     }
 
-    downloadFileWithoutUrlToken(catalogId: number, folderId: number, fileId: number, shouldOpen: boolean): Observable<Blob> {
-        const url = environment.driveUrl + `${this.DRIVE_FILES}DownloadFile`;
+    // downloadFileWithoutUrlToken(catalogId: number, folderId: number, fileId: number, shouldOpen: boolean): Observable<Blob> {
+    //     const url = environment.driveUrl + `${this.DRIVE_FILES}DownloadFile`;
 
-        return this.http.get(url, {
-            params: {
-                catalogId: catalogId.toString(),
-                folderId: folderId.toString(),
-                fileId: fileId.toString(),
-                shouldOpen: String(shouldOpen)
-            }}).pipe(map((response: Blob) => response));
-    }
+    //     return this.http.get(url, {
+    //         params: {
+    //             catalogId: catalogId.toString(),
+    //             folderId: folderId.toString(),
+    //             fileId: fileId.toString(),
+    //             shouldOpen: String(shouldOpen)
+    //         }}).pipe(map((response: Blob) => response));
+    // }
 
     deleteFile(catalogId: number, folderId: number, fileId: number): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FILES}DeleteFile`;
@@ -197,5 +202,20 @@ export class DriveService {
                 folderId: folderId.toString(),
                 fileNames
             }}).pipe(map((response: Map<string, boolean>) => response));
+    }
+
+    createNewFile(catalogId: number, folderId: number, newFileType: number): Observable<boolean> {
+        const url = environment.driveUrl + `${this.DRIVE_FILES}CreateNewFile`;
+
+        return this.http.post(url, {}, {
+            params: {
+                catalogId: catalogId.toString(),
+                folderId: folderId.toString(),
+                newFileType: newFileType.toString()
+            }}).pipe(map((response: boolean) => {
+                const message = newFileType === 1 ? 'Word file added' : 'Excel file added';
+                this.notificationService.successMessage(message);
+                return response;
+            }));
     }
 }

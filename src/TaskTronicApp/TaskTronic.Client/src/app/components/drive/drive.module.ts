@@ -7,6 +7,8 @@ import { DriveBreadcrumbs } from './drive-breadcrumbs/drive-breadcrumbs.componen
 import { FileSizeDisplayPipe } from 'src/app/core/file-size-display.pipe';
 import { FaIconPipe } from 'src/app/core/fa-icons.pipe';
 import { AppendFolderPath } from 'src/app/core/append-folder-path.pipe';
+import { FaIconColorPipe } from 'src/app/core/fa-icons-color.pipe';
+import { ModalComponent } from '../modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +16,9 @@ import { AppendFolderPath } from 'src/app/core/append-folder-path.pipe';
     DriveBreadcrumbs,
     FileSizeDisplayPipe,
     FaIconPipe,
-    AppendFolderPath
+    AppendFolderPath,
+    FaIconColorPipe,
+    ModalComponent
   ],
   imports: [CommonModule],
   providers: [DriveService, AuthService]

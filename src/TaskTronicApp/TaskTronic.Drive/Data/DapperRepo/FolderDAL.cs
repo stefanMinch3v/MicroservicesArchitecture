@@ -28,23 +28,23 @@
             }
 
         }
-        public async Task<bool> RenameFolderAsync(int catId, int folderId, string newFolderName)
+        public async Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName)
         {
             var sql = string.Format(FolderSql.RENAME_FOLDER, FolderTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.ExecuteAsync(sql, new { catId, folderId, newFolderName }) > 0;
+                return await db.ExecuteAsync(sql, new { catalogId, folderId, newFolderName }) > 0;
             }
         }
 
-        public async Task<bool> MoveFolderToNewParentAsync(int catId, int folderToMoveId, int newFolderParentId, string folderName)
+        public async Task<bool> MoveFolderToNewParentAsync(int catalogId, int folderToMoveId, int newFolderParentId, string folderName)
         {
             var sql = string.Format(FolderSql.MOVE_FOLDER_TO_NEW_PARENT, FolderTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await (db.ExecuteAsync(sql, new { catId, folderToMoveId, newFolderParentId, folderName })) > 0;
+                return await (db.ExecuteAsync(sql, new { catalogId, folderToMoveId, newFolderParentId, folderName })) > 0;
             }
         }
 
@@ -68,13 +68,13 @@
             }
         }
 
-        public async Task<bool> CheckForFolderWithSameNameAsync(string name, int parentFolderId)
+        public async Task<int> GetFolderNumbersWithExistingNameAsync(string name, int parentFolderId)
         {
             var sql = string.Format(FolderSql.CHECK_FOR_FOLDER_NAME_EXIST_IN_FOLDER, FolderTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.QuerySingleOrDefaultAsync<int>(sql, new { name, parentFolderId }) > 0;
+                return await db.ExecuteScalarAsync<int>(sql, new { name, parentFolderId });
             }
         }
 
@@ -88,13 +88,13 @@
             }
         }
 
-        public async Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catId)
+        public async Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catalogId)
         {
             var sql = string.Format(FolderSql.GET_FOLDERS_BY_CATID, FolderTableName);
 
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
-                return (await conn.QueryAsync<FolderServiceModel>(sql, new { catId })).AsList();
+                return (await conn.QueryAsync<FolderServiceModel>(sql, new { catalogId })).AsList();
             }
         }
 
@@ -139,13 +139,13 @@
             }
         }
 
-        public async Task<bool> DeleteAsync(int catId, int folderId)
+        public async Task<bool> DeleteAsync(int catalogId, int folderId)
         {
             var sql = string.Format(FolderSql.DELETE_FOLDER, FolderTableName);
 
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
-                return (await conn.ExecuteAsync(sql, new { folderId, catId })) > 0;
+                return (await conn.ExecuteAsync(sql, new { folderId, catalogId })) > 0;
             }
         }
 

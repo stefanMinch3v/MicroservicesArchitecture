@@ -93,9 +93,9 @@
                     WHERE FolderId = @FolderId";
 
             public const string CHECK_FOR_FOLDER_NAME_EXIST_IN_FOLDER = @"
-                SELECT FolderId FROM {0}
+                SELECT COUNT(*) FROM {0}
                     WHERE ParentId = @parentFolderId
-                        AND Name like @name";
+                        AND [Name] LIKE CONCAT('%', @name, '%')";
 
             public const string GET_BY_ID = @"
                 SELECT * FROM {0}

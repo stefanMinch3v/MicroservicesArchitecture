@@ -13,4 +13,6 @@ export interface Folder {
     rootFolder: Folder;
     fileCount: number;
     folderCount: number;
+    createDate: Date;
+    updaterUsername: string;
 }

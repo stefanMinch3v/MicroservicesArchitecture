@@ -36,7 +36,7 @@
     float: left;
   }
 
-  img {
+  .task-logo {
     width: 70px;
     margin-left: 4em;
   }

@@ -7,9 +7,15 @@
 .top-bar {
     background-color: #EFEFEF;
 }
-  
-.folder-row {
+
+.file-name,
+.folder-name {
     cursor: pointer;
+}
+
+.file-name:hover,
+.folder-name:hover {
+    text-decoration: underline;
 }
   
 .folder-row, .file-row {
@@ -73,4 +79,8 @@
 .seachFilesContainer button{
     width: 20%;
     float: right;
+}
+
+.over-cursor {
+    cursor: pointer;
 }

@@ -40,6 +40,15 @@
             this.ValidateInput(inputModel);
             await this.ValidateParentAndRootAsync(inputModel);
 
+            var numberOfExistingNames = await folderDAL.GetFolderNumbersWithExistingNameAsync(
+                inputModel.Name, 
+                inputModel.ParentId.Value);
+
+            if (numberOfExistingNames > 0)
+            {
+                inputModel.Name = inputModel.Name + $" ({++numberOfExistingNames})";
+            }
+
             var folderId = await folderDAL.CreateFolderAsync(inputModel);
 
             if (folderId > 0 && inputModel.IsPrivate)
@@ -193,6 +202,8 @@
                 file.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
             }
 
+            folder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
+
             await this.publisher.Publish(new FolderOpenedMessage
             {
                 FolderId = folder.FolderId,
@@ -252,6 +263,8 @@
             {
                 file.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
             }
+
+            folder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
 
             await this.publisher.Publish(new FolderOpenedMessage
             {
@@ -571,6 +584,11 @@
             {
                 throw new FolderException { Message = "The folder is private." };
             }
+
+            if (model.CreateDate == default)
+            {
+                throw new FolderException { Message = "DateTime is required." };
+            }
         }
 
         private async Task ValidateParentAndRootAsync(InputFolderServiceModel model)
@@ -599,12 +617,6 @@
                 {
                     throw new FolderException { Message = "Different catalogs." };
                 }
-
-                var folderWithSameNameExist = await folderDAL.CheckForFolderWithSameNameAsync(model.Name, model.ParentId.Value);
-                if (folderWithSameNameExist)
-                {
-                    throw new FolderException { Message = "Parentfolder already contains a folder with that name." };
-                }
             }
         }
 
@@ -621,7 +633,8 @@
                 ParentName = folder.ParentName,
                 RootId = folder.RootId,
                 FileCount = folder.FileCount,
-                FolderCount = folder.FolderCount
+                FolderCount = folder.FolderCount,
+                CreateDate = folder.CreateDate
             };
         }
 
@@ -651,7 +664,8 @@
                 var folder = foldersToFindSubfoldersFor.First();
                 folder.SubFolders = folderTree
                     .Where(f => f.HasAccess && f.ParentId == folder.FolderId)
-                    .Select(MapToFolderModel).ToList();
+                    .Select(MapToFolderModel)
+                    .ToList();
 
                 foldersToFindSubfoldersFor.Remove(folder);
                 foldersToFindSubfoldersFor.AddRange(folder.SubFolders);
@@ -659,13 +673,13 @@
 
             this.CalculateTotalFileCountAndFolderCountForTree(rootTree);
 
-            var folderToReturn = FindFolderWithId(rootTree, folderId);
+            var folderToReturn = this.FindFolderWithId(rootTree, folderId);
 
             folderToReturn.Files = await this.fileDAL.GetFilesByFolderIdAsync(folderToReturn.FolderId);
 
             foreach (var subfolder in folderToReturn.SubFolders)
             {
-                subfolder.SubFolders = Array.Empty<FolderServiceModel>();
+                subfolder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(subfolder.EmployeeId);
             }
 
             return folderToReturn;
@@ -685,7 +699,7 @@
             {
                 foreach (var subFolder in folder.SubFolders)
                 {
-                    var foundFolder = FindFolderWithId(subFolder, folderId);
+                    var foundFolder = this.FindFolderWithId(subFolder, folderId);
                     if (foundFolder != null)
                     {
                         return foundFolder;
