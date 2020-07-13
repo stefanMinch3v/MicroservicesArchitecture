@@ -11,7 +11,9 @@
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using TaskTronic.Common;
+    using Services.Messages;
     using TaskTronic.Messages.Drive.Folders;
+    using TaskTronic.Data.Models;
 
     public class FolderService : IFolderService
     {
@@ -19,6 +21,7 @@
         private readonly IPermissionsDAL permissionsDAL;
         private readonly IFileDAL fileDAL;
         private readonly IEmployeeService employeeService;
+        private readonly IMessageService messageService;
         private readonly IBus publisher;
 
         public FolderService(
@@ -26,12 +29,14 @@
             IPermissionsDAL permissionsDAL,
             IFileDAL file,
             IEmployeeService employeeService,
+            IMessageService messageService,
             IBus publisher)
         {
             this.folderDAL = folderDAL;
             this.permissionsDAL = permissionsDAL;
             this.fileDAL = file;
             this.employeeService = employeeService;
+            this.messageService = messageService;
             this.publisher = publisher;
         }
 
@@ -49,7 +54,8 @@
                 inputModel.Name = inputModel.Name + $" ({++numberOfExistingNames})";
             }
 
-            var folderId = await folderDAL.CreateFolderAsync(inputModel);
+            var insertedData = await folderDAL.CreateFolderAsync(inputModel);
+            var folderId = insertedData.FolderId;
 
             if (folderId > 0 && inputModel.IsPrivate)
             {
@@ -57,10 +63,17 @@
             }
 
             // send message to the subscribers
-            await this.publisher.Publish(new FolderCreatedMessage
+            if (folderId > 0)
             {
-                FolderId = folderId
-            });
+                var messageData = new FolderCreatedMessage
+                {
+                    FolderId = folderId
+                };
+
+                await this.publisher.Publish(messageData);
+
+                await this.messageService.MarkMessageAsPublishedAsync(insertedData.MessageId);
+            }
 
             return folderId > 0;
         }
@@ -204,11 +217,20 @@
 
             folder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
 
-            await this.publisher.Publish(new FolderOpenedMessage
+            // save and send message
+            var messageData = new FolderOpenedMessage
             {
                 FolderId = folder.FolderId,
                 UserId = await this.employeeService.GetUserIdByEmployeeAsync(employeeId)
-            });
+            };
+
+            var message = new Message(messageData);
+
+            await this.messageService.SaveAsync(message);
+
+            await this.publisher.Publish(messageData);
+
+            await this.messageService.MarkMessageAsPublishedAsync(message.Id);
 
             return folderToReturn;
         }
@@ -266,11 +288,19 @@
 
             folder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
 
-            await this.publisher.Publish(new FolderOpenedMessage
+            var messageData = new FolderOpenedMessage
             {
                 FolderId = folder.FolderId,
                 UserId = await this.employeeService.GetUserIdByEmployeeAsync(employeeId)
-            });
+            };
+
+            var message = new Message(messageData);
+
+            await this.messageService.SaveAsync(message);
+
+            await this.publisher.Publish(messageData);
+
+            await this.messageService.MarkMessageAsPublishedAsync(message.Id);
 
             return folder;
         }

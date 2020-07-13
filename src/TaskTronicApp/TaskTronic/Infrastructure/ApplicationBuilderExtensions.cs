@@ -1,5 +1,6 @@
 ﻿namespace TaskTronic.Infrastructure
 {
+    using HealthChecks.UI.Client;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,15 @@
                 })
                 .UseAuthentication()
                 .UseAuthorization()
-                .UseEndpoints(builder => builder.MapControllers());
+                .UseEndpoints(builder =>
+                {
+                    builder.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+                    {
+                        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse    
+                    });
+
+                    builder.MapControllers();
+                });
 
             return app;
         }

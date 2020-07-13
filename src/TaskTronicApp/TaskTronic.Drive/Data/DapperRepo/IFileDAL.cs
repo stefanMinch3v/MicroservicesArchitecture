@@ -32,8 +32,8 @@
         Task<int> CountFilesForEmployeeAsync(int employeeId);
 
         // transaction
-        Task<int> SaveCompletedUploadAsync(InputFileServiceModel file);
-        Task<int> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName);
+        Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file);
+        Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName);
         Task<int> SaveCompletedUploadAsReplaceExistingFileAsync(InputFileServiceModel file, int fileId);
     }
 }

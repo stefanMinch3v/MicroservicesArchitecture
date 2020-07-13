@@ -4,7 +4,8 @@
     using Services.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-
+    using TaskTronic.Data.Models;
+    using TaskTronic.Messages.Drive.Folders;
     using static Sqls;
 
     internal class FolderDAL : IFolderDAL
@@ -12,21 +13,57 @@
         private const string FolderTableName = "[dbo].[Folders]";
         private const string PermissionsTableName = "[dbo].[Permissions]";
         private const string FileTableName = "[dbo].[Files]";
+        private const string MessagesTableName = "[dbo].[Messages]";
 
         private readonly IDbConnectionFactory dbConnectionFactory;
 
         public FolderDAL(IDbConnectionFactory dbConnectionFactory)
             => this.dbConnectionFactory = dbConnectionFactory;
 
-        public async Task<int> CreateFolderAsync(InputFolderServiceModel inputModel)
+        public async Task<(int FolderId, int MessageId)> CreateFolderAsync(InputFolderServiceModel inputModel)
         {
-            var sql = string.Format(FolderSql.ADD, FolderTableName);
-
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.ExecuteScalarAsync<int>(sql, inputModel);
-            }
+                db.Open();
 
+                var transaction = db.BeginTransaction();
+
+                int insertedFolderId;
+                int insertedMessageId;
+
+                try
+                {
+                    // insert folder
+                    var sql = string.Format(FolderSql.ADD, FolderTableName);
+                    insertedFolderId = await db.ExecuteScalarAsync<int>(sql, inputModel, transaction);
+
+                    // save message
+                    var sqlMessages = string.Format(FilesSql.ADD_NEW_MESSAGE, MessagesTableName);
+
+                    var messageData = new FolderCreatedMessage
+                    {
+                        FolderId = insertedFolderId
+                    };
+
+                    var message = new Message(messageData);
+
+                    insertedMessageId = await db.ExecuteScalarAsync<int>(sqlMessages, new
+                    {
+                        message.Type,
+                        message.Published,
+                        message.serializedData
+                    }, transaction);
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+
+                return (insertedFolderId, insertedMessageId);
+            }
         }
         public async Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName)
         {

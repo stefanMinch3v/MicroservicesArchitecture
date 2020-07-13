@@ -25,6 +25,8 @@ namespace TaskTronic.Statistics
                 .AddTransient<IStatisticsService, StatisticsService>()
                 .AddTransient<IFolderViewService, FolderViewService>()
                 .AddMessaging(
+                    useHangfireForPublishers: false,
+                    configuration: null,
                     typeof(FileUploadedConsumer),
                     typeof(FolderCreatedConsumer),
                     typeof(FolderOpenedConsumer));

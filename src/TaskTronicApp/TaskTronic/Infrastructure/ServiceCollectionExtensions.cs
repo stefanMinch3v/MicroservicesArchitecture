@@ -1,6 +1,8 @@
 ﻿namespace TaskTronic.Infrastructure
 {
     using AutoMapper;
+    using GreenPipes;
+    using Hangfire;
     using MassTransit;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,7 @@
     using System;
     using System.Reflection;
     using System.Text;
+    using TaskTronic.Messages;
     using TaskTronic.Models;
     using TaskTronic.Services.Identity;
 
@@ -37,6 +40,7 @@
                     allowedJwtInUrlAt != null ? JwtConfiguration.BearerEvents(allowedJwtInUrlAt) : null)
                 .AddAutoMapperProfile(Assembly.GetCallingAssembly())
                 .AddCors()
+                .AddHealth(configuration)
                 .AddControllers();
 
             return services;
@@ -49,7 +53,13 @@
             => services
                 .AddScoped<DbContext, TDbContext>()
                 .AddDbContext<TDbContext>(options => options
-                    .UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]));
+                    .UseSqlServer(
+                        configuration["ConnectionStrings:DefaultConnection"],
+                        sqlServerOptions => sqlServerOptions
+                            .EnableRetryOnFailure(
+                                maxRetryCount: 10,
+                                maxRetryDelay: TimeSpan.FromSeconds(30),
+                                errorNumbersToAdd: null)));
 
         public static IServiceCollection AddApplicationSettings(
             this IServiceCollection services,
@@ -111,6 +121,8 @@
 
         public static IServiceCollection AddMessaging(
             this IServiceCollection services,
+            bool useHangfireForPublishers = false,
+            IConfiguration configuration = null,
             params Type[] consumers)
         {
             services
@@ -118,17 +130,62 @@
                 {
                     consumers.ForEach(consumer => mt.AddConsumer(consumer));
 
-                    mt.AddBus(bus => Bus.Factory.CreateUsingRabbitMq(rmq =>
+                    mt.AddBus(busContext => Bus.Factory.CreateUsingRabbitMq(rmq =>
                     {
-                        rmq.Host("localhost"); // should come from app config
+                        // should come from app config
+                        rmq.Host("rabbitmq", host =>
+                        {
+                            host.Username("rabbitmq");
+                            host.Password("rabbitmq");
+                        });
+
+                        rmq.UseHealthCheck(busContext);
 
                         consumers.ForEach(consumer => rmq.ReceiveEndpoint(consumer.FullName, endpoint =>
                         {
-                            endpoint.ConfigureConsumer(bus, consumer);
+                            endpoint.PrefetchCount = (ushort)(Environment.ProcessorCount / 2); // number of CPUs to handle concurrently the messages
+                            endpoint.UseMessageRetry(retry => retry.Interval(10, 1000));
+
+                            endpoint.ConfigureConsumer(busContext, consumer);
                         }));
                     }));
                 })
                 .AddMassTransitHostedService(); // starts the services
+
+            // make sense only for publishers cuz subscribers are supposed to recieve only
+            if (useHangfireForPublishers)
+            {
+                if (configuration is null)
+                {
+                    throw new InvalidOperationException("Configuration is required for Hangfire.");
+                }
+
+                services
+                    .AddHangfire(config => config
+                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                        .UseSimpleAssemblyNameTypeSerializer()
+                        .UseRecommendedSerializerSettings()
+                        .UseSqlServerStorage(configuration["ConnectionStrings:DefaultConnection"]));
+
+                services.AddHangfireServer();
+
+                services.AddHostedService<MessagesHostedService>();
+            }
+
+            return services;
+        }
+
+        public static IServiceCollection AddHealth(
+            this IServiceCollection services,
+            IConfiguration configuration)
+
+        {
+            var healthChecks = services.AddHealthChecks();
+
+            healthChecks.AddSqlServer(configuration["ConnectionStrings:DefaultConnection"]);
+
+            // host:username@password format
+            healthChecks.AddRabbitMQ(rabbitConnectionString: "amqp://rabbitmq:rabbitmq@rabbitmq/");
 
             return services;
         }

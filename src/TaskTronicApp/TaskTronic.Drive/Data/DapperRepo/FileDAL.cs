@@ -1,12 +1,15 @@
 ﻿namespace TaskTronic.Drive.Data.DapperRepo
 {
     using Dapper;
+    using MassTransit;
     using System;
     using System.Collections.Generic;
     using System.Data;
     using System.IO;
     using System.Threading.Tasks;
+    using TaskTronic.Data.Models;
     using TaskTronic.Drive.Services.Files;
+    using TaskTronic.Messages.Drive.Files;
 
     using static Sqls;
 
@@ -17,10 +20,11 @@
 
         private const string BlobsTableName = "[dbo].[Blobsdata]";
         private const string FileTableName = "[dbo].[Files]";
+        private const string MessagesTableName = "[dbo].[Messages]";
 
         private readonly IDbConnectionFactory dbConnectionFactory;
 
-        public FileDAL(IDbConnectionFactory dbConnectionFactory)
+        public FileDAL(IDbConnectionFactory dbConnectionFactory) 
             => this.dbConnectionFactory = dbConnectionFactory;
 
         public async Task<bool> CreateBlobAsync(InputFileServiceModel file)
@@ -79,7 +83,8 @@
             }
         }
 
-        public async Task<int> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName)
+        #region TODO: merge in one method
+        public async Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName)
         {
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
@@ -87,13 +92,13 @@
 
                 var transaction = conn.BeginTransaction();
 
-                int insertedId;
+                int insertedFileId;
+                int insertedMessageId;
 
                 try
                 {
+                    // update blobsdata to done
                     var sqlUpdate = string.Format(BlobsSql.UPDATE_BLOB_DATA_WITH_OLD_FILENAME, BlobsTableName);
-
-                    var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
 
                     var employeeId = file.EmployeeId;
                     var fileName = file.FileName;
@@ -105,11 +110,33 @@
                         oldFileName
                     }, transaction);
 
+                    // insert new file
+                    var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
+
                     file.BlobId = updatedBlobId;
                     file.Revision = string.Empty;
                     file.EmployeeId = employeeId;
 
-                    insertedId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
+                    insertedFileId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
+
+                    // save and send message to all subscribers
+                    var sqlMessages = string.Format(FilesSql.ADD_NEW_MESSAGE, MessagesTableName);
+
+                    var messageData = new FileUploadedMessage
+                    {
+                        FileId = insertedFileId,
+                        Name = file.FileName,
+                        Type = file.ContentType
+                    };
+
+                    var message = new Message(messageData);
+
+                    insertedMessageId = await conn.ExecuteScalarAsync<int>(sqlMessages, new
+                    {
+                        message.Type,
+                        message.Published,
+                        message.serializedData
+                    }, transaction);
 
                     transaction.Commit();
                 }
@@ -119,11 +146,11 @@
                     throw;
                 }
 
-                return insertedId;
+                return (insertedFileId, insertedMessageId);
             }
         }
 
-        public async Task<int> SaveCompletedUploadAsync(InputFileServiceModel file)
+        public async Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file)
         {
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
@@ -131,13 +158,13 @@
 
                 var transaction = conn.BeginTransaction();
 
-                int insertedId;
+                int insertedFileId;
+                int insertedMessageId;
 
                 try
                 {
+                    // update blob to done
                     var sqlUpdate = string.Format(BlobsSql.UPDATE_BLOB_DATA, BlobsTableName);
-
-                    var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
 
                     var employeeId = file.EmployeeId;
                     var fileName = file.FileName;
@@ -148,11 +175,33 @@
                         fileName
                     }, transaction);
 
+                    // insert new file
+                    var sqlInsert = string.Format(FilesSql.ADD_NEW, FileTableName, BlobsTableName);
+
                     file.BlobId = updatedBlobId;
                     file.Revision = string.Empty;
                     file.EmployeeId = employeeId;
 
-                    insertedId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
+                    insertedFileId = (await conn.ExecuteScalarAsync<int>(sqlInsert, file, transaction));
+
+                    // save and send message to all subscribers
+                    var sqlMessages = string.Format(FilesSql.ADD_NEW_MESSAGE, MessagesTableName);
+
+                    var messageData = new FileUploadedMessage
+                    {
+                        FileId = insertedFileId,
+                        Name = file.FileName,
+                        Type = file.ContentType
+                    };
+
+                    var message = new Message(messageData);
+
+                    insertedMessageId = await conn.ExecuteScalarAsync<int>(sqlMessages, new
+                    {
+                        message.Type,
+                        message.Published,
+                        message.serializedData
+                    }, transaction);
 
                     transaction.Commit();
                 }
@@ -162,10 +211,12 @@
                     throw;
                 }
 
-                return insertedId;
+                return (insertedFileId, insertedMessageId);
             }
         }
+        #endregion
 
+        // not yet added to the front-end
         public async Task<int> SaveCompletedUploadAsReplaceExistingFileAsync(InputFileServiceModel file, int fileId)
         {
             using (var conn = this.dbConnectionFactory.GetSqlConnection)

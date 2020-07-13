@@ -280,6 +280,20 @@
 
         public class FilesSql
         {
+            public const string ADD_NEW_MESSAGE = @"
+                INSERT INTO {0}
+                (
+                    [Type],
+                    [Published],
+                    [serializedData]
+                )
+                VALUES
+                (
+                    @Type,
+                    @Published,
+                    @serializedData
+                ); SELECT CAST (SCOPE_IDENTITY() AS INT)";
+
             public const string ADD_NEW = @"
                 INSERT INTO {0}
                 (

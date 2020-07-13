@@ -5,7 +5,9 @@
     using DocumentFormat.OpenXml.Spreadsheet;
     using Exceptions;
     using MassTransit;
+    using Services.Employees;
     using Services.Folders;
+    using Services.Messages;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -13,7 +15,6 @@
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using TaskTronic.Common;
-    using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Messages.Drive.Files;
 
     public class FileService : IFileService
@@ -22,6 +23,7 @@
         private readonly IPermissionsDAL permissionsDAL;
         private readonly IFolderService folderService;
         private readonly IEmployeeService employeeService;
+        private readonly IMessageService messageService;
         private readonly IBus publisher;
 
         public FileService(
@@ -29,12 +31,14 @@
             IPermissionsDAL permissionsDAL,
             IFolderService folder,
             IEmployeeService employeeService,
+            IMessageService messageService,
             IBus publisher)
         {
             this.fileDAL = fileDAL;
             this.permissionsDAL = permissionsDAL;
             this.folderService = folder;
             this.employeeService = employeeService;
+            this.messageService = messageService;
             this.publisher = publisher;
         }
 
@@ -140,7 +144,9 @@
                 await this.fileDAL.AppendChunkToBlobAsync(file);
             }
 
-            var insertedId = 0;
+            var insertedFileId = 0;
+            var insertedMessageId = 0;
+
             var existingFileId = await this.fileDAL.DoesFileWithSameNameExistInFolder(
                 file.CatalogId, 
                 file.FolderId, 
@@ -152,8 +158,10 @@
                 // file with name does exist in folder
                 if (file.ReplaceExistingFiles)
                 {
+                    // TODO: Not yet added in the front-end as functionallity
                     // replace the existing file
-                    insertedId = await this.fileDAL.SaveCompletedUploadAsReplaceExistingFileAsync(file, existingFileId.Value);
+                    //insertedId = await this.fileDAL.SaveCompletedUploadAsReplaceExistingFileAsync(file, existingFileId.Value);
+                    throw new NotImplementedException("Add front end functionallity for it!");
                 }
                 else
                 {
@@ -169,11 +177,14 @@
                         file.CreateDate = DateTimeOffset.UtcNow;
                         file.UpdateDate = DateTimeOffset.UtcNow;
 
-                        insertedId = await this.fileDAL.SaveCompletedUploadAsync(file, oldFileName);
+                        // TODO: refactor to EF and move messages out
+                        var insertedData = await this.fileDAL.SaveCompletedUploadAsync(file, oldFileName);
+                        insertedFileId = insertedData.FileId;
+                        insertedMessageId = insertedData.MessageId;
                     }
                 }
 
-                if (insertedId < 1)
+                if (insertedFileId < 1)
                 {
                     return false;
                 }
@@ -183,65 +194,82 @@
                 file.CreateDate = DateTimeOffset.UtcNow;
                 file.UpdateDate = DateTimeOffset.UtcNow;
 
-                insertedId = await this.fileDAL.SaveCompletedUploadAsync(file);
-                if (insertedId < 1)
+                // TODO: refactor to EF and move messages out
+                var insertedData = await this.fileDAL.SaveCompletedUploadAsync(file);
+                insertedFileId = insertedData.FileId;
+                insertedMessageId = insertedData.MessageId;
+
+                if (insertedFileId < 1)
                 {
                     return false;
                 }
             }
 
-            // send message to all subscribers
-            await this.publisher.Publish(new FileUploadedMessage
+            if (insertedFileId > 0)
             {
-                FileId = insertedId,
-                Name = file.FileName,
-                Type = file.ContentType
-            });
+                // TODO: refactor when move to EF
+                var messageData = new FileUploadedMessage
+                {
+                    FileId = insertedFileId,
+                    Name = file.FileName,
+                    Type = file.ContentType
+                };
+
+                await this.publisher.Publish(messageData);
+
+                await this.messageService.MarkMessageAsPublishedAsync(insertedMessageId);
+            }
 
             return true;
         }
 
-        public async Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(int catalogId, int employeeId, int folderId, string[] fileNames)
+        public async Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(
+            int catalogId, 
+            int employeeId,
+            int folderId,
+            string[] fileNames)
         {
-            var result = new Dictionary<string, bool>();
+            //var result = new Dictionary<string, bool>();
 
-            if (fileNames.Any())
-            {
-                var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
+            //if (fileNames.Any())
+            //{
+            //    var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
 
-                if (folder is null)
-                {
-                    throw new FolderException { Message = "Folder not found." };
-                }
+            //    if (folder is null)
+            //    {
+            //        throw new FolderException { Message = "Folder not found." };
+            //    }
 
-                if (folder.IsPrivate)
-                {
-                    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
+            //    if (folder.IsPrivate)
+            //    {
+            //        var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
 
-                    if (!hasPermission)
-                    {
-                        throw new PermissionException { Message = "You dont have access to this folder." };
-                    }
-                }
+            //        if (!hasPermission)
+            //        {
+            //            throw new PermissionException { Message = "You dont have access to this folder." };
+            //        }
+            //    }
 
-                var filesInFolder = await this.fileDAL.GetFilesByFolderIdAsync(folderId);
-                if (filesInFolder.Any())
-                {
-                    foreach (var fileNameToCheck in fileNames)
-                    {
-                        result.Add(fileNameToCheck, filesInFolder.Any(x => fileNameToCheck.Equals(x.FileName + x.FileType)));
-                    }
-                }
-                else
-                {
-                    foreach (var fileNameToCheck in fileNames)
-                    {
-                        result.Add(fileNameToCheck, false);
-                    }
-                }
-            }
+            //    var filesInFolder = await this.fileDAL.GetFilesByFolderIdAsync(folderId);
+            //    if (filesInFolder.Any())
+            //    {
+            //        foreach (var fileNameToCheck in fileNames)
+            //        {
+            //            result.Add(fileNameToCheck, filesInFolder.Any(x => fileNameToCheck.Equals(x.FileName + x.FileType)));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        foreach (var fileNameToCheck in fileNames)
+            //        {
+            //            result.Add(fileNameToCheck, false);
+            //        }
+            //    }
+            //}
 
-            return result;
+            //return result;
+
+            throw new NotImplementedException("Add functionallity to the front-end!");
         }
 
         public Task ReadStreamFromFileAsync(int blobId, Stream stream)
@@ -269,52 +297,53 @@
 
         public async Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, int employeeId)
         {
-            var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
+            //var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
 
-            if (folder is null)
-            {
-                throw new FolderException { Message = "Folder not found." };
-            }
+            //if (folder is null)
+            //{
+            //    throw new FolderException { Message = "Folder not found." };
+            //}
 
-            if (folder.IsPrivate)
-            {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
-                if (!hasPermission)
-                {
-                    throw new PermissionException { Message = "The folder is private." };
-                }
-            }
+            //if (folder.IsPrivate)
+            //{
+            //    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
+            //    if (!hasPermission)
+            //    {
+            //        throw new PermissionException { Message = "The folder is private." };
+            //    }
+            //}
 
-            var oldFolderId = folder.FolderId;
+            //var oldFolderId = folder.FolderId;
 
-            var newFolder = await this.folderService.GetFolderByIdAsync(newFolderId, employeeId);
+            //var newFolder = await this.folderService.GetFolderByIdAsync(newFolderId, employeeId);
 
-            if (newFolder is null)
-            {
-                throw new FolderException { Message = "Folder not found." };
-            }
+            //if (newFolder is null)
+            //{
+            //    throw new FolderException { Message = "Folder not found." };
+            //}
 
-            if (newFolder.IsPrivate)
-            {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, newFolderId, employeeId);
+            //if (newFolder.IsPrivate)
+            //{
+            //    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, newFolderId, employeeId);
 
-                if (!hasPermission)
-                {
-                    throw new PermissionException { Message = "The folder is private." };
-                }
-            }
+            //    if (!hasPermission)
+            //    {
+            //        throw new PermissionException { Message = "The folder is private." };
+            //    }
+            //}
 
-            // check if we need to change filename
-            var filesInFolder = await this.GetFilesByFolderIdAsync(catalogId, newFolderId, employeeId);
+            //// check if we need to change filename
+            //var filesInFolder = await this.GetFilesByFolderIdAsync(catalogId, newFolderId, employeeId);
 
-            var file = await this.GetFileByIdAsync(catalogId, folderId, fileId);
+            //var file = await this.GetFileByIdAsync(catalogId, folderId, fileId);
 
-            if (filesInFolder != null && filesInFolder.Any(f => f.FileName.Equals(file.FileName)))
-            {
-                this.RenameFileName(filesInFolder, fileModel: file);
-            }
+            //if (filesInFolder != null && filesInFolder.Any(f => f.FileName.Equals(file.FileName)))
+            //{
+            //    this.RenameFileName(filesInFolder, fileModel: file);
+            //}
 
-            return await this.fileDAL.MoveFileAsync(catalogId, folderId, file.FileId, newFolderId, file.FileName);
+            //return await this.fileDAL.MoveFileAsync(catalogId, folderId, file.FileId, newFolderId, file.FileName);
+            throw new NotImplementedException("Add the functionallity to the front-end!");
         }
 
         public async Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId)
@@ -333,6 +362,14 @@
 
         public Task<int> CountFilesAsync(int employeeId)
             => this.fileDAL.CountFilesForEmployeeAsync(employeeId);
+
+        public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType)
+            => fileType switch
+            {
+                NewFileType.Word => await this.CreateEmptyWordDocAsync(catalogId, employeeId, folderId),
+                NewFileType.Excel => await this.CreateEmptyExcelDocAsync(catalogId, employeeId, folderId),
+                _ => throw new InvalidOperationException($"Unsupported file type: {fileType}"),
+            };
 
         private void RenameFileName(IEnumerable<FileServiceModel> filesInFolder, InputFileServiceModel inputFileModel = null, FileServiceModel fileModel = null)
         {
@@ -414,14 +451,6 @@
 
             return folderIds;
         }
-
-        public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType)
-            => fileType switch
-            {
-                NewFileType.Word => await this.CreateEmptyWordDocAsync(catalogId, employeeId, folderId),
-                NewFileType.Excel => await this.CreateEmptyExcelDocAsync(catalogId, employeeId, folderId),
-                _ => throw new InvalidOperationException($"Unsupported file type: {fileType}"),
-            };
 
         private async Task<bool> CreateEmptyWordDocAsync(int catalogId, int employeeId, int folderId)
         {

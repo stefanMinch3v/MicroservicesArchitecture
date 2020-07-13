@@ -7,9 +7,10 @@ namespace TaskTronic.Drive
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Services.Catalogs;
+    using Services.Employees;
     using Services.Files;
     using Services.Folders;
-    using TaskTronic.Drive.Services.Employees;
+    using Services.Messages;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
 
@@ -26,6 +27,7 @@ namespace TaskTronic.Drive
                 .AddSingleton<IDbConnectionFactory, DbConnectionFactory>()
                 .AddTransient<IDbSeeder, DriveDbSeeder>()
                 .AddTransient<IFileService, FileService>()
+                .AddTransient<IMessageService, MessageService>()
                 .AddTransient<IEmployeeService, EmployeeService>()
                 .AddTransient<ICatalogService, CatalogService>()
                 .AddTransient<IFolderService, FolderService>()
@@ -33,7 +35,7 @@ namespace TaskTronic.Drive
                 .AddTransient<IFileDAL, FileDAL>()
                 .AddTransient<ICatalogDAL, CatalogDAL>()
                 .AddTransient<IFolderDAL, FolderDAL>()
-                .AddMessaging();
+                .AddMessaging(useHangfireForPublishers: true, configuration: this.Configuration);
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app

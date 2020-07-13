@@ -2,6 +2,7 @@ namespace TaskTronic.Notifications
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -20,7 +21,11 @@ namespace TaskTronic.Notifications
             => services
                 .AddCors()
                 .AddTokenAuthentication(this.Configuration, JwtConfiguration.BearerEvents("/notifications"))
-                .AddMessaging(typeof(FileUploadedConsumer), typeof(FolderCreatedConsumer))
+                .AddMessaging(
+                    useHangfireForPublishers: false,
+                    configuration: null,
+                    typeof(FileUploadedConsumer), 
+                    typeof(FolderCreatedConsumer))
                 .AddSignalR();
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

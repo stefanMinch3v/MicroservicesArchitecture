@@ -6,7 +6,7 @@
 
     public interface IFolderDAL
     {
-        Task<int> CreateFolderAsync(InputFolderServiceModel inputModel);
+        Task<(int FolderId, int MessageId)> CreateFolderAsync(InputFolderServiceModel inputModel);
 
         Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName);
 
