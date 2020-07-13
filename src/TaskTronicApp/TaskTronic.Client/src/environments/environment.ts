@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  identityUrl: 'https://localhost:5001/api',
-  driveUrl: 'https://localhost:5003/api',
-  statisticsUrl: 'https://localhost:5005/api',
+  identityUrl: 'http://localhost:5000/api',
+  driveUrl: 'http://localhost:5002/api',
+  statisticsUrl: 'http://localhost:5004/api',
   toastr: {
     timeOut: 3000,
     positionClass: 'toast-top-right',
