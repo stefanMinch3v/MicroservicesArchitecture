@@ -4,6 +4,8 @@ import { FormGroup, FormBuilder } from 'ngx-strongly-typed-forms';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IdentityService } from 'src/app/core/identity.service';
+import { AuthService } from 'src/app/core/auth.service';
+import { EmployeeService } from 'src/app/core/employee.service';
 
 @Component({
   selector: 'app-register',
@@ -16,7 +18,9 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
      private identityService: IdentityService, 
-     private router: Router) { }
+     private router: Router,
+     private authService: AuthService,
+     private employeeService: EmployeeService) { }
 
   ngOnInit(): void {
     this.registerForm = this.fb.group<RegisterModelForm>({
@@ -30,6 +34,14 @@ export class RegisterComponent implements OnInit {
   register(): void {
     this.identityService.register(this.registerForm.value)
       .subscribe(res => {
+        this.identityService.login({username: this.registerForm.value.username, password: this.registerForm.value.password})
+          .subscribe(_ => {
+            this.authService.authenticateUser(res.token);
+            this.authService.saveUser(this.registerForm.value.username);
+            this.authService.saveRoles(res.roles);
+            this.authService.saveExpirationTime(res.expiration);
+          });
+
         this.router.navigate(['/identity/login']);
     })
   }

@@ -94,7 +94,7 @@
 
         [HttpGet]
         [Route(nameof(GetRootFolder))]
-        public async Task<ActionResult<FolderServiceModel>> GetRootFolder(int companyId, int departmentId)
+        public async Task<ActionResult<FolderServiceModel>> GetRootFolder(int companyDepartmentsId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -103,7 +103,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            var catalogId = await this.catalogService.GetIdAsync(companyId, departmentId, employeeId);
+            var catalogId = await this.catalogService.GetIdAsync(companyDepartmentsId, employeeId);
             return await this.folderService.GetRootFolderByCatalogIdAsync(catalogId, employeeId);
         }
 

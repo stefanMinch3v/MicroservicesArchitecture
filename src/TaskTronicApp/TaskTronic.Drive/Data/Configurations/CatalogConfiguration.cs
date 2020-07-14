@@ -12,12 +12,9 @@
                 .HasKey(c => c.CatalogId);
 
             builder
-                .Property(p => p.CompanyId)
-                .IsRequired();
-
-            builder
-                .Property(p => p.DepartmentId)
-                .IsRequired();
+                .HasOne(c => c.CompanyDepartments)
+                .WithMany()
+                .HasForeignKey(c => c.CompanyDepartmentsId);
         }
     }
 }

@@ -41,14 +41,16 @@
             public const string ADD = @"
                 INSERT INTO {0}
                 (
-                    CompanyId,
-                    DepartmentId
+                    CompanyDepartmentsId
                 )
                 VALUES
                 (
-                    @CompanyId,
-                    @DepartmentId
+                    @CompanyDepartmentsId
                 ); SELECT CAST(SCOPE_IDENTITY() AS INT)";
+
+            public const string GET = @"
+                SELECT TOP(1) FROM {0}
+                WHERE CompanyDepartmentsId = @companyDepartmentsId";
         }
 
         public class FolderSql

@@ -6,5 +6,8 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public string UserId { get; set; }
+
+        public int CompanyDepartmentsId { get; set; }
+        public CompanyDepartments CompanyDepartments { get; set; }
     }
 }

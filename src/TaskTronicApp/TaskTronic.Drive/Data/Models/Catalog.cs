@@ -3,7 +3,7 @@
     public class Catalog
     {
         public int CatalogId { get; set; }
-        public int CompanyId { get; set; }
-        public int DepartmentId { get; set; }
+        public int CompanyDepartmentsId { get; set; }
+        public CompanyDepartments CompanyDepartments { get; set; }
     }
 }

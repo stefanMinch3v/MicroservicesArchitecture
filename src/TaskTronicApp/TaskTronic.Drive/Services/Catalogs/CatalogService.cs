@@ -18,13 +18,13 @@
             this.folderService = folder;
         }
 
-        public async Task<int> GetIdAsync(int companyId, int departmentId, int employeeId)
+        public async Task<int> GetIdAsync(int companyDepartmentsId, int employeeId)
         {
-            var catalogId = await this.catalogDAL.GetAsync(companyId, departmentId);
+            var catalogId = await this.catalogDAL.GetAsync(companyDepartmentsId);
 
             if (catalogId is null)
             {
-                var createdCatId = await this.catalogDAL.AddAsync(companyId, departmentId);
+                var createdCatId = await this.catalogDAL.AddAsync(companyDepartmentsId);
 
                 await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(createdCatId, employeeId));
 

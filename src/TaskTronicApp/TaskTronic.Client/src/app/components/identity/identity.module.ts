@@ -8,6 +8,7 @@ import { NgxStronglyTypedFormsModule } from 'ngx-strongly-typed-forms';
 import { IdentityService } from 'src/app/core/identity.service';
 import { AuthService } from 'src/app/core/auth.service';
 import { HttpClientModule } from '@angular/common/http';
+import { EmployeeService } from 'src/app/core/employee.service';
 
 
 @NgModule({
@@ -23,6 +24,6 @@ import { HttpClientModule } from '@angular/common/http';
     NgxStronglyTypedFormsModule,
     ReactiveFormsModule
   ],
-  providers: [IdentityService, AuthService]
+  providers: [IdentityService, AuthService, EmployeeService]
 })
 export class IdentityModule { }

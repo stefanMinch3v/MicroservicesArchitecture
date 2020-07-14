@@ -13,34 +13,24 @@
         public CatalogDAL(IDbConnectionFactory dbConnectionFactory)
             => this.dbConnectionFactory = dbConnectionFactory;
 
-        public async Task<int?> GetAsync(int companyId, int departmentId)
+        public async Task<int?> GetAsync(int companyDepartmentsId)
         {
-            var sql = this.GenerateSelectSql();
+            var sql = string.Format(CatalogSql.GET, CatalogTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.QuerySingleOrDefaultAsync<int?>(sql, new { companyId, departmentId });
+                return await db.QuerySingleOrDefaultAsync<int?>(sql, new { companyDepartmentsId });
             }
         }
 
-        public async Task<int> AddAsync(int companyId, int departmentId)
+        public async Task<int> AddAsync(int companyDepartmentsId)
         {
             var sql = string.Format(CatalogSql.ADD, CatalogTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.ExecuteScalarAsync<int>(sql, new { companyId, departmentId });
+                return await db.ExecuteScalarAsync<int>(sql, new { companyDepartmentsId });
             }
-        }
-
-        private string GenerateSelectSql()
-        {
-            return $@"
-                SELECT * FROM {CatalogTableName}
-                WHERE CompanyId = @CompanyId
-                    AND DepartmentId = @DepartmentId";
-
-            // removed old data
         }
     }
 }

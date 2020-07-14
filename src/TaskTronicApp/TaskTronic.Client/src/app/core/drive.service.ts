@@ -63,13 +63,12 @@ export class DriveService {
             }));
     }
 
-    getRootFolder(companyId: number, departmentId: number): Observable<Folder> {
+    getRootFolder(companyDepartmentsId: number): Observable<Folder> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}GetRootFolder`;
 
         return this.http.get(url, {
             params: {
-                companyId: companyId.toString(),
-                departmentId: departmentId.toString()
+                companyDepartmentsId: companyDepartmentsId.toString()
             }}).pipe(map((response: Folder) => response));
     }
 

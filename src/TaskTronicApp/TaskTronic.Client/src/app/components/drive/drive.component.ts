@@ -28,8 +28,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
   parameters: object;
   //
 
-  public companyId: number = 1;
-  public departmentId: number = 1;
+  public companyDepartmentsId: number = 1;
   public selectedFolderId: number;
   public folder: Folder;
   public newFolderName: string;
@@ -64,8 +63,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
   public ngOnInit(): void {
     const params = this.route.snapshot;
-    this.companyId = Number(params.paramMap.get('companyId'));
-    this.departmentId = Number(params.paramMap.get('departmentId'));
+    this.companyDepartmentsId = Number(params.paramMap.get('companyDepartmentsId'));
     this.selectedFolderId = Number(params.paramMap.get('selectedFolderId'));
 
     this.signalRService.subscribe();
@@ -90,13 +88,13 @@ export class DriveComponent implements OnInit, AfterViewInit {
   }
 
   public navigateToRoot(){
-    this.router.navigate(['drive', this.companyId, this.departmentId]);
+    this.router.navigate(['drive', this.companyDepartmentsId]);
   }
 
   public getRootFolder(): void {
     this.isLoading = true;
 
-    this.driveService.getRootFolder(this.companyId, this.departmentId)
+    this.driveService.getRootFolder(this.companyDepartmentsId)
       .subscribe(folder => {
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
@@ -152,7 +150,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
   // FOLDER ACTIONS
   public openFolder(folderId: number): void {
     this.selectedFolderId = folderId;
-    this.router.navigate(['drive', this.companyId, this.departmentId, this.selectedFolderId]);
+    this.router.navigate(['drive', this.companyDepartmentsId, this.selectedFolderId]);
   }
 
   public stopPropagation(event: MouseEvent) {
@@ -211,7 +209,6 @@ export class DriveComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // PLUPLOAD
   // PLUPLOAD
   initPlupload() {
     this.parameters = this.getGroupParameters();

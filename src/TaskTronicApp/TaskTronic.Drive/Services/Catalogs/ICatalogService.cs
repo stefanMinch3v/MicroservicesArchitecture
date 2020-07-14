@@ -4,6 +4,6 @@
 
     public interface ICatalogService
     {
-        Task<int> GetIdAsync(int companyId, int departmentId, int employeeId);
+        Task<int> GetIdAsync(int companyDepartmentsId, int employeeId);
     }
 }

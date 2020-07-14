@@ -18,6 +18,9 @@
         public DbSet<Catalog> Catalogs { get; set; }
         public DbSet<Blobsdata> Blobsdata { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<CompanyDepartments> CompanyDepartments { get; set; }
 
         protected override Assembly ConfigurationsAssembly => Assembly.GetExecutingAssembly();
     }

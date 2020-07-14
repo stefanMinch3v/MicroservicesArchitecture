@@ -4,17 +4,17 @@ import { DriveComponent } from './drive.component';
 import { AuthGuard } from 'src/app/core/auth.guard';
 
 const routes: Routes = [
-  { 
-    path: ':companyId/:departmentId', 
-    component: DriveComponent, 
+  {
+    path: ':companyDepartmentsId',
+    component: DriveComponent,
     canActivate: [AuthGuard],
-    data: { kind: 'root' } 
+    data: { kind: 'root' }
   },
-  { 
-    path: ':companyId/:departmentId/:selectedFolderId', 
-    component: DriveComponent, 
+  {
+    path: ':companyDepartmentsId/:selectedFolderId',
+    component: DriveComponent,
     canActivate: [AuthGuard],
-    data: { kind: 'folder' } 
+    data: { kind: 'folder' }
   }
 ];
 
