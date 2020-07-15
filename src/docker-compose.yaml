@@ -117,10 +117,6 @@ services:
         ports: 
             - "5010:80"
         env_file: TaskTronicApp/TaskTronic/Common.env
-        environment:
-            - identity=http://identity:80
-            - ServiceEndpoints__Employees=http://drive:80
-            - ServiceEndpoints__Statistics=http://statistics:80
         restart: on-failure
         volumes:
             - ./.aspnet/admin/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
@@ -146,7 +142,19 @@ services:
         depends_on:
             - statistics
             - drive
-    
+
+    watchdog:
+        container_name: watchdog
+        build:
+            context: ./TaskTronicApp
+            dockerfile: ./TaskTronic.Watchdog/Dockerfile
+        ports: 
+            - "5013:80"
+        restart: on-failure
+        volumes:
+            - ./.aspnet/watchdog/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+        networks: 
+            - tasktronic-network
 networks:
     tasktronic-network:
 

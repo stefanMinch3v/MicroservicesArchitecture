@@ -11,6 +11,7 @@ namespace TaskTronic.Drive
     using Services.Files;
     using Services.Folders;
     using Services.Messages;
+    using TaskTronic.Drive.Services.CompanyDepartments;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
 
@@ -31,6 +32,7 @@ namespace TaskTronic.Drive
                 .AddTransient<IEmployeeService, EmployeeService>()
                 .AddTransient<ICatalogService, CatalogService>()
                 .AddTransient<IFolderService, FolderService>()
+                .AddTransient<ICompanyDepartmentsService, CompanyDepartmentsService>()
                 .AddTransient<IPermissionsDAL, PermissionsDAL>()
                 .AddTransient<IFileDAL, FileDAL>()
                 .AddTransient<ICatalogDAL, CatalogDAL>()

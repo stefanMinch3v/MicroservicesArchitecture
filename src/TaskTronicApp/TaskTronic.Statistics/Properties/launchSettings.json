@@ -13,7 +13,7 @@
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api",
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": false
     }
   }
 }

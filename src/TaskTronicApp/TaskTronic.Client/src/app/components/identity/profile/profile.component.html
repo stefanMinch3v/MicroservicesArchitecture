@@ -1,0 +1,26 @@
+<ng-template #loading>
+	<div class="col-md-10 center-spinner">
+		<i class="fa fa-refresh fa-spin my-spinner"></i>
+	</div>
+</ng-template>
+<div *ngIf="companyDepartments$ | async as data; else loading">
+	<h2><i class="fa fa-info-circle" aria-hidden="true"></i>User {{user.user.username}} - personal information:</h2>
+	<div class="table-responsive">
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Company</th>
+					<th>Departments</th>
+					<th>Operations</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{data.companyName}}</td>
+					<td *ngFor="department in data.departments">{{department.name}}</td>
+                    <td><button class="btn btn-success" (click)="selectCompanyDepartment()">Select</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

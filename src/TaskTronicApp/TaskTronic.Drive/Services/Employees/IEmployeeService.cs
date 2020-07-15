@@ -22,5 +22,9 @@
         Task<Employee> FindByUserAsync(string userId);
 
         Task<string> GetUserIdByEmployeeAsync(int employeeId);
+
+        Task<int> GetCompanyDepartmentsIdAsync(string userId);
+
+        Task SetCompanyDepartmentsIdAsync(string userId, int companyId, int departmentId);
     }
 }

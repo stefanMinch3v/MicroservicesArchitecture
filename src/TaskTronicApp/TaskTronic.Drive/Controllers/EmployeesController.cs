@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
+    using TaskTronic.Drive.Services.CompanyDepartments;
     using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
@@ -15,13 +16,16 @@
     {
         private readonly ICurrentUserService currentUser;
         private readonly IEmployeeService employeeService;
+        private readonly ICompanyDepartmentsService companyDepartments;
 
         public EmployeesController(
             ICurrentUserService currentUser,
-            IEmployeeService employeeService)
+            IEmployeeService employeeService,
+            ICompanyDepartmentsService companyDepartments)
         {
             this.currentUser = currentUser;
             this.employeeService = employeeService;
+            this.companyDepartments = companyDepartments;
         }
 
         [HttpPost]
@@ -35,6 +39,40 @@
             var userId = this.currentUser.UserId;
 
             await this.employeeService.SaveAsync(userId, email);
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route(nameof(GetCompanyDepartmentSignId))]
+        public async Task<ActionResult<int>> GetCompanyDepartmentSignId()
+        {
+            if (this.currentUser.IsAdministrator)
+            {
+                return BadRequest("Must be an employee.");
+            }
+
+            return await this.employeeService.GetCompanyDepartmentsIdAsync(this.currentUser.UserId);
+        }
+
+        [HttpGet]
+        [Route(nameof(GetCompanyDepartments))]
+        public async Task<ActionResult<IReadOnlyList<OutputCompanyDepartmentsServiceModel>>> GetCompanyDepartments()
+            => Ok(await this.companyDepartments.GetAllAsync());
+
+        [HttpPost]
+        [Route(nameof(SetCompanyDepartmentSignId))]
+        public async Task<ActionResult> SetCompanyDepartmentSignId(int companyId, int departmentId)
+        {
+            if (this.currentUser.IsAdministrator)
+            {
+                return BadRequest("Must be an employee.");
+            }
+
+            await this.employeeService.SetCompanyDepartmentsIdAsync(
+                this.currentUser.UserId,
+                companyId,
+                departmentId);
 
             return Ok();
         }

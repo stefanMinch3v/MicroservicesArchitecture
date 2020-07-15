@@ -85,6 +85,33 @@
                 .Select(e => e.UserId)
                 .FirstOrDefaultAsync();
 
+        public async Task<int> GetCompanyDepartmentsIdAsync(string userId)
+            => (await this.FindByUserAsync(userId)).CompanyDepartmentsId;
+
+        public async Task SetCompanyDepartmentsIdAsync(string userId, int companyId, int departmentId)
+        {
+            var employee = await this.FindByUserAsync(userId);
+            
+            // only admin should be able to switch the employee company/department
+            if (employee is null || employee.CompanyDepartmentsId != 0)
+            {
+                return;
+            }
+
+            var companyDepartment = await base.Data.Set<CompanyDepartments>()
+                .FirstOrDefaultAsync(cd => cd.CompanyId == companyId 
+                    && cd.DepartmentId == departmentId);
+
+            if (companyDepartment is null)
+            {
+                return;
+            }
+
+            employee.CompanyDepartmentsId = companyDepartment.Id;
+
+            await base.Data.SaveChangesAsync();
+        }
+
         private async Task<T> FindByUserAsync<T>(
             string userId,
             Expression<Func<Employee, T>> selectorExpression)

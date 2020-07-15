@@ -10,6 +10,7 @@ import { FolderIdName } from './folder-id-name.model';
 import { environment } from 'src/environments/environment';
 import { SignalRService } from 'src/app/core/signalR.service';
 import { FaIconPipe } from 'src/app/core/fa-icons.pipe';
+import { EmployeeService } from 'src/app/core/employee.service';
 
 @Component({
   selector: 'app-drive',
@@ -57,26 +58,33 @@ export class DriveComponent implements OnInit, AfterViewInit {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly signalRService: SignalRService,
-    private readonly faIconPipe: FaIconPipe) {
+    private readonly faIconPipe: FaIconPipe,
+    private readonly employeeService: EmployeeService) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
   public ngOnInit(): void {
-    const params = this.route.snapshot;
-    this.companyDepartmentsId = Number(params.paramMap.get('companyDepartmentsId'));
-    this.selectedFolderId = Number(params.paramMap.get('selectedFolderId'));
+    this.employeeService.getCompanyDepartmentsSignId()
+      .subscribe(id => {
+        if (id < 1) {
+          this.notificationService.errorMessage('Please pick company/department from your profile!');
+        } else {
+          this.companyDepartmentsId = id;
+          this.selectedFolderId = Number(this.route.snapshot.paramMap.get('selectedFolderId'));
 
-    this.signalRService.subscribe();
+          this.signalRService.subscribe();
 
-    this.route.data.subscribe(data => {
-      switch (data.kind) {
-        case 'root':
-          this.getRootFolder();
-          break;
-        case 'folder':
-          this.getFolder(this.selectedFolderId);
-          break;
-      }});
+          this.route.data.subscribe(data => {
+            switch (data.kind) {
+              case 'root':
+                this.getRootFolder();
+                break;
+              case 'folder':
+                this.getFolder(this.selectedFolderId);
+                break;
+            }});
+        }
+      });
   }
 
   ngAfterViewInit() {

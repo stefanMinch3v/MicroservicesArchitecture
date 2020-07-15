@@ -153,24 +153,24 @@
                 .AddMassTransitHostedService(); // starts the services
 
             // make sense only for publishers cuz subscribers are supposed to recieve only
-            if (useHangfireForPublishers)
-            {
-                if (configuration is null)
-                {
-                    throw new InvalidOperationException("Configuration is required for Hangfire.");
-                }
+            //if (useHangfireForPublishers)
+            //{
+            //    if (configuration is null)
+            //    {
+            //        throw new InvalidOperationException("Configuration is required for Hangfire.");
+            //    }
 
-                services
-                    .AddHangfire(config => config
-                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                        .UseSimpleAssemblyNameTypeSerializer()
-                        .UseRecommendedSerializerSettings()
-                        .UseSqlServerStorage(configuration["ConnectionStrings:DefaultConnection"]));
+            //    services
+            //        .AddHangfire(config => config
+            //            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            //            .UseSimpleAssemblyNameTypeSerializer()
+            //            .UseRecommendedSerializerSettings()
+            //            .UseSqlServerStorage(configuration["ConnectionStrings:DefaultConnection"]));
 
-                services.AddHangfireServer();
+            //    services.AddHangfireServer();
 
-                services.AddHostedService<MessagesHostedService>();
-            }
+            //    services.AddHostedService<MessagesHostedService>();
+            //}
 
             return services;
         }

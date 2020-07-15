@@ -73,7 +73,7 @@
             }
             
             app
-                .UseHttpsRedirection()
+                //.UseHttpsRedirection()
                 .UseRouting()
                 .UseMiddleware<JwtHeaderAuthenticationMiddleware>()
                 .UseAuthentication()
