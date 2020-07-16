@@ -4,7 +4,7 @@
 
     public interface ICatalogDAL
     {
-        Task<int?> GetAsync(int companyDepartmentsId);
+        Task<int> GetAsync(int companyDepartmentsId);
 
         Task<int> AddAsync(int companyDepartmentsId);
     }

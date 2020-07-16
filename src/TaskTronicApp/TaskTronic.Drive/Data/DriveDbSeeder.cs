@@ -59,17 +59,6 @@
 
             this.dbContext.CompanyDepartments.AddRange(companyDepartments);
             this.dbContext.SaveChanges();
-
-            // catalogs
-            var catalogs = new List<Catalog>
-            {
-                new Catalog { CompanyDepartments = companyDepartments[0] },
-                new Catalog { CompanyDepartments = companyDepartments[1] },
-                new Catalog { CompanyDepartments = companyDepartments[2] },
-            };
-
-            this.dbContext.Catalogs.AddRange(catalogs);
-            this.dbContext.SaveChanges();
         }
     }
 }

@@ -13,13 +13,13 @@
         public CatalogDAL(IDbConnectionFactory dbConnectionFactory)
             => this.dbConnectionFactory = dbConnectionFactory;
 
-        public async Task<int?> GetAsync(int companyDepartmentsId)
+        public async Task<int> GetAsync(int companyDepartmentsId)
         {
             var sql = string.Format(CatalogSql.GET, CatalogTableName);
 
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return await db.QuerySingleOrDefaultAsync<int?>(sql, new { companyDepartmentsId });
+                return await db.QuerySingleOrDefaultAsync<int>(sql, new { companyDepartmentsId });
             }
         }
 

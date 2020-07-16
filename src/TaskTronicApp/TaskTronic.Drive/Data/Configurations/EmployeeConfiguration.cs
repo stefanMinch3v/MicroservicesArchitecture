@@ -25,8 +25,7 @@
 
             builder
                 .HasOne(e => e.CompanyDepartments)
-                .WithMany()
-                .HasForeignKey(e => e.CompanyDepartmentsId);
+                .WithMany();
         }
     }
 }

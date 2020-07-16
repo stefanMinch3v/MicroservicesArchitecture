@@ -45,13 +45,16 @@
             this.ValidateInput(inputModel);
             await this.ValidateParentAndRootAsync(inputModel);
 
-            var numberOfExistingNames = await folderDAL.GetFolderNumbersWithExistingNameAsync(
-                inputModel.Name, 
-                inputModel.ParentId.Value);
-
-            if (numberOfExistingNames > 0)
+            if (inputModel.Name != DriveConstants.ROOT_FOLDER_NAME)
             {
-                inputModel.Name = inputModel.Name + $" ({++numberOfExistingNames})";
+                var numberOfExistingNames = await folderDAL.GetFolderNumbersWithExistingNameAsync(
+                    inputModel.Name,
+                    inputModel.ParentId.Value);
+
+                if (numberOfExistingNames > 0)
+                {
+                    inputModel.Name = inputModel.Name + $" ({++numberOfExistingNames})";
+                }
             }
 
             var insertedData = await folderDAL.CreateFolderAsync(inputModel);

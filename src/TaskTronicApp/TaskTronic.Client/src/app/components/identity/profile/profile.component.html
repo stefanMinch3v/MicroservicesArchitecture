@@ -3,24 +3,32 @@
 		<i class="fa fa-refresh fa-spin my-spinner"></i>
 	</div>
 </ng-template>
-<div *ngIf="companyDepartments$ | async as data; else loading">
-	<h2><i class="fa fa-info-circle" aria-hidden="true"></i>User {{user.user.username}} - personal information:</h2>
-	<div class="table-responsive">
-		<table class="table table-bordered table-hover">
-			<thead>
-				<tr>
-					<th>Company</th>
-					<th>Departments</th>
-					<th>Operations</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>{{data.companyName}}</td>
-					<td *ngFor="department in data.departments">{{department.name}}</td>
-                    <td><button class="btn btn-success" (click)="selectCompanyDepartment()">Select</button></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+
+<div *ngIf="companyWrapper && companyWrapper.companies; else loading" class="table-responsive">
+	<table class="table table-bordered table-hover"> 
+		<thead>
+			<tr>
+				<th>Company</th>
+				<th>Departments</th>
+			</tr>
+		</thead>
+		<tbody *ngFor="let company of companyWrapper.companies">
+			<tr>
+				<td>{{company.name}}</td>
+				<td *ngFor="let department of company.departments">
+					<span *ngIf="selectedDataMatch(company.companyId, department.departmentId, companyWrapper.selectedData)">
+						<i class="fas fa-check-square"></i>Current &nbsp;
+					</span>
+
+					<span>{{department.departmentName}}</span> &nbsp;
+					
+					<button
+						class="btn btn-success btn-sm" 
+						(click)="selectCompanyDepartment(company.companyId, department.departmentId)">Select</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>
+
+<p *ngIf="!companyWrapper" class="text-danger">Something went wrong with Seed method for Drive.</p>

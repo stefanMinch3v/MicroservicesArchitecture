@@ -25,6 +25,9 @@ namespace TaskTronic.Identity
                 .AddTransient<IDbSeeder, IdentityDbSeeder>()
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<IJwtGeneratorService, JwtGeneratorService>()
+                .AddMessaging(
+                    useHangfireForPublishers: true,
+                    configuration: this.Configuration)
                 .AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 6;

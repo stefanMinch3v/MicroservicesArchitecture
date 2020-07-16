@@ -9,12 +9,15 @@ import { IdentityService } from 'src/app/core/identity.service';
 import { AuthService } from 'src/app/core/auth.service';
 import { HttpClientModule } from '@angular/common/http';
 import { EmployeeService } from 'src/app/core/employee.service';
+import { BrowserModule } from '@angular/platform-browser';
+import { ProfileComponent } from './profile/profile.component';
 
 
 @NgModule({
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    ProfileComponent
   ],
   imports: [
     CommonModule,

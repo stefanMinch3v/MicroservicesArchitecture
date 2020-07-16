@@ -39,7 +39,7 @@
                 .Select(u => u.Email)
                 .FirstOrDefaultAsync();
 
-        public async Task SaveAsync(string userId, string email)
+        public async Task SaveAsync(string userId, string email, string name)
         {
             var existing = await this.All().FirstOrDefaultAsync(e => e.Email == email);
 
@@ -48,7 +48,7 @@
                 return;
             }
 
-            await this.Save(new Employee { Email = email, UserId = userId });
+            await this.Save(new Employee { Email = email, UserId = userId, Name = name });
         }
 
         public async Task<IReadOnlyCollection<EmployeeDetailsOutputModel>> GetAllAsync()
@@ -92,8 +92,8 @@
         {
             var employee = await this.FindByUserAsync(userId);
             
-            // only admin should be able to switch the employee company/department
-            if (employee is null || employee.CompanyDepartmentsId != 0)
+            // TODO: only admin should be able to switch the employee company/department
+            if (employee is null)
             {
                 return;
             }

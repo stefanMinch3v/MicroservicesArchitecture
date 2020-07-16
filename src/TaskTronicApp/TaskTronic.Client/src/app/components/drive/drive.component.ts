@@ -29,7 +29,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
   parameters: object;
   //
 
-  public companyDepartmentsId: number = 1;
+  public companyDepartmentsId: number;
   public selectedFolderId: number;
   public folder: Folder;
   public newFolderName: string;
@@ -104,6 +104,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     this.driveService.getRootFolder(this.companyDepartmentsId)
       .subscribe(folder => {
+
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
         this.isLoading = false;
@@ -117,6 +118,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
 
     this.driveService.getFolder(folderId)
       .subscribe(folder => {
+
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
         this.isLoading = false;

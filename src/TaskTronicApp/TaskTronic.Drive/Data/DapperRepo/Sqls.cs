@@ -49,7 +49,7 @@
                 ); SELECT CAST(SCOPE_IDENTITY() AS INT)";
 
             public const string GET = @"
-                SELECT TOP(1) FROM {0}
+                SELECT TOP(1) CatalogId FROM {0}
                 WHERE CompanyDepartmentsId = @companyDepartmentsId";
         }
 

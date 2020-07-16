@@ -1,7 +1,6 @@
 ﻿namespace TaskTronic.Drive.Data.DapperRepo
 {
     using Dapper;
-    using MassTransit;
     using System;
     using System.Collections.Generic;
     using System.Data;
@@ -133,7 +132,7 @@
 
                     insertedMessageId = await conn.ExecuteScalarAsync<int>(sqlMessages, new
                     {
-                        message.Type,
+                        Type = message.Type.AssemblyQualifiedName,
                         message.Published,
                         message.serializedData
                     }, transaction);
@@ -198,7 +197,7 @@
 
                     insertedMessageId = await conn.ExecuteScalarAsync<int>(sqlMessages, new
                     {
-                        message.Type,
+                        Type = message.Type.AssemblyQualifiedName,
                         message.Published,
                         message.serializedData
                     }, transaction);

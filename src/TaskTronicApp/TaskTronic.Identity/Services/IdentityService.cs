@@ -6,6 +6,8 @@
     using System.Threading.Tasks;
     using TaskTronic.Services;
     using TaskTronic.Identity.Models;
+    using TaskTronic.Messages.Drive.Employees;
+    using MassTransit;
 
     public class IdentityService : IIdentityService
     {
@@ -15,15 +17,18 @@
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IJwtGeneratorService jwtGeneratorService;
+        private readonly IBus publisher;
 
         public IdentityService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IJwtGeneratorService jwtGeneratorService)
+            IJwtGeneratorService jwtGeneratorService,
+            IBus publisher)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.jwtGeneratorService = jwtGeneratorService;
+            this.publisher = publisher;
         }
 
         public async Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model)
@@ -62,6 +67,15 @@
             {
                 return Result<bool>.Failure(result.Errors.Select(e => e.Description));
             }
+
+            var messageData = new UserRegisteredMessage
+            {
+                Email = user.Email,
+                Name = user.UserName,
+                UserId = user.Id
+            };
+
+            await this.publisher.Publish(messageData);
 
             return Result<bool>.SuccessWith(true);
         }

@@ -28,21 +28,6 @@
             this.companyDepartments = companyDepartments;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Create(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-            {
-                return BadRequest(nameof(email));
-            }
-
-            var userId = this.currentUser.UserId;
-
-            await this.employeeService.SaveAsync(userId, email);
-
-            return Ok();
-        }
-
         [HttpGet]
         [Route(nameof(GetCompanyDepartmentSignId))]
         public async Task<ActionResult<int>> GetCompanyDepartmentSignId()
@@ -52,13 +37,13 @@
                 return BadRequest("Must be an employee.");
             }
 
-            return await this.employeeService.GetCompanyDepartmentsIdAsync(this.currentUser.UserId);
+            return Ok(await this.employeeService.GetCompanyDepartmentsIdAsync(this.currentUser.UserId));
         }
 
         [HttpGet]
         [Route(nameof(GetCompanyDepartments))]
-        public async Task<ActionResult<IReadOnlyList<OutputCompanyDepartmentsServiceModel>>> GetCompanyDepartments()
-            => Ok(await this.companyDepartments.GetAllAsync());
+        public async Task<ActionResult<OutputCompaniesServiceModel>> GetCompanyDepartments()
+            => await this.companyDepartments.GetAllAsync(this.currentUser.UserId);
 
         [HttpPost]
         [Route(nameof(SetCompanyDepartmentSignId))]

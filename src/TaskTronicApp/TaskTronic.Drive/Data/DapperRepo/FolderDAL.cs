@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using TaskTronic.Data.Models;
     using TaskTronic.Messages.Drive.Folders;
+
     using static Sqls;
 
     internal class FolderDAL : IFolderDAL
@@ -49,7 +50,7 @@
 
                     insertedMessageId = await db.ExecuteScalarAsync<int>(sqlMessages, new
                     {
-                        message.Type,
+                        Type = message.Type.AssemblyQualifiedName,
                         message.Published,
                         message.serializedData
                     }, transaction);

@@ -22,7 +22,7 @@
         {
             var catalogId = await this.catalogDAL.GetAsync(companyDepartmentsId);
 
-            if (catalogId is null)
+            if (catalogId == 0)
             {
                 var createdCatId = await this.catalogDAL.AddAsync(companyDepartmentsId);
 
@@ -31,7 +31,7 @@
                 return createdCatId;
             }
 
-            return catalogId.Value;
+            return catalogId;
         }
 
         private InputFolderServiceModel CreateInputFolderModel(int catId, int employeeId)
@@ -39,7 +39,7 @@
             {
                 CatalogId = catId,
                 EmployeeId = employeeId,
-                Name = "Root",
+                Name = DriveConstants.ROOT_FOLDER_NAME,
                 CreateDate = DateTimeOffset.UtcNow
             };
     }

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
+import { CompanyWrapper } from './models/company-wrapper.model';
 
 @Injectable({
     providedIn: 'root'
@@ -17,8 +18,24 @@ export class EmployeeService {
     }
 
     public getCompanyDepartmentsSignId(): Observable<number> {
-        const url = environment.driveUrl + '/Employees/GetCompanyDepartmentSignId';
+        const url = environment.driveUrl + `${this.DRIVE_EMPLOYEES}GetCompanyDepartmentSignId`;
         return this.http.get(url)
             .pipe(map((response: number) => response));
+    }
+
+    public getCompanies(): Observable<CompanyWrapper> {
+        const url = environment.driveUrl + `${this.DRIVE_EMPLOYEES}GetCompanyDepartments`;
+        return this.http.get(url)
+            .pipe(map((response: CompanyWrapper) => response));
+    }
+
+    public setCompany(companyId: number, departmentId: number): Observable<any> {
+        const url = environment.driveUrl + `${this.DRIVE_EMPLOYEES}SetCompanyDepartmentSignId`;
+        const payload = {
+            companyId: companyId.toString(),
+            departmentId: departmentId.toString()
+        };
+
+        return this.http.post(url, {}, { params: payload });
     }
 }

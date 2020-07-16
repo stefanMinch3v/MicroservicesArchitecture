@@ -11,7 +11,7 @@
 
         Task<string> GetEmailByIdAsync(int employeeId);
 
-        Task SaveAsync(string userId, string email);
+        Task SaveAsync(string userId, string email, string name);
 
         Task<IReadOnlyCollection<EmployeeDetailsOutputModel>> GetAllAsync();
 

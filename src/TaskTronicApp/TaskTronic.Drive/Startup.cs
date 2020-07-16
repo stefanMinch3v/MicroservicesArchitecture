@@ -11,6 +11,7 @@ namespace TaskTronic.Drive
     using Services.Files;
     using Services.Folders;
     using Services.Messages;
+    using TaskTronic.Drive.Messages;
     using TaskTronic.Drive.Services.CompanyDepartments;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
@@ -37,7 +38,10 @@ namespace TaskTronic.Drive
                 .AddTransient<IFileDAL, FileDAL>()
                 .AddTransient<ICatalogDAL, CatalogDAL>()
                 .AddTransient<IFolderDAL, FolderDAL>()
-                .AddMessaging(useHangfireForPublishers: true, configuration: this.Configuration);
+                .AddMessaging(
+                    useHangfireForPublishers: true,
+                    configuration: this.Configuration,
+                    typeof(UserRegisteredConsumer));
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
