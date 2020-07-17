@@ -1,13 +1,14 @@
-﻿namespace TaskTronic.Identity.Services
+﻿namespace TaskTronic.Identity.Services.Identity
 {
     using Data.Models;
+    using MassTransit;
     using Microsoft.AspNetCore.Identity;
+    using Services.Jwt;
     using System.Linq;
     using System.Threading.Tasks;
-    using TaskTronic.Services;
     using TaskTronic.Identity.Models;
     using TaskTronic.Messages.Drive.Employees;
-    using MassTransit;
+    using TaskTronic.Services;
 
     public class IdentityService : IIdentityService
     {
@@ -76,6 +77,8 @@
             };
 
             await this.publisher.Publish(messageData);
+
+            // mark as finished
 
             return Result<bool>.SuccessWith(true);
         }

@@ -1,4 +1,4 @@
-﻿namespace TaskTronic.Identity.Services
+﻿namespace TaskTronic.Identity.Services.Jwt
 {
     using Data.Models;
     using Microsoft.AspNetCore.Identity;

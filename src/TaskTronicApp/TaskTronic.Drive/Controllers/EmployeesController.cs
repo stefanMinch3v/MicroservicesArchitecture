@@ -5,7 +5,6 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
-    using TaskTronic.Drive.Services.CompanyDepartments;
     using TaskTronic.Drive.Services.Employees;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
@@ -16,16 +15,13 @@
     {
         private readonly ICurrentUserService currentUser;
         private readonly IEmployeeService employeeService;
-        private readonly ICompanyDepartmentsService companyDepartments;
 
         public EmployeesController(
             ICurrentUserService currentUser,
-            IEmployeeService employeeService,
-            ICompanyDepartmentsService companyDepartments)
+            IEmployeeService employeeService)
         {
             this.currentUser = currentUser;
             this.employeeService = employeeService;
-            this.companyDepartments = companyDepartments;
         }
 
         [HttpGet]
@@ -39,11 +35,6 @@
 
             return Ok(await this.employeeService.GetCompanyDepartmentsIdAsync(this.currentUser.UserId));
         }
-
-        [HttpGet]
-        [Route(nameof(GetCompanyDepartments))]
-        public async Task<ActionResult<OutputCompaniesServiceModel>> GetCompanyDepartments()
-            => await this.companyDepartments.GetAllAsync(this.currentUser.UserId);
 
         [HttpPost]
         [Route(nameof(SetCompanyDepartmentSignId))]

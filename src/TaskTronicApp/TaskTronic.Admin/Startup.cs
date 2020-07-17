@@ -9,6 +9,7 @@ namespace TaskTronic.Admin
     using Microsoft.Extensions.Hosting;
     using Refit;
     using Services;
+    using Services.Companies;
     using Services.Employees;
     using Services.Identity;
     using Services.Statistics;
@@ -48,6 +49,10 @@ namespace TaskTronic.Admin
             services
                 .AddRefitClient<IEmployeeService>()
                 .WithConfiguration(serviceEndpoints.Employees);
+
+            services
+                .AddRefitClient<ICompanyService>()
+                .WithConfiguration(serviceEndpoints.Companies);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

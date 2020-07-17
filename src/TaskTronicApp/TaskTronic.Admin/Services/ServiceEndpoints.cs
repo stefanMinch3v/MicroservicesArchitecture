@@ -11,6 +11,8 @@
 
         public string Employees { get; private set; }
 
+        public string Companies { get; private set; }
+
         //public string this[string service]
         //    => this.GetType()
         //        .GetProperties()

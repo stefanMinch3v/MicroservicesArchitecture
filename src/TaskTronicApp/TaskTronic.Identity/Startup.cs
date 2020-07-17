@@ -1,13 +1,13 @@
 namespace TaskTronic.Identity
 {
     using Data;
-    using Infrastructure;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Services;
+    using Services.Identity;
+    using Services.Jwt;
     using TaskTronic.Identity.Data.Models;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;

@@ -10,7 +10,7 @@
         public int CompanyId { get; set; }
         public string Name { get; set; }
 
-        public IReadOnlyList<OutputDepartmentServiceModel> Departments { get; set; }
+        public IReadOnlyList<OutputDepartmentMapServiceModel> Departments { get; set; }
 
         public void Mapping(Profile mapper)
             => mapper

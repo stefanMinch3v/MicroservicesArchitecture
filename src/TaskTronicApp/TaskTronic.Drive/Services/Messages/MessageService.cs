@@ -3,7 +3,6 @@
     using System.Threading.Tasks;
     using TaskTronic.Data.Models;
     using TaskTronic.Drive.Data;
-    using TaskTronic.Messages.Drive.Folders;
 
     public class MessageService : IMessageService
     {

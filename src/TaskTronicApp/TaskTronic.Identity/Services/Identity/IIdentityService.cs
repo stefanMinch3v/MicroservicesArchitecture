@@ -1,4 +1,4 @@
-﻿namespace TaskTronic.Identity.Services
+﻿namespace TaskTronic.Identity.Services.Identity
 {
     using Models;
     using System.Threading.Tasks;

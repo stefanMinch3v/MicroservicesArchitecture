@@ -3,7 +3,6 @@ namespace TaskTronic.Watchdog
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
 
-    // TODO: add docker
     public class Startup
     {
         public void ConfigureServices(IServiceCollection services)

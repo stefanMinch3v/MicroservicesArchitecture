@@ -3,6 +3,7 @@ import { EmployeeService } from 'src/app/core/employee.service';
 import { NotificationService } from 'src/app/core/notification.service';
 import { CompanyWrapper } from 'src/app/core/models/company-wrapper.model';
 import { SelectedCompanyModel } from 'src/app/core/models/selected-company.model';
+import { CompanyService } from 'src/app/core/company.service';
 
 @Component({
   selector: 'app-profile',
@@ -14,10 +15,11 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private readonly employeeService: EmployeeService,
-    private readonly notificationService: NotificationService) { }
+    private readonly notificationService: NotificationService,
+    private readonly companyService: CompanyService) { }
 
   ngOnInit() {
-    this.employeeService.getCompanies()
+    this.companyService.getCompanies()
       .subscribe(companyWrapper => this.companyWrapper = companyWrapper);
   }
 
@@ -30,7 +32,7 @@ export class ProfileComponent implements OnInit {
       .subscribe(_ => {
         this.notificationService.successMessage('Data saved.');
 
-        this.employeeService.getCompanies()
+        this.companyService.getCompanies()
           .subscribe(companyWrapper => this.companyWrapper = companyWrapper);
       });
   }
