@@ -155,6 +155,10 @@ services:
             - ./.aspnet/watchdog/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
         networks: 
             - tasktronic-network
+        depends_on:
+            - statistics
+            - drive
+            - identity
 networks:
     tasktronic-network:
 

@@ -15,7 +15,13 @@ const routes: Routes = [
     component: DriveComponent,
     canActivate: [AuthGuard],
     data: { kind: 'folder' }
-  }
+  },
+  {
+    path: '',
+    component: DriveComponent,
+    canActivate: [AuthGuard],
+    data: { kind: 'root' }
+  },
 ];
 
 @NgModule({

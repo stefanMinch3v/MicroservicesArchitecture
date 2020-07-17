@@ -12,7 +12,7 @@
  
         Task<bool> MoveFolderAsync(int catalogId, int folderId, int employeeId, int newParentFolderId);
 
-        Task<FolderServiceModel> GetFolderByIdAsync(int folderId, int employeeId);
+        Task<FolderServiceModel> GetFolderByIdAsync(int folderId, int employeeId, int? companyDepartmentsId = null);
 
         Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(
             int catalogId, 

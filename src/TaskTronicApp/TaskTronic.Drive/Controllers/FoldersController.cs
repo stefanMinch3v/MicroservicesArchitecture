@@ -10,6 +10,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
+    using TaskTronic.Drive.Exceptions;
     using TaskTronic.Services.Identity;
 
     [Authorize]
@@ -118,7 +119,14 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.folderService.GetFolderByIdAsync(folderId, employeeId);
+            try
+            {
+                return await this.folderService.GetFolderByIdAsync(folderId, employeeId);
+            }
+            catch (FolderException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]

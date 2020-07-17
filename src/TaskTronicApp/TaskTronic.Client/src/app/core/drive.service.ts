@@ -72,12 +72,13 @@ export class DriveService {
             }}).pipe(map((response: Folder) => response));
     }
 
-    getFolder(folderId: number): Observable<Folder> {
+    getFolder(folderId: number, companyDepartmentsId: number = null): Observable<Folder> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}GetFolderById`;
 
         return this.http.get(url, {
             params: {
-                folderId: folderId.toString()
+                folderId: folderId.toString(),
+                companyDepartmentsId: companyDepartmentsId.toString()
             }}).pipe(map((response: Folder) => response));
     }
 

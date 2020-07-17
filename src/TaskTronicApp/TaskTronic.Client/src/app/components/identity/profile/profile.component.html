@@ -1,10 +1,8 @@
-<ng-template #loading>
-	<div class="col-md-10 center-spinner">
-		<i class="fa fa-refresh fa-spin my-spinner"></i>
-	</div>
-</ng-template>
+<div class="col-md-10 center-spinner" *ngIf="!companyWrapper">
+	<i class="fa fa-refresh fa-spin my-spinner"></i>
+</div>
 
-<div *ngIf="companyWrapper && companyWrapper.companies; else loading" class="table-responsive">
+<div *ngIf="companyWrapper && companyWrapper.companies" class="table-responsive">
 	<table class="table table-bordered table-hover"> 
 		<thead>
 			<tr>
@@ -32,5 +30,25 @@
 		</tbody>
 	</table>
 </div>
-
-<p *ngIf="!companyWrapper" class="text-danger">Something went wrong with Seed method for Drive.</p>
+<hr>
+<h4 class="ml-2">My folders</h4>
+<div *ngIf="totalViews && totalViews.length > 0" class="table-responsive">
+	<table class="table table-bordered table-hover"> 
+		<thead>
+			<tr>
+				<th>Folder name</th>
+				<th>Folder id</th>
+				<th>Is private</th>
+				<th>Create date</th>
+			</tr>
+		</thead>
+		<tbody *ngFor="let view of totalViews">
+			<tr>
+				<td>{{view.name}}</td>
+				<td>{{view.folderId}}</td>
+				<td>{{view.isPrivate}}</td>
+				<td>{{view.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

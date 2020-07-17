@@ -88,6 +88,13 @@
         public async Task<int> GetCompanyDepartmentsIdAsync(string userId)
             => (await this.FindByUserAsync(userId)).CompanyDepartmentsId;
 
+        public async Task<int> GetSelectedCompanyDepartmentId(int employeeId)
+            => await this.All()
+                .Where(e => e.EmployeeId == employeeId)
+                .Select(e => e.CompanyDepartmentsId)
+                .FirstOrDefaultAsync();
+                
+
         public async Task SetCompanyDepartmentsIdAsync(string userId, int companyId, int departmentId)
         {
             var employee = await this.FindByUserAsync(userId);

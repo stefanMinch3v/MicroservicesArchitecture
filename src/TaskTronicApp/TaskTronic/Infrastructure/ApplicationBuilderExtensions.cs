@@ -75,6 +75,14 @@
             app
                 //.UseHttpsRedirection()
                 .UseRouting()
+                .UseCors(builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200");
+
+                    builder.AllowAnyHeader()
+                        .WithMethods("GET", "POST", "PUT", "DELETE")
+                        .AllowCredentials();
+                })
                 .UseMiddleware<JwtHeaderAuthenticationMiddleware>()
                 .UseAuthentication()
                 .UseAuthorization()

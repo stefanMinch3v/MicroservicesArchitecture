@@ -14,14 +14,14 @@
 
         <p class="col-md-1"></p>
 
-        <div class="btn btn-sm btn-warning">
+        <div class="btn btn-sm btn-warning" (click)="pluploadHell()">
           <div class="plupload-container" #pluploadcontainer>
             <div class="plupload-drop-target" #pluploader><span><i class="fa fa-upload"></i> Upload/Plupload</span></div>
           </div>
         </div>
       </div>
 
-      <div class="upload-button" style="cursor: no-drop;">
+      <div class="upload-button">
         <div class="plupload-container" #pluploadcontainer>
           <div class="plupload-drop-target" #pluploader></div>
         </div>
@@ -125,7 +125,7 @@
               Delete
             </button>
             |
-            <button  class="btn btn-sm btn-warning">
+            <button  class="btn btn-sm btn-warning" (click)="notImplementedYet()">
               Rename
             </button>
           </td>

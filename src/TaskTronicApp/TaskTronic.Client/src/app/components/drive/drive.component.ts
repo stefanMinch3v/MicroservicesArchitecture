@@ -116,7 +116,7 @@ export class DriveComponent implements OnInit, AfterViewInit {
   private getFolder(folderId: number): void {
     this.isLoading = true;
 
-    this.driveService.getFolder(folderId)
+    this.driveService.getFolder(folderId, this.companyDepartmentsId)
       .subscribe(folder => {
 
         this.folder = folder;
@@ -349,5 +349,13 @@ export class DriveComponent implements OnInit, AfterViewInit {
           this.reloadFolder();
         });
     }
+  }
+
+  pluploadHell(): void {
+    this.notificationService.warningMessage('Plupload needs to be adjusted, now does not work.');
+  }
+
+  notImplementedYet(): void {
+    this.notificationService.warningMessage('Not implemented yet.');
   }
 }

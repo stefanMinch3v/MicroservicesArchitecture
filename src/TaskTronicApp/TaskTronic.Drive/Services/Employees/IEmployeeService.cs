@@ -26,5 +26,7 @@
         Task<int> GetCompanyDepartmentsIdAsync(string userId);
 
         Task SetCompanyDepartmentsIdAsync(string userId, int companyId, int departmentId);
+
+        Task<int> GetSelectedCompanyDepartmentId(int employeeId);
     }
 }

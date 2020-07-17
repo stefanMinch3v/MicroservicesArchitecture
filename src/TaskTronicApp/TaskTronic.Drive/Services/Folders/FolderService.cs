@@ -193,8 +193,21 @@
             return success;
         }
 
-        public async Task<FolderServiceModel> GetFolderByIdAsync(int folderId, int employeeId)
+        public async Task<FolderServiceModel> GetFolderByIdAsync(
+            int folderId, 
+            int employeeId, 
+            int? companyDepartmentsId = null)
         {
+            if (companyDepartmentsId.HasValue)
+            {
+                var selectedDataId = await this.employeeService.GetSelectedCompanyDepartmentId(employeeId);
+
+                if (selectedDataId != companyDepartmentsId.Value)
+                {
+                    throw new FolderException { Message = "The selected company/department is invalid." };
+                }
+            }
+
             var folder = await this.folderDAL.GetFolderByIdAsync(folderId);
 
             if (folder is null)

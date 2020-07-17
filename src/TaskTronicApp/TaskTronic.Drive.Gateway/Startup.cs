@@ -30,6 +30,7 @@ namespace TaskTronic.Drive.Gateway
                 .AddTokenAuthentication(this.Configuration)
                 .AddScoped<ICurrentTokenService, CurrentTokenService>()
                 .AddTransient<JwtHeaderAuthenticationMiddleware>()
+                .AddCors()
                 .AddControllers();
 
             services

@@ -21,7 +21,7 @@ export class SignalRService {
         };
 
         this.hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl('https://localhost:5009/notifications', options)
+            .withUrl('http://localhost:5008/notifications', options)
             .build();
 
         this.hubConnection
@@ -31,7 +31,7 @@ export class SignalRService {
 
         this.hubConnection.on('ReceiveNotification', (data) => {
             console.log(data);
-            this.notificationService.successMessage(`Success upload file/or folder added. TODO: distinguish`);
+            this.notificationService.successMessage(`Success uploaded file/folder SignalR. TODO: distinguish`);
         });
     }
 }
