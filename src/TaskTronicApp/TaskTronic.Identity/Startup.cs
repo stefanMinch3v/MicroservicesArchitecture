@@ -1,6 +1,7 @@
 namespace TaskTronic.Identity
 {
     using Data;
+    using Data.Models;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
@@ -8,7 +9,7 @@ namespace TaskTronic.Identity
     using Microsoft.Extensions.DependencyInjection;
     using Services.Identity;
     using Services.Jwt;
-    using TaskTronic.Identity.Data.Models;
+    using Services.Messages;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
 
@@ -24,6 +25,7 @@ namespace TaskTronic.Identity
                 .AddApiService<IdentityDbContext>(this.Configuration)
                 .AddTransient<IDbSeeder, IdentityDbSeeder>()
                 .AddTransient<IIdentityService, IdentityService>()
+                .AddTransient<IMessageService, MessageService>()
                 .AddTransient<IJwtGeneratorService, JwtGeneratorService>()
                 .AddMessaging(
                     useHangfireForPublishers: true,

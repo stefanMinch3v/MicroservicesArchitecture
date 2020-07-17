@@ -13,23 +13,23 @@
 
         public async Task MarkMessageAsPublishedAsync(int id)
         {
-            //var message = await this.dbContext.Messages.FindAsync(id);
+            var message = await this.dbContext.Messages.FindAsync(id);
 
-            //if (message is null)
-            //{
-            //    return;
-            //}
+            if (message is null)
+            {
+                return;
+            }
 
-            //message.MarkedAsPublished();
+            message.MarkedAsPublished();
 
-            //await this.dbContext.SaveChangesAsync();
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task SaveAsync(Message message)
         {
-            //this.dbContext.Messages.Add(message);
+            this.dbContext.Messages.Add(message);
 
-            //await this.dbContext.SaveChangesAsync();
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }

@@ -3,10 +3,12 @@
     using Data.Models;
     using MassTransit;
     using Microsoft.AspNetCore.Identity;
+    using Models;
     using Services.Jwt;
+    using Services.Messages;
     using System.Linq;
     using System.Threading.Tasks;
-    using TaskTronic.Identity.Models;
+    using TaskTronic.Data.Models;
     using TaskTronic.Messages.Drive.Employees;
     using TaskTronic.Services;
 
@@ -19,17 +21,20 @@
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IJwtGeneratorService jwtGeneratorService;
         private readonly IBus publisher;
+        private readonly IMessageService messageService;
 
         public IdentityService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IJwtGeneratorService jwtGeneratorService,
-            IBus publisher)
+            IBus publisher,
+            IMessageService messageService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.jwtGeneratorService = jwtGeneratorService;
             this.publisher = publisher;
+            this.messageService = messageService;
         }
 
         public async Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model)
@@ -76,9 +81,13 @@
                 UserId = user.Id
             };
 
+            var message = new Message(messageData);
+
+            await this.messageService.SaveAsync(message);
+
             await this.publisher.Publish(messageData);
 
-            // mark as finished
+            await this.messageService.MarkMessageAsPublishedAsync(message.Id);
 
             return Result<bool>.SuccessWith(true);
         }

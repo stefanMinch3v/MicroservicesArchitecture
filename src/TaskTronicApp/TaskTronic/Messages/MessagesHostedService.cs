@@ -3,7 +3,9 @@
     using Hangfire;
     using MassTransit;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -13,17 +15,17 @@
     public class MessagesHostedService : IHostedService
     {
         private readonly IRecurringJobManager recurringJobManager;
-        private readonly DbContext dbContext;
         private readonly IBus publisher;
+        private readonly IServiceProvider services;
 
         public MessagesHostedService(
             IRecurringJobManager recurringJobManager,
-            DbContext dbContext,
-            IBus publisher)
+            IBus publisher,
+            IServiceProvider services)
         {
             this.recurringJobManager = recurringJobManager;
-            this.dbContext = dbContext;
             this.publisher = publisher;
+            this.services = services;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -43,7 +45,13 @@
         // hangfire will handle all failures if something went wrong with the method below
         public void ProccessPendingMessages()
         {
-            var messages = this.dbContext
+            using var scope = this.services.CreateScope();
+
+            var dbContext =
+                scope.ServiceProvider
+                    .GetRequiredService<DbContext>();
+
+            var messages = dbContext
                 .Set<Message>()
                 .Where(m => !m.Published)
                 .OrderBy(m => m.Id)
@@ -55,7 +63,7 @@
 
                 message.MarkedAsPublished();
 
-                this.dbContext.SaveChanges();
+                dbContext.SaveChanges();
             }
         }
     }

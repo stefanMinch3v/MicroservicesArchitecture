@@ -15,16 +15,18 @@
 		<tbody *ngFor="let company of companyWrapper.companies">
 			<tr>
 				<td>{{company.name}}</td>
-				<td *ngFor="let department of company.departments">
-					<span *ngIf="selectedDataMatch(company.companyId, department.departmentId, companyWrapper.selectedData)">
-						<i class="fas fa-check-square"></i>Current &nbsp;
-					</span>
-
-					<span>{{department.departmentName}}</span> &nbsp;
-					
-					<button
-						class="btn btn-success btn-sm" 
-						(click)="selectCompanyDepartment(company.companyId, department.departmentId)">Select</button>
+				<td>
+					<div *ngFor="let department of company.departments" class="mb-1">
+						<span *ngIf="selectedDataMatch(company.companyId, department.departmentId, companyWrapper.selectedData)">
+							<i class="fas fa-check-square"></i>Current &nbsp;
+						</span>
+						
+						<span>{{department.departmentName}}</span> &nbsp;
+						
+						<button
+							class="btn btn-success btn-sm" 
+							(click)="selectCompanyDepartment(company.companyId, department.departmentId)">Select</button>
+					</div>
 				</td>
 			</tr>
 		</tbody>
