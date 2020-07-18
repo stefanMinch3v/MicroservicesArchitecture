@@ -47,6 +47,7 @@
 
             if (inputModel.Name != DriveConstants.ROOT_FOLDER_NAME)
             {
+                // TODO: fix (needs to be fixed cuz the names are sometimes incorrect)
                 var numberOfExistingNames = await folderDAL.GetFolderNumbersWithExistingNameAsync(
                     inputModel.Name,
                     inputModel.ParentId.Value);

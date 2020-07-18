@@ -12,7 +12,7 @@ export class GatewayService {
     constructor(private http: HttpClient) { }
 
     public getTotalViews(): Observable<Array<TotalView>> {
-        const url = environment.gatewayUrl + '/drive/myfolders';
+        const url = environment.gatewayUrl + '/Drive/MyFolders';
         return this.http.get(url)
             .pipe(map((response: Array<TotalView>) => response));
     }
