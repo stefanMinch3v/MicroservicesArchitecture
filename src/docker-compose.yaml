@@ -6,12 +6,8 @@ services:
              # context: ./TaskTronicApp
              # dockerfile: ./TaskTronic.Client/Dockerfile
         # ports:
-          # - "4200:80"
+            # - "4200:80"
         # container_name: angular-client
-        # volumes:
-         # - ./.aspnet/angular-client:/
-         # - ./TaskTronic.Client/node_modules
-          
     data:
         container_name: sqlserver
         image: mcr.microsoft.com/mssql/server:2019-latest

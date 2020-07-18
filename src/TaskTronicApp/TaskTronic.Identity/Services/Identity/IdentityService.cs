@@ -37,6 +37,26 @@
             this.messageService = messageService;
         }
 
+        public async Task EditAsync(InputEditModel model)
+        {
+            if (model is null)
+            {
+                return;
+            }
+
+            var user = await this.userManager.FindByIdAsync(model.UserId);
+
+            if (user is null)
+            {
+                return;
+            }
+
+            user.UserName = model.UserName;
+            user.Email = model.Email;
+
+            await this.userManager.UpdateAsync(user);
+        }
+
         public async Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model)
         {
             if (model is null)

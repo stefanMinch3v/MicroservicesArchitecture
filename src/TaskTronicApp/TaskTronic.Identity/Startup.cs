@@ -10,6 +10,7 @@ namespace TaskTronic.Identity
     using Services.Identity;
     using Services.Jwt;
     using Services.Messages;
+    using TaskTronic.Identity.Messages;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
 
@@ -29,7 +30,8 @@ namespace TaskTronic.Identity
                 .AddTransient<IJwtGeneratorService, JwtGeneratorService>()
                 .AddMessaging(
                     useHangfireForPublishers: true,
-                    configuration: this.Configuration)
+                    configuration: this.Configuration,
+                    typeof(UserEditedConsumer))
                 .AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 6;

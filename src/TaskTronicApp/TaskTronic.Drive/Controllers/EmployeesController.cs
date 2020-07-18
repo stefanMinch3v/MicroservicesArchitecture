@@ -1,12 +1,16 @@
 ﻿namespace TaskTronic.Drive.Controllers
 {
+    using MassTransit;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Services.Employees;
+    using Services.Messages;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
-    using TaskTronic.Drive.Services.Employees;
+    using TaskTronic.Data.Models;
     using TaskTronic.Infrastructure;
+    using TaskTronic.Messages.Drive.Employees;
     using TaskTronic.Services;
     using TaskTronic.Services.Identity;
 
@@ -15,13 +19,19 @@
     {
         private readonly ICurrentUserService currentUser;
         private readonly IEmployeeService employeeService;
+        private readonly IMessageService messageService;
+        private readonly IBus publisher;
 
         public EmployeesController(
             ICurrentUserService currentUser,
-            IEmployeeService employeeService)
+            IEmployeeService employeeService,
+            IMessageService messageService,
+            IBus publisher)
         {
             this.currentUser = currentUser;
             this.employeeService = employeeService;
+            this.messageService = messageService;
+            this.publisher = publisher;
         }
 
         [HttpGet]
@@ -66,10 +76,33 @@
                 return BadRequest(Result.Failure(this.currentUser.UserId));
             }
 
+            if (input.Name.Contains(" "))
+            {
+                input.Name = input.Name.Replace(" ", "_");
+            }
+
+            if (input.Email.Contains(" "))
+            {
+                input.Email = input.Email.Replace(" ", "_");
+            }
+
             employee.Name = input.Name;
             employee.Email = input.Email;
 
-            await this.employeeService.Save(employee);
+            var messageData = new UserEditedMessage
+            {
+                UserId = employee.UserId,
+                Email = input.Email,
+                Name = input.Name
+            };
+
+            var message = new Message(messageData);
+
+            await this.employeeService.Save(employee, message);
+
+            await this.publisher.Publish(messageData);
+
+            await this.messageService.MarkMessageAsPublishedAsync(message.Id);
 
             return Ok();
         }

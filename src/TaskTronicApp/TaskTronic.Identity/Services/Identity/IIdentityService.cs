@@ -9,5 +9,7 @@
         Task<Result<bool>> RegisterAsync(InputRegisterModel model);
 
         Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model);
+
+        Task EditAsync(InputEditModel model);
     }
 }

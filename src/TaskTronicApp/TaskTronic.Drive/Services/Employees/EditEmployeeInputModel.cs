@@ -2,7 +2,6 @@
 {
     using System.ComponentModel.DataAnnotations;
 
-    // TODO: validations
     public class EditEmployeeInputModel
     {
         [Required]
