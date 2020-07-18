@@ -32,7 +32,7 @@
         {
             this.recurringJobManager.AddOrUpdate(
                 nameof(MessagesHostedService),
-                () => this.ProccessPendingMessages(),
+                () => this.ProccessPendingMessages(cancellationToken),
                 "*/5 * * * * *"); // Cron job expression syntax -> runs in every 5 sec
 
             return Task.CompletedTask;
@@ -43,12 +43,11 @@
 
         // must be public and not async in order to work with recurring job manager
         // hangfire will handle all failures if something went wrong with the method below
-        public void ProccessPendingMessages()
+        public void ProccessPendingMessages(CancellationToken cancellationToken)
         {
             using var scope = this.services.CreateScope();
 
-            var dbContext =
-                scope.ServiceProvider
+            var dbContext = scope.ServiceProvider
                     .GetRequiredService<DbContext>();
 
             var messages = dbContext
@@ -59,7 +58,9 @@
 
             foreach (var message in messages)
             {
-                this.publisher.Publish(message.Data, message.Type);
+                this.publisher.Publish(message.Data, message.Type, cancellationToken)
+                    .GetAwaiter()
+                    .GetResult();
 
                 message.MarkedAsPublished();
 
