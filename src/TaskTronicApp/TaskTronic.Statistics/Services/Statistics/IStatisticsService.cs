@@ -10,5 +10,9 @@
         Task AddFolderAsync();
 
         Task AddFileAsync();
+
+        Task RemoveFileAsync();
+
+        Task RemoveFolderAsync();
     }
 }

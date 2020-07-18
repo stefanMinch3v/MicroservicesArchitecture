@@ -6,8 +6,6 @@
 
     public interface IFolderDAL
     {
-        Task<(int FolderId, int MessageId)> CreateFolderAsync(InputFolderServiceModel inputModel);
-
         Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName);
 
         Task<FolderServiceModel> GetFolderByIdAsync(int folderId);
@@ -32,12 +30,14 @@
 
         Task<int> GetFolderNumbersWithExistingNameAsync(string name, int parentFolderId);
 
-        Task<bool> DeleteAsync(int catalogId, int folderId);
-
         Task<int> CountFoldersForEmployeeAsync(int employeeId);
 
         Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllFlatForEmployeeAsync(int employeeId);
 
         Task<IList<FolderSearchServiceModel>> GetAllForSearchAsync(int catalogId, int? rootFolderId);
+
+        // transactions
+        Task<(bool Success, int MessageId)> DeleteAsync(int catalogId, int folderId);
+        Task<(int FolderId, int MessageId)> CreateFolderAsync(InputFolderServiceModel inputModel);
     }
 }

@@ -38,5 +38,23 @@
             => await this.mapper
                 .ProjectTo<StatisticsOutputModel>(base.All())
                 .FirstOrDefaultAsync();
+
+        public async Task RemoveFileAsync()
+        {
+            var statistics = await base.All().SingleOrDefaultAsync();
+
+            statistics.TotalFiles--;
+
+            await base.Save(statistics);
+        }
+
+        public async Task RemoveFolderAsync()
+        {
+            var statistics = await base.All().SingleOrDefaultAsync();
+
+            statistics.TotalFolders--;
+
+            await base.Save(statistics);
+        }
     }
 }

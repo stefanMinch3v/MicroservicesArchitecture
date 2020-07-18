@@ -79,7 +79,26 @@
                 throw new FileException { Message = "File not found." };
             }
 
-            return await this.fileDAL.DeleteFileAsync(file.CatalogId, file.FolderId, file.FileId, file.BlobId);
+            var (success, insertedMessageId) = await this.fileDAL.DeleteFileAsync(
+                file.CatalogId, 
+                file.FolderId, 
+                file.FileId, 
+                file.BlobId);
+
+            if (success)
+            {
+                // TODO: refactor when move to EF
+                var messageData = new FileDeletedMessage
+                {
+                    FileId = fileId
+                };
+
+                await this.publisher.Publish(messageData);
+
+                await this.messageService.MarkMessageAsPublishedAsync(insertedMessageId);
+            }
+
+            return success;
         }
 
         public async Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, int employeeId, string newFileName)

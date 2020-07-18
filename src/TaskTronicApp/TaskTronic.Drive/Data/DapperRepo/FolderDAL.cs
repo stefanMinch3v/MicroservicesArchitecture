@@ -177,13 +177,47 @@
             }
         }
 
-        public async Task<bool> DeleteAsync(int catalogId, int folderId)
+        public async Task<(bool Success, int MessageId)> DeleteAsync(int catalogId, int folderId)
         {
-            var sql = string.Format(FolderSql.DELETE_FOLDER, FolderTableName);
-
-            using (var conn = this.dbConnectionFactory.GetSqlConnection)
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
-                return (await conn.ExecuteAsync(sql, new { folderId, catalogId })) > 0;
+                db.Open();
+                var transaction = db.BeginTransaction();
+
+                int insertedMessageId;
+
+                try
+                {
+                    // delete folder
+                    var sql = string.Format(FolderSql.DELETE_FOLDER, FolderTableName);
+                    await db.ExecuteAsync(sql, new { folderId, catalogId }, transaction);
+
+                    // save message
+                    var sqlMessages = string.Format(FilesSql.ADD_NEW_MESSAGE, MessagesTableName);
+
+                    var messageData = new FolderDeletedMessage
+                    {
+                        FolderId = folderId
+                    };
+
+                    var message = new Message(messageData);
+
+                    insertedMessageId = await db.ExecuteScalarAsync<int>(sqlMessages, new
+                    {
+                        Type = message.Type.AssemblyQualifiedName,
+                        message.Published,
+                        message.serializedData
+                    }, transaction);
+
+                    transaction.Commit();
+
+                    return (true, insertedMessageId);
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
         }
 

@@ -76,6 +76,19 @@
                 return BadRequest(Result.Failure(this.currentUser.UserId));
             }
 
+            if (input is null)
+            {
+                return BadRequest("Input is null");
+            }
+
+            if (string.IsNullOrEmpty(input.Name) || string.IsNullOrEmpty(input.Email))
+            {
+                return BadRequest("Name or email is not valid.");
+            }
+
+            input.Name = input.Name.Trim();
+            input.Email = input.Email.Trim();
+
             if (input.Name.Contains(" "))
             {
                 input.Name = input.Name.Replace(" ", "_");

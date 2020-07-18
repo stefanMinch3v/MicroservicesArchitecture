@@ -298,13 +298,14 @@
             }
         }
 
-        public async Task<bool> DeleteFileAsync(int catalogId, int folderId, int fileId, int blobId)
+        public async Task<(bool Success, int MessageId)> DeleteFileAsync(int catalogId, int folderId, int fileId, int blobId)
         {
             using (var conn = this.dbConnectionFactory.GetSqlConnection)
             {
                 conn.Open();
                 var transaction = conn.BeginTransaction();
-                bool success;
+
+                int insertedMessageId;
 
                 try
                 {
@@ -325,13 +326,30 @@
 
                     if (deletedFileBlob && deletedFile)
                     {
+                        // save and send message to all subscribers
+                        var sqlMessages = string.Format(FilesSql.ADD_NEW_MESSAGE, MessagesTableName);
+
+                        var messageData = new FileDeletedMessage
+                        {
+                            FileId = fileId
+                        };
+
+                        var message = new Message(messageData);
+
+                        insertedMessageId = await conn.ExecuteScalarAsync<int>(sqlMessages, new
+                        {
+                            Type = message.Type.AssemblyQualifiedName,
+                            message.Published,
+                            message.serializedData
+                        }, transaction);
+
                         transaction.Commit();
-                        success = true;
+                        return (true, insertedMessageId);
                     }
                     else
                     {
-                        success = false;
                         transaction.Rollback();
+                        return (false, 0);
                     }
                 }
                 catch
@@ -339,7 +357,6 @@
                     transaction.Rollback();
                     throw;
                 }
-                return success;
             }
         }
 

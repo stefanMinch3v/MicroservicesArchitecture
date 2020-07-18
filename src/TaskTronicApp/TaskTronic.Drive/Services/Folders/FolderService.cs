@@ -528,11 +528,22 @@
             }
 
             // folders must be empty at this point
-            var isDeleted = await this.folderDAL.DeleteAsync(catalogId, folder.FolderId);
+            var (isDeleted, insertedMessageId) = await this.folderDAL.DeleteAsync(catalogId, folder.FolderId);
             if (!isDeleted)
             {
                 return;
             }
+
+            // TODO: refactor when move to EF
+            var messageData = new FolderDeletedMessage
+            {
+                FolderId = folder.FolderId
+            };
+
+            await this.publisher.Publish(messageData);
+
+            await this.messageService.MarkMessageAsPublishedAsync(insertedMessageId);
+
 
             foreach (var subFolder in folder.SubFolders)
             {

@@ -13,13 +13,9 @@
 
         Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId);
 
-        Task<bool> DeleteFileAsync(int catalogId, int folderId, int fileId, int blobId);
-
         Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, string newFileName);
 
         Task<bool> CreateBlobAsync(InputFileServiceModel file);
-
-        Task<bool> AppendChunkToBlobAsync(InputFileServiceModel file);
 
         Task<int?> DoesFileWithSameNameExistInFolder(int catalogId, int folderId, string fileName, string fileType);
 
@@ -31,9 +27,11 @@
 
         Task<int> CountFilesForEmployeeAsync(int employeeId);
 
-        // transaction
+        // transactions
+        Task<(bool Success, int MessageId)> DeleteFileAsync(int catalogId, int folderId, int fileId, int blobId);
         Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file);
         Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName);
         Task<int> SaveCompletedUploadAsReplaceExistingFileAsync(InputFileServiceModel file, int fileId);
+        Task<bool> AppendChunkToBlobAsync(InputFileServiceModel file);
     }
 }

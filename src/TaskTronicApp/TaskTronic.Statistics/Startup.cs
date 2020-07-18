@@ -29,7 +29,9 @@ namespace TaskTronic.Statistics
                     configuration: null,
                     typeof(FileUploadedConsumer),
                     typeof(FolderCreatedConsumer),
-                    typeof(FolderOpenedConsumer));
+                    typeof(FolderOpenedConsumer),
+                    typeof(FileDeletedConsumer),
+                    typeof(FolderDeletedConsumer));
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
