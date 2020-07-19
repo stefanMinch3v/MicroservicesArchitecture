@@ -1,13 +1,6 @@
 version: "3.8"
 
-services:
-    # angular:
-        # build:
-             # context: ./TaskTronicApp
-             # dockerfile: ./TaskTronic.Client/Dockerfile
-        # ports:
-            # - "4200:80"
-        # container_name: angular-client
+services:  
     data:
         container_name: sqlserver
         image: mcr.microsoft.com/mssql/server:2019-latest
@@ -154,6 +147,19 @@ services:
         depends_on:
             - statistics
             - drive
+            - identity
+
+    angular:
+        container_name: angular-client
+        build:
+             context: ./TaskTronic.Client
+             dockerfile: ./Dockerfile
+        ports:
+            - "4200:4200"
+        restart: on-failure
+        networks:
+            - tasktronic-network
+        depends_on:
             - identity
 networks:
     tasktronic-network:

@@ -7,7 +7,6 @@ import * as plupload from 'plupload';
 import { Folder } from './folder.model';
 import { FileModel } from './file.model';
 import { FolderIdName } from './folder-id-name.model';
-import { environment } from 'src/environments/environment';
 import { SignalRService } from 'src/app/core/signalR.service';
 import { FaIconPipe } from 'src/app/core/fa-icons.pipe';
 import { EmployeeService } from 'src/app/core/employee.service';
@@ -18,12 +17,12 @@ import { EmployeeService } from 'src/app/core/employee.service';
   styleUrls: ['./drive.component.scss'],
   providers: [FaIconPipe]
 })
-export class DriveComponent implements OnInit, AfterViewInit {
+export class DriveComponent implements OnInit {
   private readonly FILE_MAX_SIZE = 2147483647;
 
   // PLUPLOAD
-  @ViewChild('pluploader') element: ElementRef;
-  @ViewChild('pluploadcontainer') containerElement: ElementRef;
+  // @ViewChild('pluploader') element: ElementRef;
+  // @ViewChild('pluploadcontainer') containerElement: ElementRef;
   public dropElement: any;
   public uploader: plupload.Uploader;
   parameters: object;
@@ -87,13 +86,13 @@ export class DriveComponent implements OnInit, AfterViewInit {
       });
   }
 
-  ngAfterViewInit() {
-    if (this.uploader) {
-      this.uploader.settings.multipart_params = this.getGroupParameters();
-    } else {
-      this.uploader = this.initPlupload();
-    }
-  }
+  // ngAfterViewInit() {
+  //   if (this.uploader) {
+  //     this.uploader.settings.multipart_params = this.getGroupParameters();
+  //   } else {
+  //     this.uploader = this.initPlupload();
+  //   }
+  // }
 
   public navigateToRoot(){
     this.router.navigate(['drive', this.companyDepartmentsId]);
@@ -220,91 +219,91 @@ export class DriveComponent implements OnInit, AfterViewInit {
   }
 
   // PLUPLOAD
-  initPlupload() {
-    this.parameters = this.getGroupParameters();
+  // initPlupload() {
+  //   this.parameters = this.getGroupParameters();
 
-    const uploader = new plupload.Uploader({
-      runtimes: 'html5',
-      browse_button: this.element.nativeElement,
-      drop_element: 'app-body',
-      container: this.containerElement.nativeElement,
-      multipart_params: this.parameters,
-      chunk_size: '10mb',
-      url: environment.driveUrl + '/files/UploadFileToFolder',
-      headers: { Authorization: 'Bearer ' + this.authService.getToken() },
-      filters: { prevent_empty: false} as any
-    });
+  //   const uploader = new plupload.Uploader({
+  //     runtimes: 'html5',
+  //     browse_button: this.element.nativeElement,
+  //     drop_element: 'app-body',
+  //     container: this.containerElement.nativeElement,
+  //     multipart_params: this.parameters,
+  //     chunk_size: '10mb',
+  //     url: environment.driveUrl + '/files/UploadFileToFolder',
+  //     headers: { Authorization: 'Bearer ' + this.authService.getToken() },
+  //     filters: { prevent_empty: false} as any
+  //   });
 
-    uploader.init();
+  //   uploader.init();
 
-    uploader.bind('FilesAdded', (up, files) => {
-      const fileNamesAdded = [];
+  //   uploader.bind('FilesAdded', (up, files) => {
+  //     const fileNamesAdded = [];
 
-      files.forEach(element => {
-        if (element.size > this.FILE_MAX_SIZE) {
-          up.removeFile(element);
+  //     files.forEach(element => {
+  //       if (element.size > this.FILE_MAX_SIZE) {
+  //         up.removeFile(element);
 
-          if (up.state === plupload.STARTED && element.status === plupload.UPLOADING) {
-            up.stop();
-            up.start();
-          }
+  //         if (up.state === plupload.STARTED && element.status === plupload.UPLOADING) {
+  //           up.stop();
+  //           up.start();
+  //         }
 
-          this.notificationService.errorMessage('File max size is 2GB');
-          return;
-        }
+  //         this.notificationService.errorMessage('File max size is 2GB');
+  //         return;
+  //       }
 
-        fileNamesAdded.push(element.name.toString());
-      });
+  //       fileNamesAdded.push(element.name.toString());
+  //     });
 
-      this.driveService.checkFilesNamesForFolder(this.folder.catalogId, this.folder.folderId, fileNamesAdded)
-        .subscribe(response => {
-          const fileNamesToBeRenamed = [];
+  //     this.driveService.checkFilesNamesForFolder(this.folder.catalogId, this.folder.folderId, fileNamesAdded)
+  //       .subscribe(response => {
+  //         const fileNamesToBeRenamed = [];
 
-          for (const key in response) {
-            const value = response[key];
-            if (value) {
-              fileNamesToBeRenamed.push(key);
-            }
-          }
+  //         for (const key in response) {
+  //           const value = response[key];
+  //           if (value) {
+  //             fileNamesToBeRenamed.push(key);
+  //           }
+  //         }
 
-          if (fileNamesToBeRenamed.length > 0) {
-            const confirmation = confirm('Some files already exist in the folder, do you want to replace them?');
-            if (confirmation) {
-                uploader.settings.multipart_params.replaceExistingFiles = true;
-                document.getElementById('upload-overlay').style.width = '100%';
-                uploader.start();
-            }
-            // ask user to choose from -> overwrite files / rename files / cancel upload
-            // and tell user what files clashes
+  //         if (fileNamesToBeRenamed.length > 0) {
+  //           const confirmation = confirm('Some files already exist in the folder, do you want to replace them?');
+  //           if (confirmation) {
+  //               uploader.settings.multipart_params.replaceExistingFiles = true;
+  //               document.getElementById('upload-overlay').style.width = '100%';
+  //               uploader.start();
+  //           }
+  //           // ask user to choose from -> overwrite files / rename files / cancel upload
+  //           // and tell user what files clashes
 
-            // set users chocie like this
-            // uploader.settings.multipart_params.GOOD_override_name = true/false;
+  //           // set users chocie like this
+  //           // uploader.settings.multipart_params.GOOD_override_name = true/false;
 
-            // end with this
-            // document.getElementById('upload-overlay').style.width = '100%';
-            // uploader.start();
-          } else {
-            document.getElementById('upload-overlay').style.width = '100%';
-            uploader.start();
-          }
-        });
-    });
+  //           // end with this
+  //           // document.getElementById('upload-overlay').style.width = '100%';
+  //           // uploader.start();
+  //         } else {
+  //           document.getElementById('upload-overlay').style.width = '100%';
+  //           uploader.start();
+  //         }
+  //       });
+  //   });
 
-    uploader.bind('UploadComplete', (up, file) => {
-      setTimeout(() => {
-        this.uploader.files.length = 0;
-        document.getElementById('upload-overlay').style.width = '0';
-        this.reloadFolder();
-      }, 500);
-    });
+  //   uploader.bind('UploadComplete', (up, file) => {
+  //     setTimeout(() => {
+  //       this.uploader.files.length = 0;
+  //       document.getElementById('upload-overlay').style.width = '0';
+  //       this.reloadFolder();
+  //     }, 500);
+  //   });
 
-    uploader.bind('BeforeChunkUpload', (up: plupload.Uploader, file: any, post: any) => {
-      // Send the total file size
-      post.total_filesize = file.size;
-    });
+  //   uploader.bind('BeforeChunkUpload', (up: plupload.Uploader, file: any, post: any) => {
+  //     // Send the total file size
+  //     post.total_filesize = file.size;
+  //   });
 
-    return uploader;
-  }
+  //   return uploader;
+  // }
 
   getGroupParameters(): object {
     if (this.folder) {

@@ -30,6 +30,16 @@
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            using var scope = this.services.CreateScope();
+
+            var dbContext = scope.ServiceProvider
+                    .GetRequiredService<DbContext>();
+
+            if (!dbContext.Database.CanConnect())
+            {
+                dbContext.Database.Migrate();
+            }
+
             this.recurringJobManager.AddOrUpdate(
                 nameof(MessagesHostedService),
                 () => this.ProccessPendingMessages(cancellationToken),

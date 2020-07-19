@@ -53,7 +53,7 @@
           <th scope="col">Updater</th>
         </tr>
       </thead>
-      <tbody *ngFor="let file of searchResults; else loading">
+      <tbody *ngFor="let file of searchResults">
         <tr class="file-row">
           <td></td>
           <td>
@@ -113,8 +113,7 @@
         </tr>
       </thead>
       <tbody *ngIf="folder && folder.subFolders">
-        <ng-template #loading *ngIf="isLoading">Spinner loading...</ng-template>
-        <tr *ngFor="let folder of folder.subFolders; else loading" class="folder-row">
+        <tr *ngFor="let folder of folder.subFolders" class="folder-row">
           <td></td>
           <td>
             <i class="fas fa-folder" style="color: #F7D774;"></i>
@@ -134,7 +133,7 @@
           <td>{{folder.folderCount}} folders, {{folder.fileCount}} files</td>
           <td>{{folder.updaterUsername}}</td>
         </tr>
-        <tr *ngFor="let file of folder.files; else loading" class="file-row">
+        <tr *ngFor="let file of folder.files" class="file-row">
           <td></td>
           <td>
             <i 

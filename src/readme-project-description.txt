@@ -1,7 +1,7 @@
+(after Wednesday this file will be erased)
+
 The idea behind the project: to use internal System for managing tasks with uploading and downloading files. It is based on Google drive but much simplified.
 Every company has department and the Drive is based on that department.
-
-The actual front end is Angular, so far i couldn't manage to run it in a docker container thats why it has to be started seperately :(
 
 Admin project can:
 - add companies
