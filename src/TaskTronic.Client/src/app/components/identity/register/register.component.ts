@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { RegisterModelForm } from './register.model';
+import { RegisterModelForm } from '../../../core/models/register.model';
 import { FormGroup, FormBuilder } from 'ngx-strongly-typed-forms';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IdentityService } from 'src/app/core/identity.service';
-import { AuthService } from 'src/app/core/auth.service';
-import { EmployeeService } from 'src/app/core/employee.service';
+import { IdentityService } from 'src/app/core/services/identity.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { EmployeeService } from 'src/app/core/services/employee.service';
 
 @Component({
   selector: 'app-register',

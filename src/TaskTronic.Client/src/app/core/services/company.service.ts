@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
-import { CompanyWrapper } from './models/company-wrapper.model';
+import { CompanyWrapper } from '../models/company-wrapper.model';
 
 @Injectable({
     providedIn: 'root'

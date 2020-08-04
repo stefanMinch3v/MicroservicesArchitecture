@@ -1,15 +1,17 @@
 import { Router, ActivatedRoute } from '@angular/router';
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { DriveService } from 'src/app/core/drive.service';
-import { NotificationService } from 'src/app/core/notification.service';
-import { AuthService } from 'src/app/core/auth.service';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, TemplateRef } from '@angular/core';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { DriveService } from 'src/app/core/services/drive.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import * as plupload from 'plupload';
-import { Folder } from './folder.model';
-import { FileModel } from './file.model';
-import { FolderIdName } from './folder-id-name.model';
-import { SignalRService } from 'src/app/core/signalR.service';
-import { FaIconPipe } from 'src/app/core/fa-icons.pipe';
-import { EmployeeService } from 'src/app/core/employee.service';
+import { Folder } from '../../core/models/folder.model';
+import { FileModel } from '../../core/models/file.model';
+import { FolderIdName } from '../../core/models/folder-id-name.model';
+import { SignalRService } from 'src/app/core/services/signalR.service';
+import { FaIconPipe } from 'src/app/core/pipes/fa-icons.pipe';
+import { EmployeeService } from 'src/app/core/services/employee.service';
+import { CommonHelper } from 'src/app/core/helpers/common.helper';
 
 @Component({
   selector: 'app-drive',
@@ -42,11 +44,19 @@ export class DriveComponent implements OnInit {
   public parentFolderChain: FolderIdName[] = [];
   public isLoading = true;
 
-  //search
+  // search
   @ViewChild('searchValue', {static: true}) searchValue: ElementRef;
   public hasSearchResult = false;
   public searchResults: FileModel[] = [];
   //
+
+  // edit modal
+  private modalElementId: number;
+  private modalCurrentFolderId: number;
+  modalNameToChange: string;
+  modalIsFolder: boolean;
+  modalRef: BsModalRef;
+  @ViewChild('modalTemplate', { static: true }) modalTemplateRef: TemplateRef<any>;
 
   public constructor(
     private readonly driveService: DriveService,
@@ -56,7 +66,8 @@ export class DriveComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly signalRService: SignalRService,
     private readonly faIconPipe: FaIconPipe,
-    private readonly employeeService: EmployeeService) {
+    private readonly employeeService: EmployeeService,
+    private readonly modalService: BsModalService) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
@@ -96,12 +107,19 @@ export class DriveComponent implements OnInit {
     this.router.navigate(['drive', this.companyDepartmentsId]);
   }
 
+  public openModal(name: string, isFolder: boolean, currentFolderId: number, elementId: number) {
+    this.modalNameToChange = name;
+    this.modalIsFolder = isFolder;
+    this.modalElementId = elementId;
+    this.modalCurrentFolderId = currentFolderId;
+
+    this.modalRef = this.modalService.show(this.modalTemplateRef);
+  }
+
   public getRootFolder(): void {
     this.isLoading = true;
-
     this.driveService.getRootFolder(this.companyDepartmentsId)
       .subscribe(folder => {
-
         this.folder = folder;
         this.addFolderToParentFolderChain(folder.folderId, folder.name);
         this.isLoading = false;
@@ -195,6 +213,47 @@ export class DriveComponent implements OnInit {
     // }
   }
 
+  public renameFolder() {
+    if (!this.modalNameToChange ||
+        this.modalNameToChange.length < 2 ||
+        this.modalNameToChange.length > 255) {
+      this.notificationService.warningMessage('Name must be at least 2 and maximum 255 symbols long!');
+      return;
+    }
+
+    const hasInvalidChars = CommonHelper.hasInvalidCharacters(this.modalNameToChange);
+    if (hasInvalidChars) {
+      this.notificationService.warningMessage('\\,/,:,*,?,<,>,|,\" are not allowed!');
+      return;
+    }
+
+    this.driveService.renameFolder(this.folder.catalogId, this.modalElementId, this.modalNameToChange)
+      .subscribe(_ => {
+        this.modalRef.hide();
+        this.reloadFolder();
+      });
+  }
+
+  public renameFile() {
+    if (!this.modalNameToChange ||
+        this.modalNameToChange.length < 2 ||
+        this.modalNameToChange.length > 255) {
+      this.notificationService.warningMessage('Name must be at least 2 and maximum 255 symbols long!');
+      return;
+    }
+
+    const hasInvalidChars = CommonHelper.hasInvalidCharacters(this.modalNameToChange);
+    if (hasInvalidChars) {
+      this.notificationService.warningMessage('\\,/,:,*,?,<,>,|,\" are not allowed!');
+      return;
+    }
+
+    this.driveService.renameFile(this.folder.catalogId, this.folder.folderId, this.modalElementId, this.modalNameToChange)
+      .subscribe(_ => {
+        this.modalRef.hide();
+        this.reloadFolder();
+      });
+  }
   // FILE ACTIONS
   public downloadFile(file: FileModel, shouldOpen: boolean = false) {
     const downloadUrl = this.driveService.downloadFile(file.catalogId, file.folderId, file.fileId, shouldOpen);

@@ -3,8 +3,8 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NotificationService } from './notification.service';
-import { Folder } from '../components/drive/folder.model';
-import { FileModel } from '../components/drive/file.model';
+import { Folder } from '../models/folder.model';
+import { FileModel } from '../models/file.model';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
 
@@ -33,29 +33,28 @@ export class DriveService {
             }));
     }
 
-    renameFolder(folder: Folder, newFolderName: string): Observable<boolean> {
+    renameFolder(catalogId: number, folderId: number, newFolderName: string): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}RenameFolder`;
 
         return this.http.post(url, {}, {
             params: {
-                catalogId: folder.catalogId.toString(),
-                folderId: folder.folderId.toString(),
+                catalogId: String(catalogId),
+                folderId: String(folderId),
                 name: newFolderName
-            }
-            }).pipe(map((response: boolean) => {
+            }}).pipe(map((response: boolean) => {
                 this.notificationService.successMessage('Folder renamed');
                 return response;
             }));
     }
 
-    renameFile(file: FileModel, newFileName: string): Observable<boolean> {
+    renameFile(catalogId: number, folderId: number, fileId: number, newFileName: string): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FILES}RenameFile`;
 
         return this.http.post(url, {}, {
             params: {
-                catalogId: file.catalogId.toString(),
-                folderId: file.folderId.toString(),
-                fileId: file.fileId.toString(),
+                catalogId: String(catalogId),
+                folderId: String(folderId),
+                fileId: String(fileId),
                 name: newFileName
             }}).pipe(map((response: boolean) => {
                 this.notificationService.successMessage('File renamed');

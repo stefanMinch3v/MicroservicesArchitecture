@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { FolderIdName } from '../folder-id-name.model';
+import { FolderIdName } from '../../../core/models/folder-id-name.model';
 
 @Component({
   // tslint:disable-next-line: component-selector

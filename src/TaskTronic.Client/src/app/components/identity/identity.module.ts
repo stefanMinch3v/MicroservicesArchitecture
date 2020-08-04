@@ -5,10 +5,10 @@ import { IdentityRoutingModule } from './identity-routing.module';
 import { RegisterComponent } from './register/register.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxStronglyTypedFormsModule } from 'ngx-strongly-typed-forms';
-import { IdentityService } from 'src/app/core/identity.service';
-import { AuthService } from 'src/app/core/auth.service';
+import { IdentityService } from 'src/app/core/services/identity.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 import { HttpClientModule } from '@angular/common/http';
-import { EmployeeService } from 'src/app/core/employee.service';
+import { EmployeeService } from 'src/app/core/services/employee.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { ProfileComponent } from './profile/profile.component';
 

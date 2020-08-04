@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
-import { PayloadModel } from '../components/identity/login/payload.model';
+import { PayloadModel } from '../models/payload.model';
 import { map } from 'rxjs/operators';
 
 @Injectable({

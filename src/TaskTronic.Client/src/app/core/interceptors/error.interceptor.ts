@@ -3,7 +3,7 @@ import { HttpRequest, HttpHandler, HttpInterceptor, HttpEvent } from '@angular/c
 import { throwError, Observable } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { NotificationService } from './notification.service';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable({
   providedIn: 'root'

@@ -70,6 +70,8 @@
           <td>
             <button class="btn btn-sm btn-danger" (click)="deleteFile(file)">Delete</button>
             |
+            <button class="btn btn-sm btn-warning" (click)="openModal(file.fileName, false, file.folderId, file.fileId)">Edit</button>
+            |
             <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
           </td>
           <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
@@ -124,8 +126,8 @@
               Delete
             </button>
             |
-            <button  class="btn btn-sm btn-warning" (click)="notImplementedYet()">
-              Rename
+            <button  class="btn btn-sm btn-warning" (click)="openModal(folder.name, true, folder.folderId, folder.folderId)">
+              Edit
             </button>
           </td>
           <td>{{folder.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
@@ -150,6 +152,8 @@
           <td>
             <button class="btn btn-sm btn-danger" (click)="deleteFile(file)">Delete</button>
             |
+            <button class="btn btn-sm btn-warning" (click)="openModal(file.fileName, false, file.folderId, file.fileId)">Edit</button>
+            |
             <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
           </td>
           <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
@@ -169,4 +173,22 @@
         <div class="progress-bar" [style.width]="file.percent + '%'"></div>
       </div>
   </div>
-</div>  
+</div> 
+
+<ng-template #modalTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Edit modal</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <input type="text" [value]="modalNameToChange" (input)="modalNameToChange = $event.target.value">
+  </div>
+
+  <div class="modal-footer">
+    <button *ngIf="modalIsFolder" type="button" class="btn btn-outline-dark" (click)="renameFolder()">Save</button>
+    <button *ngIf="!modalIsFolder" type="button" class="btn btn-outline-dark" (click)="renameFile()">Save</button>
+  </div>
+</ng-template>

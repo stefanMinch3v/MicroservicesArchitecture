@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { IdentityService } from 'src/app/core/identity.service';
-import { AuthService } from 'src/app/core/auth.service';
-import { NotificationService } from 'src/app/core/notification.service';
+import { IdentityService } from 'src/app/core/services/identity.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { notificationMessages } from 'src/app/core/notification-messages.constants';
 
 @Component({

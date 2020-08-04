@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
-import { TotalView } from './models/total-view.model';
+import { TotalView } from '../models/total-view.model';
 
 @Injectable({
     providedIn: 'root'

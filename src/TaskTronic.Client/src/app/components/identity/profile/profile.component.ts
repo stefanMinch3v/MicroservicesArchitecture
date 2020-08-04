@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { EmployeeService } from 'src/app/core/employee.service';
-import { NotificationService } from 'src/app/core/notification.service';
+import { EmployeeService } from 'src/app/core/services/employee.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { CompanyWrapper } from 'src/app/core/models/company-wrapper.model';
 import { SelectedCompanyModel } from 'src/app/core/models/selected-company.model';
-import { CompanyService } from 'src/app/core/company.service';
+import { CompanyService } from 'src/app/core/services/company.service';
 import { TotalView } from 'src/app/core/models/total-view.model';
-import { GatewayService } from 'src/app/core/gateway.service';
+import { GatewayService } from 'src/app/core/services/gateway.service';
 
 @Component({
   selector: 'app-profile',

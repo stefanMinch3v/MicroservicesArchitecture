@@ -1,11 +1,11 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormGroup, FormBuilder } from 'ngx-strongly-typed-forms';
-import { LoginFormModel } from './login.model';
+import { LoginFormModel } from '../../../core/models/login.model';
 import { Router, ActivatedRoute } from '@angular/router';
-import { IdentityService } from 'src/app/core/identity.service';
-import { AuthService } from 'src/app/core/auth.service';
-import { NotificationService } from 'src/app/core/notification.service';
+import { IdentityService } from 'src/app/core/services/identity.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { notificationMessages } from 'src/app/core/notification-messages.constants';
 
 @Component({
@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
         this.authService.saveUser(this.loginForm.value.username);
         this.authService.saveRoles(res.roles);
         this.authService.saveExpirationTime(res.expiration);
-        
+
         this.notificationService.successMessage(notificationMessages.successLogin);
         this.router.navigateByUrl(this.returnUrl);
       });

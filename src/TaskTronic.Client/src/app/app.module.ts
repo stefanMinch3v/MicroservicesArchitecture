@@ -6,14 +6,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { IdentityModule } from './components/identity/identity.module';
-import { TokenInterceptor } from './core/token.interceptor';
-import { AuthGuard } from './core/auth.guard';
-import { AdminGuard } from './core/admin.guard';
+import { TokenInterceptor } from './core/interceptors/token.interceptor';
+import { AuthGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
 import { SharedModule } from './components/shared/shared.module';
 import { ToastrModule } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { CommonModule } from '@angular/common';
-import { ErrorInterceptorService } from './core/error.interceptor';
+import { ErrorInterceptorService } from './core/interceptors/error.interceptor';
 import { DriveModule } from './components/drive/drive.module';
 
 @NgModule({
