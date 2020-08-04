@@ -13,6 +13,8 @@
 
         Task<FolderServiceModel> GetFolderByIdAsync(int folderId, int employeeId, int? companyDepartmentsId = null);
 
+        Task CheckFolderPermissionsAsync(int catalogId, int folderId, int employeeId);
+
         Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(
             int catalogId, 
             int employeeId,

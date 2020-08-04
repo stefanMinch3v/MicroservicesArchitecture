@@ -224,5 +224,15 @@
                 })).AsList();
             }
         }
+
+        public async Task<OutputFolderFlatServiceModel> GetFolderFlatByIdAsync(int folderId)
+        {
+            var sql = string.Format(FolderSql.FLAT_FOLDER, FolderTableName);
+
+            using (var db = this.dbConnectionFactory.GetSqlConnection)
+            {
+                return await db.QueryFirstOrDefaultAsync<OutputFolderFlatServiceModel>(sql, new { folderId });
+            }
+        }
     }
 }

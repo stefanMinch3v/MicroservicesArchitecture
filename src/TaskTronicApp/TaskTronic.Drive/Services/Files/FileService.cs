@@ -114,20 +114,7 @@
                 throw new FileException { Message = "File not found." };
             }
 
-            var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
-            if (folder is null)
-            {
-                throw new FolderException { Message = "Folder not found." };
-            }
-
-            if (folder.IsPrivate)
-            {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
-                if (!hasPermission)
-                {
-                    throw new PermissionException { Message = "You dont have access to this folder." };
-                }
-            }
+            await this.folderService.CheckFolderPermissionsAsync(catalogId, folderId, employeeId);
 
             return await this.fileDAL.RenameFileAsync(catalogId, folderId, fileId, newFileName);
         }

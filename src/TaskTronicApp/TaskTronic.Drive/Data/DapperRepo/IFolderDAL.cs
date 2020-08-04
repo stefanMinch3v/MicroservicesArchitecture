@@ -10,6 +10,8 @@
 
         Task<FolderServiceModel> GetFolderByIdAsync(int folderId);
 
+        Task<OutputFolderFlatServiceModel> GetFolderFlatByIdAsync(int folderId);
+
         Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId);
 
         Task<int?> GetRootFolderIdAsync(int folderId);

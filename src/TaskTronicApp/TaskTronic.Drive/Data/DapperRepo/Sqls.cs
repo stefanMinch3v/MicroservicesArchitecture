@@ -177,6 +177,10 @@
             public const string FLAT_FOLDERS_FOR_INITIATOR = @"
                 SELECT FolderId, [Name], IsPrivate, CreateDate FROM {0}
                 WHERE EmployeeId = @employeeId";
+
+            public const string FLAT_FOLDER = @"
+                SELECT FolderId, [Name], IsPrivate, CreateDate FROM {0}
+                WHERE FolderId = @folderId";
         }
 
         public class PermissionsSql

@@ -72,7 +72,7 @@
 
         [HttpPost]
         [Route(nameof(RenameFile))]
-        public async Task<ActionResult<bool>> RenameFile(int catId, int folderId, int fileId, string name)
+        public async Task<ActionResult<bool>> RenameFile(int catalogId, int folderId, int fileId, string name)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -81,7 +81,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.fileService.RenameFileAsync(catId, folderId, fileId, employeeId, name);
+            return await this.fileService.RenameFileAsync(catalogId, folderId, fileId, employeeId, name);
         }
 
         [HttpDelete]

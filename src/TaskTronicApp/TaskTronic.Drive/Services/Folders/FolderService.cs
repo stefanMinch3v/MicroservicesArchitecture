@@ -111,11 +111,7 @@
             }
 
             var folder = await this.folderDAL.GetFolderByIdAsync(folderId);
-
-            if (folder is null)
-            {
-                Guard.AgainstNullObject<FolderException>(folder, nameof(folder));
-            }
+            Guard.AgainstNullObject<FolderException>(folder, nameof(folder));
 
             var rootId = folder.RootId;
 
@@ -257,6 +253,21 @@
             return foundFiles
                 .OrderByDescending(f => f.CreateDate)
                 .ThenBy(f => f.SearchFolderNamesPath.Count);
+        }
+
+        public async Task CheckFolderPermissionsAsync(int catalogId, int folderId, int employeeId)
+        { 
+            var folder = await this.folderDAL.GetFolderFlatByIdAsync(folderId);
+            Guard.AgainstNullObject<FolderException>(folder, nameof(folder));
+
+            if (folder.IsPrivate)
+            {
+                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
+                if (!hasPermission)
+                {
+                    throw new PermissionException { Message = "You dont have access to this folder." };
+                }
+            }
         }
 
         private async Task AddUpdatersUsernamesAsync(IEnumerable<FileServiceModel> foundFiles)
