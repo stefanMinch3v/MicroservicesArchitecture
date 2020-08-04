@@ -10,23 +10,15 @@
 
         Task<FolderServiceModel> GetFolderByIdAsync(int folderId);
 
-        Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catalogId);
-
         Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId);
 
         Task<int?> GetRootFolderIdAsync(int folderId);
 
         Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId);
 
-        Task<bool> CheckForParentFolderAsync(int folderId);
-
-        Task<bool> CheckForRootFolderAsync(int folderId);
-
         Task<bool> IsFolderPrivateAsync(int folderId);
 
         Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, int employeeId);
-
-        Task<bool> MoveFolderToNewParentAsync(int catalogId, int folderToMoveId, int newFolderParentId, string folderName);
 
         Task<int> GetFolderNumbersWithExistingNameAsync(string name, int parentFolderId);
 

@@ -8,53 +8,56 @@
     using System.Threading.Tasks;
     using TaskTronic.Services;
 
-    public class StatisticsService : DataService<Statistics>, IStatisticsService
+    public class StatisticsService : IStatisticsService
     {
         private readonly IMapper mapper;
+        private readonly StatisticsDbContext dbContext;
 
         public StatisticsService(StatisticsDbContext dbContext, IMapper mapper)
-            : base(dbContext) 
-            => this.mapper = mapper;
+        {
+            this.mapper = mapper;
+            this.dbContext = dbContext;
+        }
 
         public async Task AddFileAsync()
         {
-            var statistics = await base.All().SingleOrDefaultAsync();
+            var statistics = await this.dbContext.Statistics.SingleOrDefaultAsync();
 
             statistics.TotalFiles++;
 
-            await base.Save(statistics);
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task AddFolderAsync()
         {
-            var statistics = await base.All().SingleOrDefaultAsync();
+            var statistics = await this.dbContext.Statistics.SingleOrDefaultAsync();
 
             statistics.TotalFolders++;
 
-            await base.Save(statistics);
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task<OutputStatisticsServiceModel> FullStatsAsync()
             => await this.mapper
-                .ProjectTo<OutputStatisticsServiceModel>(base.All())
+                .ProjectTo<OutputStatisticsServiceModel>(this.dbContext.Statistics)
                 .FirstOrDefaultAsync();
 
         public async Task RemoveFileAsync()
         {
-            var statistics = await base.All().SingleOrDefaultAsync();
+            var statistics = await this.dbContext.Statistics.SingleOrDefaultAsync();
 
             statistics.TotalFiles--;
 
-            await base.Save(statistics);
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task RemoveFolderAsync()
         {
-            var statistics = await base.All().SingleOrDefaultAsync();
+            var statistics = await this.dbContext.Statistics.SingleOrDefaultAsync();
 
             statistics.TotalFolders--;
 
-            await base.Save(statistics);
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }

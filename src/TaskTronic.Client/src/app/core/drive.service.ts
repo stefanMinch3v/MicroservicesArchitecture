@@ -82,35 +82,6 @@ export class DriveService {
             }}).pipe(map((response: Folder) => response));
     }
 
-    moveFile(file: FileModel, newFolderId: number): Observable<boolean> {
-        const url = environment.driveUrl + `${this.DRIVE_FILES}MoveFile`;
-
-        return this.http.post(url, {}, {
-            params: {
-                fileId: file.fileId.toString(),
-                catalogId: file.catalogId.toString(),
-                folderId: file.folderId.toString(),
-                newFolderId: newFolderId.toString()
-            }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage('File moved');
-                return response;
-            }));
-    }
-
-    moveFolder(catalogId: number, folderId: number, newFolderId: number): Observable<boolean> {
-        const url = environment.driveUrl + `${this.DRIVE_FOLDERS}MoveFolder`;
-
-        return this.http.post(url, {}, {
-            params: {
-                catalogId: catalogId.toString(),
-                folderId: folderId.toString(),
-                newFolderId: newFolderId.toString()
-            }}).pipe(map((response: boolean) => {
-                this.notificationService.successMessage('Folder moved');
-                return response;
-            }));
-    }
-
     deleteFolder(catalogId: number, folderId: number): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}DeleteFolder`;
 
@@ -191,17 +162,6 @@ export class DriveService {
                 currentFolderId: currentFolderId.toString(),
                 searchValue: value
             }}).pipe(map((response: Array<FileModel>) => response));
-    }
-
-    checkFilesNamesForFolder(catalogId: number, folderId: number, fileNames: string[]): Observable<Map<string, boolean>> {
-        const url = environment.driveUrl + `${this.DRIVE_FOLDERS}CheckFilesNamesForFolder`;
-
-        return this.http.get(url, {
-            params: {
-                catalogId: catalogId.toString(),
-                folderId: folderId.toString(),
-                fileNames
-            }}).pipe(map((response: Map<string, boolean>) => response));
     }
 
     createNewFile(catalogId: number, folderId: number, newFileType: number): Observable<boolean> {

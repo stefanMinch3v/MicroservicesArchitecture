@@ -71,20 +71,6 @@
         }
 
         [HttpPost]
-        [Route(nameof(MoveFile))]
-        public async Task<ActionResult<bool>> MoveFile(int fileId, int catId, int folderId, int newFolderId)
-        {
-            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
-
-            if (employeeId == 0)
-            {
-                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
-            }
-
-            return await this.fileService.MoveFileAsync(catId, folderId, fileId, newFolderId, employeeId);
-        }
-
-        [HttpPost]
         [Route(nameof(RenameFile))]
         public async Task<ActionResult<bool>> RenameFile(int catId, int folderId, int fileId, string name)
         {

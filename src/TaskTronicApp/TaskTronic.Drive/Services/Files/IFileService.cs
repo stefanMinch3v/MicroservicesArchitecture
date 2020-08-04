@@ -17,16 +17,10 @@
 
         Task<bool> UploadFileAsync(InputFileServiceModel file);
 
-        Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(int catalogId, int employeeId, int folderId, string[] fileNames);
-
         Task<OutputFileDownloadServiceModel> GetFileInfoForDownloadAsync(int catalogId, int employeeId, int folderId, int fileId);
 
         Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, int employeeId, string newFileName);
 
-        Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, int employeeId);
-
         Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType);
-
-        Task<int> CountFilesAsync(int employeeId);
     }
 }

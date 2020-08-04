@@ -38,8 +38,6 @@ export class DriveComponent implements OnInit {
   public folderToMove: Folder;
   public selectedFile: FileModel;
   public newFileName: string;
-  public moveFileFolders: Map<string, number>[] = [];
-  public moveFileToFolder: number;
   public fileToMove: FileModel;
   public parentFolderChain: FolderIdName[] = [];
   public isLoading = true;

@@ -21,8 +21,6 @@
 
         Task<OutputFileDownloadServiceModel> GetFileInfoForDownloadAsync(int fileId);
 
-        Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, string fileName);
-
         Task<IEnumerable<FileServiceModel>> SearchFilesAsync(int catalogId, string value, IEnumerable<int> accessibleFiles);
 
         Task<int> CountFilesForEmployeeAsync(int employeeId);
@@ -31,7 +29,6 @@
         Task<(bool Success, int MessageId)> DeleteFileAsync(int catalogId, int folderId, int fileId, int blobId);
         Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file);
         Task<(int FileId, int MessageId)> SaveCompletedUploadAsync(InputFileServiceModel file, string oldFileName);
-        Task<int> SaveCompletedUploadAsReplaceExistingFileAsync(InputFileServiceModel file, int fileId);
         Task<bool> AppendChunkToBlobAsync(InputFileServiceModel file);
     }
 }

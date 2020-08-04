@@ -4,9 +4,10 @@
     using Models.Employees;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using TaskTronic.Data.Models;
     using TaskTronic.Services;
 
-    public interface IEmployeeService : IDataService<Employee>
+    public interface IEmployeeService
     {
         Task<int> GetIdByUserAsync(string userId);
 
@@ -29,5 +30,7 @@
         Task SetCompanyDepartmentsIdAsync(string userId, int companyId, int departmentId);
 
         Task<int> GetSelectedCompanyDepartmentId(int employeeId);
+
+        Task SaveWithMessagesAsync(Employee employee, params Message[] messages);
     }
 }

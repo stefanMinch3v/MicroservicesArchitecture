@@ -66,6 +66,7 @@
                 return (insertedFolderId, insertedMessageId);
             }
         }
+
         public async Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName)
         {
             var sql = string.Format(FolderSql.RENAME_FOLDER, FolderTableName);
@@ -73,36 +74,6 @@
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteAsync(sql, new { catalogId, folderId, newFolderName }) > 0;
-            }
-        }
-
-        public async Task<bool> MoveFolderToNewParentAsync(int catalogId, int folderToMoveId, int newFolderParentId, string folderName)
-        {
-            var sql = string.Format(FolderSql.MOVE_FOLDER_TO_NEW_PARENT, FolderTableName);
-
-            using (var db = this.dbConnectionFactory.GetSqlConnection)
-            {
-                return await (db.ExecuteAsync(sql, new { catalogId, folderToMoveId, newFolderParentId, folderName })) > 0;
-            }
-        }
-
-        public async Task<bool> CheckForParentFolderAsync(int folderId)
-        {
-            var sql = string.Format(FolderSql.CHECK_FOR_FOLDER, FolderTableName);
-
-            using (var db = this.dbConnectionFactory.GetSqlConnection)
-            {
-                return (await db.QuerySingleOrDefaultAsync<int>(sql, new { folderId })) > 0;
-            }
-        }
-
-        public async Task<bool> CheckForRootFolderAsync(int folderId)
-        {
-            var sql = string.Format(FolderSql.CHECK_FOR_FOLDER, FolderTableName);
-
-            using (var db = this.dbConnectionFactory.GetSqlConnection)
-            {
-                return (await db.QuerySingleOrDefaultAsync<int>(sql, new { folderId })) > 0;
             }
         }
 
@@ -126,16 +97,6 @@
             }
         }
 
-        public async Task<IEnumerable<FolderServiceModel>> GetFoldersByCatalogIdAsync(int catalogId)
-        {
-            var sql = string.Format(FolderSql.GET_FOLDERS_BY_CATID, FolderTableName);
-
-            using (var conn = this.dbConnectionFactory.GetSqlConnection)
-            {
-                return (await conn.QueryAsync<FolderServiceModel>(sql, new { catalogId })).AsList();
-            }
-        }
-
         public async Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId)
         {
             var sql = string.Format(FolderSql.GET_ROOT_FOLDER_BY_CATID, FolderTableName);
@@ -155,7 +116,6 @@
                 return (await conn.QueryAsync<FolderWithAccessServiceModel>(sql, new { folderId, employeeId })).AsList();
             }
         }
-
 
         public async Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId)
         {

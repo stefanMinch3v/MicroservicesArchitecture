@@ -112,7 +112,7 @@
 
             var message = new Message(messageData);
 
-            await this.employeeService.Save(employee, message);
+            await this.employeeService.SaveWithMessagesAsync(employee, message);
 
             await this.publisher.Publish(messageData);
 

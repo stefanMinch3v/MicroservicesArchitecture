@@ -244,55 +244,6 @@
             return true;
         }
 
-        public async Task<Dictionary<string, bool>> CheckFilesInFolderForCollisions(
-            int catalogId, 
-            int employeeId,
-            int folderId,
-            string[] fileNames)
-        {
-            //var result = new Dictionary<string, bool>();
-
-            //if (fileNames.Any())
-            //{
-            //    var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
-
-            //    if (folder is null)
-            //    {
-            //        throw new FolderException { Message = "Folder not found." };
-            //    }
-
-            //    if (folder.IsPrivate)
-            //    {
-            //        var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
-
-            //        if (!hasPermission)
-            //        {
-            //            throw new PermissionException { Message = "You dont have access to this folder." };
-            //        }
-            //    }
-
-            //    var filesInFolder = await this.fileDAL.GetFilesByFolderIdAsync(folderId);
-            //    if (filesInFolder.Any())
-            //    {
-            //        foreach (var fileNameToCheck in fileNames)
-            //        {
-            //            result.Add(fileNameToCheck, filesInFolder.Any(x => fileNameToCheck.Equals(x.FileName + x.FileType)));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        foreach (var fileNameToCheck in fileNames)
-            //        {
-            //            result.Add(fileNameToCheck, false);
-            //        }
-            //    }
-            //}
-
-            //return result;
-
-            throw new NotImplementedException("Add functionallity to the front-end!");
-        }
-
         public Task ReadStreamFromFileAsync(int blobId, Stream stream)
             => this.fileDAL.ReadStreamFromFileAsync(blobId, stream);
 
@@ -316,57 +267,6 @@
             return await this.fileDAL.GetFileInfoForDownloadAsync(fileId);
         }
 
-        public async Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, int employeeId)
-        {
-            //var folder = await this.folderService.GetFolderByIdAsync(folderId, employeeId);
-
-            //if (folder is null)
-            //{
-            //    throw new FolderException { Message = "Folder not found." };
-            //}
-
-            //if (folder.IsPrivate)
-            //{
-            //    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
-            //    if (!hasPermission)
-            //    {
-            //        throw new PermissionException { Message = "The folder is private." };
-            //    }
-            //}
-
-            //var oldFolderId = folder.FolderId;
-
-            //var newFolder = await this.folderService.GetFolderByIdAsync(newFolderId, employeeId);
-
-            //if (newFolder is null)
-            //{
-            //    throw new FolderException { Message = "Folder not found." };
-            //}
-
-            //if (newFolder.IsPrivate)
-            //{
-            //    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, newFolderId, employeeId);
-
-            //    if (!hasPermission)
-            //    {
-            //        throw new PermissionException { Message = "The folder is private." };
-            //    }
-            //}
-
-            //// check if we need to change filename
-            //var filesInFolder = await this.GetFilesByFolderIdAsync(catalogId, newFolderId, employeeId);
-
-            //var file = await this.GetFileByIdAsync(catalogId, folderId, fileId);
-
-            //if (filesInFolder != null && filesInFolder.Any(f => f.FileName.Equals(file.FileName)))
-            //{
-            //    this.RenameFileName(filesInFolder, fileModel: file);
-            //}
-
-            //return await this.fileDAL.MoveFileAsync(catalogId, folderId, file.FileId, newFolderId, file.FileName);
-            throw new NotImplementedException("Add the functionallity to the front-end!");
-        }
-
         public async Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId)
         {
             var file = await this.fileDAL.GetFileByIdAsync(catalogId, folderId, fileId);
@@ -380,9 +280,6 @@
 
             return file;
         }
-
-        public Task<int> CountFilesAsync(int employeeId)
-            => this.fileDAL.CountFilesForEmployeeAsync(employeeId);
 
         public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType)
             => fileType switch
@@ -439,20 +336,6 @@
             }
         }
 
-        private async Task<List<int>> FindAccessibleFolderIds(int employeeId, int catalogId)
-        {
-            var acessibleFolders = await this.folderService.GetAccessableFolders(catalogId, employeeId);
-
-            var folderIds = new List<int>
-            {
-                acessibleFolders.FolderId
-            };
-
-            folderIds.AddRange(GetSubfolderId(acessibleFolders));
-
-            return folderIds;
-        }
-
         private List<int> GetSubfolderId(FolderServiceModel model)
         {
             var folderIds = new List<int>();
@@ -494,7 +377,7 @@
             }
         }
 
-        public async Task<bool> CreateEmptyExcelDocAsync(int catalogId, int employeeId, int folderId)
+        private async Task<bool> CreateEmptyExcelDocAsync(int catalogId, int employeeId, int folderId)
         {
             using (var ms = this.GenerateEmptyExcelFileInStream())
             {
@@ -539,28 +422,6 @@
 
             ms.Position = 0;
             return ms;
-        }
-
-        private OutputFileServiceModel MapToOutputModel(FileServiceModel model)
-        {
-            if (model is null)
-            {
-                return null;
-            }
-
-            return new OutputFileServiceModel
-            {
-                BlobId = model.BlobId,
-                CatalogId = model.CatalogId,
-                ContentType = model.ContentType,
-                FileId = model.FileId,
-                FileName = model.FileName,
-                FileSize = model.FileSize,
-                FileType = model.FileType,
-                FolderId = model.FolderId,
-                UpdaterId = model.EmployeeId,
-                UpdaterUsername = model.UpdaterUsername
-            };
         }
     }
 }

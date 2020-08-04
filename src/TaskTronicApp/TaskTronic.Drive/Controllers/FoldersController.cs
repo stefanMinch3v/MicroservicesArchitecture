@@ -81,20 +81,6 @@
             return await this.folderService.RenameFolderAsync(catalogId, folderId, employeeId, name);
         }
 
-        [HttpPost]
-        [Route(nameof(MoveFolder))]
-        public async Task<ActionResult<bool>> MoveFolder(int catalogId, int folderId, int newFolderId)
-        {
-            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
-
-            if (employeeId == 0)
-            {
-                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
-            }
-
-            return await this.folderService.MoveFolderAsync(catalogId, folderId, employeeId, newFolderId);
-        }
-
         [HttpGet]
         [Route(nameof(GetRootFolder))]
         public async Task<ActionResult<FolderServiceModel>> GetRootFolder(int companyDepartmentsId)
@@ -129,26 +115,6 @@
             {
                 return BadRequest(ex.Message);
             }
-        }
-
-        [HttpGet]
-        [Route(nameof(CheckFilesNamesForFolder))]
-        public async Task<ActionResult<Dictionary<string, bool>>> CheckFilesNamesForFolder(int catalogId, int folderId)
-        {
-            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
-
-            if (employeeId == 0)
-            {
-                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
-            }
-
-            var fileNames = HttpContext.Request.Query["fileNames"];
-
-            return await this.fileService.CheckFilesInFolderForCollisions(
-                catalogId,
-                employeeId,
-                folderId,
-                fileNames);
         }
 
         [HttpDelete]

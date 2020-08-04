@@ -215,69 +215,6 @@
         }
         #endregion
 
-        // not yet added to the front-end
-        public async Task<int> SaveCompletedUploadAsReplaceExistingFileAsync(InputFileServiceModel file, int fileId)
-        {
-            using (var conn = this.dbConnectionFactory.GetSqlConnection)
-            {
-                conn.Open();
-
-                var transaction = conn.BeginTransaction();
-
-                int insertedId;
-
-                try
-                {
-                    var sqlUpdate = string.Format(BlobsSql.UPDATE_BLOB_DATA, BlobsTableName);
-
-                    var sqlDeleteOldBlob = string.Format(BlobsSql.Delete_Blob_FROM_FILEID, BlobsTableName, FileTableName);
-
-                    var sqlUpdateFile = string.Format(FilesSql.UPDATE_FIlE_WITH_NEW_BLOB, FileTableName);
-
-                    var employeeId = file.EmployeeId;
-                    var fileName = file.FileName;
-
-                    var updatedBlobId = await conn.ExecuteScalarAsync<int>(sqlUpdate, new
-                    {
-                        employeeId,
-                        fileName
-                    }, transaction);
-
-                    var deletedFileBlob = (await conn.ExecuteAsync(sqlDeleteOldBlob, new
-                    {
-                        file.CatalogId,
-                        file.FolderId,
-                        fileId
-                    }, transaction)) == 1;
-                    if (deletedFileBlob)
-                    {
-                        insertedId = (await conn.ExecuteScalarAsync<int>(sqlUpdateFile, new
-                        {
-                            file.CatalogId,
-                            file.FolderId,
-                            fileId,
-                            updatedBlobId,
-                            UpdateDate = DateTime.UtcNow
-                        }, transaction));
-
-                        transaction.Commit();
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                        insertedId = 0;
-                    }
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-
-                return insertedId;
-            }
-        }
-
         public async Task<IEnumerable<FileServiceModel>> GetFilesByFolderIdAsync(int folderId)
         {
             var sql = string.Format(FilesSql.GET_FILES_BY_FOLDER_ID, FileTableName);
@@ -404,16 +341,6 @@
             using (var db = this.dbConnectionFactory.GetSqlConnection)
             {
                 return await db.ExecuteAsync(sql, new { catalogId, folderId, fileId, newFileName }) > 0;
-            }
-        }
-
-        public async Task<bool> MoveFileAsync(int catalogId, int folderId, int fileId, int newFolderId, string fileName)
-        {
-            var sql = string.Format(FilesSql.MOVE_FILE, FileTableName);
-
-            using (var db = this.dbConnectionFactory.GetSqlConnection)
-            {
-                return await db.ExecuteAsync(sql, new { catalogId, folderId, fileId, newFolderId, fileName }) > 0;
             }
         }
 

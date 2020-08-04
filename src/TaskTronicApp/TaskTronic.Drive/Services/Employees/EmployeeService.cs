@@ -11,51 +11,56 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
+    using TaskTronic.Data.Models;
     using TaskTronic.Services;
 
-    public class EmployeeService : DataService<Employee>, IEmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly IMapper mapper;
         private readonly IFileDAL fileDAL;
         private readonly IFolderDAL folderDAL;
+        private readonly DriveDbContext dbContext;
 
         public EmployeeService(
-            DriveDbContext db, 
+            DriveDbContext dbContext, 
             IMapper mapper,
             IFileDAL fileDAL,
             IFolderDAL folderDAL)
-            : base(db)
         {
             this.mapper = mapper;
             this.fileDAL = fileDAL;
             this.folderDAL = folderDAL;
+            this.dbContext = dbContext;
         }
 
         public async Task<int> GetIdByUserAsync(string userId)
             => await this.FindByUserAsync(userId, employee => employee.EmployeeId);
 
         public async Task<string> GetEmailByIdAsync(int employeeId)
-            => await this.All()
+            => await this.dbContext.Employees
                 .Where(e => e.EmployeeId == employeeId)
                 .Select(u => u.Email)
                 .FirstOrDefaultAsync();
 
         public async Task SaveAsync(string userId, string email, string name)
         {
-            var existing = await this.All().FirstOrDefaultAsync(e => e.Email == email);
+            var existing = await this.dbContext.Employees
+                .FirstOrDefaultAsync(e => e.Email == email);
 
             if (!(existing is null) || string.IsNullOrWhiteSpace(userId))
             {
                 return;
             }
 
-            await this.Save(new Employee { Email = email, UserId = userId, Name = name });
+            this.dbContext.Employees.Add(new Employee { Email = email, UserId = userId, Name = name });
+
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task<IReadOnlyCollection<OutputEmployeeDetailsServiceModel>> GetAllAsync()
         {
             var employees = await this.mapper
-                .ProjectTo<OutputEmployeeDetailsServiceModel>(this.All())
+                .ProjectTo<OutputEmployeeDetailsServiceModel>(this.dbContext.Employees)
                 .ToListAsync();
 
             foreach (var employee in employees)
@@ -69,19 +74,19 @@
         }
 
         public async Task<Employee> FindByIdAsync(int employeeId)
-            => await this.Data.FindAsync<Employee>(employeeId);
+            => await this.dbContext.Employees.FindAsync(employeeId);
 
         public async Task<Employee> FindByUserAsync(string userId)
             => await this.FindByUserAsync(userId, employee => employee);
 
         public async Task<OutputEmployeeDetailsServiceModel> GetDetails(int employeeId)
             => await this.mapper
-                .ProjectTo<OutputEmployeeDetailsServiceModel>(this.All()
+                .ProjectTo<OutputEmployeeDetailsServiceModel>(this.dbContext.Employees
                     .Where(d => d.EmployeeId == employeeId))
                 .FirstOrDefaultAsync();
 
         public async Task<string> GetUserIdByEmployeeAsync(int employeeId)
-            => await base.All()
+            => await this.dbContext.Employees
                 .Where(e => e.EmployeeId == employeeId)
                 .Select(e => e.UserId)
                 .FirstOrDefaultAsync();
@@ -90,7 +95,7 @@
             => (await this.FindByUserAsync(userId)).CompanyDepartmentsId;
 
         public async Task<int> GetSelectedCompanyDepartmentId(int employeeId)
-            => await this.All()
+            => await this.dbContext.Employees
                 .Where(e => e.EmployeeId == employeeId)
                 .Select(e => e.CompanyDepartmentsId)
                 .FirstOrDefaultAsync();
@@ -106,7 +111,7 @@
                 return;
             }
 
-            var companyDepartment = await base.Data.Set<CompanyDepartments>()
+            var companyDepartment = await this.dbContext.CompanyDepartments
                 .FirstOrDefaultAsync(cd => cd.CompanyId == companyId 
                     && cd.DepartmentId == departmentId);
 
@@ -117,14 +122,34 @@
 
             employee.CompanyDepartmentsId = companyDepartment.Id;
 
-            await base.Data.SaveChangesAsync();
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        public async Task SaveWithMessagesAsync(Employee employee, params Message[] messages)
+        {
+            if (employee is null)
+            {
+                return;
+            }
+
+            foreach (var message in messages)
+            {
+                if (message != null)
+                {
+                    this.dbContext.Messages.Add(message);
+                }
+            }
+
+            this.dbContext.Employees.Add(employee);
+
+            await this.dbContext.SaveChangesAsync();
         }
 
         private async Task<T> FindByUserAsync<T>(
             string userId,
             Expression<Func<Employee, T>> selectorExpression)
         {
-            var employeeInfo = await this.All()
+            var employeeInfo = await this.dbContext.Employees
                 .Where(u => u.UserId == userId)
                 .Select(selectorExpression)
                 .FirstOrDefaultAsync();

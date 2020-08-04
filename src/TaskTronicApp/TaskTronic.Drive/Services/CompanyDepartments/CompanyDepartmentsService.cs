@@ -12,18 +12,22 @@
     using TaskTronic.Drive.Exceptions;
     using TaskTronic.Services;
 
-    public class CompanyDepartmentsService : DataService<Company>, ICompanyDepartmentsService
+    public class CompanyDepartmentsService : ICompanyDepartmentsService
     {
         private readonly IMapper mapper;
+        private readonly DriveDbContext dbContext;
 
         public CompanyDepartmentsService(
             DriveDbContext dbContext,
             IMapper mapper)
-            : base(dbContext) => this.mapper = mapper;
+        {
+            this.mapper = mapper;
+            this.dbContext = dbContext;
+        }
 
         public async Task<bool> AddDepartmentToCompany(int companyId, int departmentId)
         {
-            var existingCompanyDepartment = await this.Data.Set<CompanyDepartments>()
+            var existingCompanyDepartment = await this.dbContext.CompanyDepartments
                 .FirstOrDefaultAsync(cd => cd.CompanyId == companyId && cd.DepartmentId == departmentId);
 
             if (existingCompanyDepartment != null)
@@ -37,10 +41,10 @@
                 DepartmentId = departmentId
             };
 
-            this.Data.Set<CompanyDepartments>()
+            this.dbContext.CompanyDepartments
                 .Add(companyDepartment);
 
-            await this.Data.SaveChangesAsync();
+            await this.dbContext.SaveChangesAsync();
 
             return true;
         }
@@ -51,9 +55,9 @@
 
             var model = new Company { Name = name };
 
-            this.Data.Add(model);
+            this.dbContext.Companies.Add(model);
 
-            await this.Data.SaveChangesAsync();
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task CreateDepartment(string name)
@@ -62,9 +66,9 @@
 
             var model = new Department { Name = name };
 
-            this.Data.Add(model);
+            this.dbContext.Departments.Add(model);
 
-            await this.Data.SaveChangesAsync();
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task<OutputCompaniesServiceModel> GetAllAsync(string userId)
@@ -72,11 +76,11 @@
             var outputCompanies = new OutputCompaniesServiceModel
             {
                 Companies = await this.mapper
-                    .ProjectTo<OutputCompanyDepartmentsServiceModel>(this.All())
+                    .ProjectTo<OutputCompanyDepartmentsServiceModel>(this.dbContext.Companies)
                     .ToListAsync()
             };
 
-            var employee = await this.Data.Set<Employee>()
+            var employee = await this.dbContext.Employees
                 .Include(e => e.CompanyDepartments)
                 .FirstOrDefaultAsync(e => e.UserId == userId);
 
@@ -102,16 +106,16 @@
             => new OutputCompaniesAndDepartmentsServiceModel
             {
                 Companies = await this.mapper
-                    .ProjectTo<OutputCompanyDepartmentsServiceModel>(this.All())
+                    .ProjectTo<OutputCompanyDepartmentsServiceModel>(this.dbContext.Companies)
                     .ToListAsync(),
                 Departments = await this.mapper
-                    .ProjectTo<OutputDepartmentServiceModel>(this.Data.Set<Department>())
+                    .ProjectTo<OutputDepartmentServiceModel>(this.dbContext.Departments)
                     .ToListAsync()
             };
 
         public async Task<IReadOnlyList<OutputDepartmentServiceModel>> AllNotInCompany(int companyId)
             => await this.mapper
-                .ProjectTo<OutputDepartmentServiceModel>(this.Data.Set<Department>()
+                .ProjectTo<OutputDepartmentServiceModel>(this.dbContext.Departments
                     .Where(d => !d.Companies.Any(c => c.CompanyId == companyId)))
                 .ToListAsync();
     }

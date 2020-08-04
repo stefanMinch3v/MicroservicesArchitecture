@@ -3,17 +3,18 @@
     using Data;
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
-    using Models.FolderViews;
+    using TaskTronic.Statistics.Models.FolderViews;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Services;
 
-    public class FolderViewService : DataService<FolderView>, IFolderViewService
+    public class FolderViewService : IFolderViewService
     {
-        public FolderViewService(StatisticsDbContext dbContext)
-            : base(dbContext)
-        { }
+        private readonly StatisticsDbContext dbContext;
+
+        public FolderViewService(StatisticsDbContext dbContext) 
+            => this.dbContext = dbContext;
 
         public async Task AddViewAsync(int folderId, string userId)
         {
@@ -23,15 +24,17 @@
             }
 
             var folderView = new FolderView { UserId = userId, FolderId = folderId };
-            await base.Save(folderView);
+            this.dbContext.FolderViews.Add(folderView);
+
+            await this.dbContext.SaveChangesAsync();
         }
 
         public async Task<int> GetTotalViews(int folderId)
-            => await base.All()
+            => await this.dbContext.FolderViews
                 .CountAsync(v => v.FolderId == folderId);
 
         public async Task<IReadOnlyCollection<OutputFolderViewServiceModel>> GetTotalViews(IEnumerable<int> ids)
-            => await base.All()
+            => await this.dbContext.FolderViews
                 .Where(v => ids.Contains(v.FolderId))
                 .GroupBy(v => v.FolderId)
                 .Select(gr => new OutputFolderViewServiceModel
