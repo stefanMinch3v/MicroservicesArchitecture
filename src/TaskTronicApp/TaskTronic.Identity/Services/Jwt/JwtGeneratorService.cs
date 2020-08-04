@@ -25,7 +25,7 @@
             this.applicationSettings = applicationSettings.Value;
         }
 
-        public async Task<JwtOutputModel> GenerateTokenAsync(ApplicationUser appUser)
+        public async Task<OutputJwtModel> GenerateTokenAsync(ApplicationUser appUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(this.applicationSettings.Secret);
@@ -54,7 +54,7 @@
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var encryptedToken = tokenHandler.WriteToken(token);
 
-            return new JwtOutputModel(encryptedToken, roles, token.ValidTo);
+            return new OutputJwtModel(encryptedToken, roles, token.ValidTo);
         }
     }
 }

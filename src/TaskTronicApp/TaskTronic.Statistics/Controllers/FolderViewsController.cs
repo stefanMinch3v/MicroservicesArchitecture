@@ -29,7 +29,7 @@
             => await this.folderViewService.GetTotalViews(id);
 
         [HttpGet]
-        public async Task<IReadOnlyCollection<FolderViewOutputModel>> TotalViews([FromQuery] IEnumerable<int> ids)
+        public async Task<IReadOnlyCollection<OutputFolderViewServiceModel>> TotalViews([FromQuery] IEnumerable<int> ids)
             => await this.folderViewService.GetTotalViews(ids);
     }
 }

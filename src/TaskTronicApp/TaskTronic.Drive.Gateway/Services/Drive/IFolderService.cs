@@ -8,6 +8,6 @@
     public interface IFolderService
     {
         [Get("/Folders/GetMine")]
-        Task<IReadOnlyCollection<OutputFolderFlatModel>> Mine();
+        Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> Mine();
     }
 }

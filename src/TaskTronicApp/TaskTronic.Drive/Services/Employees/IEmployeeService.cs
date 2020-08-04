@@ -1,6 +1,7 @@
 ﻿namespace TaskTronic.Drive.Services.Employees
 {
     using Data.Models;
+    using Models.Employees;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Services;
@@ -13,9 +14,9 @@
 
         Task SaveAsync(string userId, string email, string name);
 
-        Task<IReadOnlyCollection<EmployeeDetailsOutputModel>> GetAllAsync();
+        Task<IReadOnlyCollection<OutputEmployeeDetailsServiceModel>> GetAllAsync();
 
-        Task<EmployeeDetailsOutputModel> GetDetails(int employeeId);
+        Task<OutputEmployeeDetailsServiceModel> GetDetails(int employeeId);
 
         Task<Employee> FindByIdAsync(int employeeId);
 

@@ -57,7 +57,7 @@
             await this.userManager.UpdateAsync(user);
         }
 
-        public async Task<Result<JwtOutputModel>> LoginAsync(InputLoginModel model)
+        public async Task<Result<OutputJwtModel>> LoginAsync(InputLoginModel model)
         {
             if (model is null)
             {

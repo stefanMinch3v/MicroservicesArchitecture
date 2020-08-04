@@ -3,17 +3,18 @@
     using Data.DapperRepo;
     using Exceptions;
     using MassTransit;
+    using Models.Files;
+    using Models.Folders;
     using Services.Employees;
-    using Services.Files;
+    using Services.Messages;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using TaskTronic.Common;
-    using Services.Messages;
-    using TaskTronic.Messages.Drive.Folders;
     using TaskTronic.Data.Models;
+    using TaskTronic.Messages.Drive.Folders;
 
     public class FolderService : IFolderService
     {

@@ -13,6 +13,9 @@
             => this.employeeService = employeeService;
 
         public async Task Consume(ConsumeContext<UserRegisteredMessage> context)
-            => await this.employeeService.SaveAsync(context.Message.UserId, context.Message.Email, context.Message.Name);
+            => await this.employeeService.SaveAsync(
+                context.Message.UserId, 
+                context.Message.Email, 
+                context.Message.Name);
     }
 }

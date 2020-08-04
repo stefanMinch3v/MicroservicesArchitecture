@@ -3,7 +3,7 @@
     using System.ComponentModel.DataAnnotations;
     using TaskTronic.Models;
 
-    public class EmployeeFormModel : IMapFrom<EmployeeDetailsOutputModel>
+    public class EmployeeFormModel : IMapFrom<OutputEmployeeDetailsServiceModel>
     {
         [Required]
         public string Name { get; set; }

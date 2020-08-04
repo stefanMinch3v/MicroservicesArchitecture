@@ -30,11 +30,11 @@
             => await base.All()
                 .CountAsync(v => v.FolderId == folderId);
 
-        public async Task<IReadOnlyCollection<FolderViewOutputModel>> GetTotalViews(IEnumerable<int> ids)
+        public async Task<IReadOnlyCollection<OutputFolderViewServiceModel>> GetTotalViews(IEnumerable<int> ids)
             => await base.All()
                 .Where(v => ids.Contains(v.FolderId))
                 .GroupBy(v => v.FolderId)
-                .Select(gr => new FolderViewOutputModel
+                .Select(gr => new OutputFolderViewServiceModel
                 {
                     FolderId = gr.Key,
                     TotalViews = gr.Count()

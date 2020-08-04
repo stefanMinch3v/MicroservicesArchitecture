@@ -8,12 +8,12 @@
     public interface IEmployeeService
     {
         [Get("/Employees")]
-        Task<IReadOnlyCollection<EmployeeDetailsOutputModel>> All();
+        Task<IReadOnlyCollection<OutputEmployeeDetailsServiceModel>> All();
 
         [Get("/Employees/{id}")]
-        Task<EmployeeDetailsOutputModel> Details(int id);
+        Task<OutputEmployeeDetailsServiceModel> Details(int id);
 
         [Put("/Employees/{id}")]
-        Task Edit(int id, EmployeeInputModel employee);
+        Task Edit(int id, InputEmployeeServiceModel employee);
     }
 }

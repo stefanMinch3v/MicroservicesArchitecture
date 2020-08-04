@@ -7,6 +7,6 @@
     public interface IIdentityService
     {
         [Post("/Identity/Login")]
-        Task<JwtOutputModel> Login([Body] UserInputModel loginInput);
+        Task<OutputJwtModel> Login([Body] InputUserServiceModel loginInput);
     }
 }

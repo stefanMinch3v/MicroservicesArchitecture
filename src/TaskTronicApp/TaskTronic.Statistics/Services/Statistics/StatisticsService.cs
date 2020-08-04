@@ -34,9 +34,9 @@
             await base.Save(statistics);
         }
 
-        public async Task<StatisticsOutputModel> FullStatsAsync()
+        public async Task<OutputStatisticsServiceModel> FullStatsAsync()
             => await this.mapper
-                .ProjectTo<StatisticsOutputModel>(base.All())
+                .ProjectTo<OutputStatisticsServiceModel>(base.All())
                 .FirstOrDefaultAsync();
 
         public async Task RemoveFileAsync()

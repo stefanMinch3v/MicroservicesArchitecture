@@ -1,5 +1,6 @@
 ﻿namespace TaskTronic.Drive.Services.CompanyDepartments
 {
+    using Models.CompanyDepartments;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@
 
         Task<OutputCompaniesAndDepartmentsServiceModel> GetAllAsync();
 
-        Task Create(string name);
+        Task CreateCompany(string name);
 
         Task CreateDepartment(string name);
 

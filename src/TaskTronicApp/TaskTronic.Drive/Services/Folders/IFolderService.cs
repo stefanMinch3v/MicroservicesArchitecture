@@ -1,6 +1,7 @@
 ﻿namespace TaskTronic.Drive.Services.Folders
 {
-    using Services.Files;
+    using Models.Files;
+    using Models.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 

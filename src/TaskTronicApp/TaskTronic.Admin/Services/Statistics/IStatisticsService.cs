@@ -7,6 +7,6 @@
     public interface IStatisticsService
     {
         [Get("/Statistics")]
-        Task<StatisticsOutputModel> Full();
+        Task<OutputStatisticsServiceModel> Full();
     }
 }

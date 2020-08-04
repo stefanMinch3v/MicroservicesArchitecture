@@ -1,8 +1,8 @@
 ﻿namespace TaskTronic.Drive.Data.DapperRepo
 {
-    using Services.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using TaskTronic.Drive.Models.Folders;
 
     public interface IPermissionsDAL
     {

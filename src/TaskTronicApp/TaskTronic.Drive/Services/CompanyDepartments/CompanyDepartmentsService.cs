@@ -3,6 +3,7 @@
     using AutoMapper;
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
+    using Models.CompanyDepartments;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -44,7 +45,7 @@
             return true;
         }
 
-        public async Task Create(string name)
+        public async Task CreateCompany(string name)
         {
             Guard.AgainstEmptyString<CompanyDepartmentException>(name);
 

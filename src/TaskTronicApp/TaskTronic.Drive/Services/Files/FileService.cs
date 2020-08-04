@@ -5,6 +5,8 @@
     using DocumentFormat.OpenXml.Spreadsheet;
     using Exceptions;
     using MassTransit;
+    using Models.Files;
+    using Models.Folders;
     using Services.Employees;
     using Services.Folders;
     using Services.Messages;

@@ -8,6 +8,6 @@
     public interface IFolderViewService
     {
         [Get("/FolderViews")]
-        Task<IReadOnlyCollection<FolderViewOutputModel>> TotalViews([Query(CollectionFormat.Multi)] IEnumerable<int> ids);
+        Task<IReadOnlyCollection<OutputFolderViewServiceModel>> TotalViews([Query(CollectionFormat.Multi)] IEnumerable<int> ids);
     }
 }

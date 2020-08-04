@@ -14,7 +14,7 @@
             => this.statistics = statistics;
 
         [HttpGet]
-        public async Task<StatisticsOutputModel> Full()
+        public async Task<OutputStatisticsServiceModel> Full()
             => await this.statistics.FullStatsAsync();
     }
 }

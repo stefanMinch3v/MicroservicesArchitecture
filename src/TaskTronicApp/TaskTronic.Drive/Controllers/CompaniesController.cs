@@ -1,6 +1,7 @@
 ﻿namespace TaskTronic.Drive.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using Models.CompanyDepartments;
     using Services.CompanyDepartments;
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -31,7 +32,7 @@
         [AuthorizeAdministrator]
         public async Task<ActionResult> Create(string name)
         {
-            await this.companyDepartments.Create(name);
+            await this.companyDepartments.CreateCompany(name);
             return Ok();
         }
 

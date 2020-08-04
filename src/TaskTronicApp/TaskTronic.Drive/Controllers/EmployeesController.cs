@@ -3,6 +3,7 @@
     using MassTransit;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Models.Employees;
     using Services.Employees;
     using Services.Messages;
     using System.Collections.Generic;
@@ -65,7 +66,7 @@
 
         [HttpPut]
         [Route(Id)]
-        public async Task<ActionResult> Edit(int id, EditEmployeeInputModel input)
+        public async Task<ActionResult> Edit(int id, InputEditEmployeeModel input)
         {
             var employee = this.currentUser.IsAdministrator
                 ? await this.employeeService.FindByIdAsync(id)
@@ -122,12 +123,12 @@
 
         [HttpGet]
         [Route(Id)]
-        public async Task<ActionResult<EmployeeDetailsOutputModel>> Details(int id)
+        public async Task<ActionResult<OutputEmployeeDetailsServiceModel>> Details(int id)
             => await this.employeeService.GetDetails(id);
 
         [HttpGet]
         [AuthorizeAdministrator]
-        public async Task<IReadOnlyCollection<EmployeeDetailsOutputModel>> All()
+        public async Task<IReadOnlyCollection<OutputEmployeeDetailsServiceModel>> All()
             => await this.employeeService.GetAllAsync();
     }
 }

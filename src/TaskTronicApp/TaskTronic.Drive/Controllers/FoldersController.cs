@@ -1,7 +1,10 @@
 ﻿namespace TaskTronic.Drive.Controllers
 {
+    using Exceptions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using Models.Files;
+    using Models.Folders;
     using Services.Catalogs;
     using Services.Employees;
     using Services.Files;
@@ -10,7 +13,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
-    using TaskTronic.Drive.Exceptions;
     using TaskTronic.Services.Identity;
 
     [Authorize]

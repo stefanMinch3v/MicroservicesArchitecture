@@ -5,12 +5,11 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Models.Files;
     using Services.Employees;
     using Services.Files;
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
     using TaskTronic.Controllers;
     using TaskTronic.Services.Identity;

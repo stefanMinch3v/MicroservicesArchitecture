@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
-    using TaskTronic.Drive.Services.Files;
+    using TaskTronic.Drive.Models.Files;
 
     public interface IFileDAL
     {

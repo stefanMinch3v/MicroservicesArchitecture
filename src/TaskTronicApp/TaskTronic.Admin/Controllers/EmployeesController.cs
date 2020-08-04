@@ -35,7 +35,7 @@
         [HttpPost]
         public async Task<IActionResult> Edit(int id, EmployeeFormModel model)
             => await this.HandleAsync(async () =>
-                    await this.employeeService.Edit(id, this.mapper.Map<EmployeeInputModel>(model)),
+                    await this.employeeService.Edit(id, this.mapper.Map<InputEmployeeServiceModel>(model)),
                     success: RedirectToAction(nameof(Index)),
                     failure: View(model));
     }

@@ -38,7 +38,7 @@
 
         [HttpPost]
         [Route(nameof(Login))]
-        public async Task<ActionResult<JwtOutputModel>> Login([FromBody] InputLoginModel model)
+        public async Task<ActionResult<OutputJwtModel>> Login([FromBody] InputLoginModel model)
         {
             var result = await this.identityService.LoginAsync(model);
 

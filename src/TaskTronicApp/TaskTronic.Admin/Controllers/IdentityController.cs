@@ -31,7 +31,7 @@
                 async () =>
                 {
                     var jwtModel = await this.identityService
-                        .Login(this.mapper.Map<UserInputModel>(model));
+                        .Login(this.mapper.Map<InputUserServiceModel>(model));
 
                     this.Response.Cookies.Append(
                         InfrastructureConstants.AuthenticationCookieName,

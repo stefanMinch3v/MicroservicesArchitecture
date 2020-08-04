@@ -5,6 +5,7 @@
     using Data.DapperRepo;
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
+    using Models.Employees;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -51,10 +52,10 @@
             await this.Save(new Employee { Email = email, UserId = userId, Name = name });
         }
 
-        public async Task<IReadOnlyCollection<EmployeeDetailsOutputModel>> GetAllAsync()
+        public async Task<IReadOnlyCollection<OutputEmployeeDetailsServiceModel>> GetAllAsync()
         {
             var employees = await this.mapper
-                .ProjectTo<EmployeeDetailsOutputModel>(this.All())
+                .ProjectTo<OutputEmployeeDetailsServiceModel>(this.All())
                 .ToListAsync();
 
             foreach (var employee in employees)
@@ -73,9 +74,9 @@
         public async Task<Employee> FindByUserAsync(string userId)
             => await this.FindByUserAsync(userId, employee => employee);
 
-        public async Task<EmployeeDetailsOutputModel> GetDetails(int employeeId)
+        public async Task<OutputEmployeeDetailsServiceModel> GetDetails(int employeeId)
             => await this.mapper
-                .ProjectTo<EmployeeDetailsOutputModel>(this.All()
+                .ProjectTo<OutputEmployeeDetailsServiceModel>(this.All()
                     .Where(d => d.EmployeeId == employeeId))
                 .FirstOrDefaultAsync();
 

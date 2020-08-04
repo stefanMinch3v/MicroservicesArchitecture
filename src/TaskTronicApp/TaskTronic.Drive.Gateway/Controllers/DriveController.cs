@@ -30,7 +30,7 @@
 
         [HttpGet]
         [Route(nameof(MyFolders))]
-        public async Task<ActionResult<IReadOnlyCollection<MineFolderFlatOutputModel>>> MyFolders()
+        public async Task<ActionResult<IReadOnlyCollection<OutputMineFolderFlatModel>>> MyFolders()
         {
             var mineFolders = await this.driveService.Mine();
 
@@ -38,7 +38,7 @@
 
             var mineFolderViews = await this.folderViewService.TotalViews(mineFoldersIds);
 
-            var folderResults = new List<MineFolderFlatOutputModel>();
+            var folderResults = new List<OutputMineFolderFlatModel>();
 
             foreach (var folderView in mineFolderViews)
             {
@@ -46,7 +46,7 @@
 
                 if (flatFolder != null)
                 {
-                    var outputFolder = this.mapper.Map<OutputFolderFlatModel, MineFolderFlatOutputModel>(flatFolder);
+                    var outputFolder = this.mapper.Map<OutputFolderFlatServiceModel, OutputMineFolderFlatModel>(flatFolder);
 
                     outputFolder.TotalViews = folderView.TotalViews;
 

@@ -1,10 +1,10 @@
 ﻿namespace TaskTronic.Drive.Data.DapperRepo
 {
     using Dapper;
-    using Services.Folders;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Data.Models;
+    using TaskTronic.Drive.Models.Folders;
     using TaskTronic.Messages.Drive.Folders;
 
     using static Sqls;
