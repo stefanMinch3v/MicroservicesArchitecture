@@ -10,7 +10,6 @@
     using TaskTronic.Common;
     using TaskTronic.Drive.Data;
     using TaskTronic.Drive.Exceptions;
-    using TaskTronic.Services;
 
     public class CompanyDepartmentsService : ICompanyDepartmentsService
     {

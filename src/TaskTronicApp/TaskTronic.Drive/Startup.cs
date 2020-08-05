@@ -1,18 +1,18 @@
 namespace TaskTronic.Drive
 {
     using Data;
-    using Data.DapperRepo;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Services.Catalogs;
+    using Services.CompanyDepartments;
+    using Services.DapperRepo;
     using Services.Employees;
     using Services.Files;
     using Services.Folders;
     using Services.Messages;
     using TaskTronic.Drive.Messages;
-    using TaskTronic.Drive.Services.CompanyDepartments;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
 
@@ -34,10 +34,9 @@ namespace TaskTronic.Drive
                 .AddTransient<ICatalogService, CatalogService>()
                 .AddTransient<IFolderService, FolderService>()
                 .AddTransient<ICompanyDepartmentsService, CompanyDepartmentsService>()
-                .AddTransient<IPermissionsDAL, PermissionsDAL>()
-                .AddTransient<IFileDAL, FileDAL>()
-                .AddTransient<ICatalogDAL, CatalogDAL>()
-                .AddTransient<IFolderDAL, FolderDAL>()
+                .AddTransient<IPermissionDapper, PermissionDapper>()
+                .AddTransient<IFileDapper, FileDapper>()
+                .AddTransient<IFolderDapper, FolderDapper>()
                 .AddMessaging(
                     useHangfireForPublishers: true,
                     configuration: this.Configuration,

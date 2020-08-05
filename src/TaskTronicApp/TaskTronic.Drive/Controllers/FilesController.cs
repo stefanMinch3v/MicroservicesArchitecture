@@ -33,11 +33,6 @@
         }
 
         [HttpGet]
-        [Route(nameof(GetFileById))]
-        public async Task<ActionResult<FileServiceModel>> GetFileById(int catId, int folderId, int fileId)
-            => await this.fileService.GetFileByIdAsync(catId, folderId, fileId);
-
-        [HttpGet]
         [Route(nameof(DownloadFile))]
         public async Task<ActionResult> DownloadFile(int catId, int folderId, int fileId, bool shouldOpen)
         {

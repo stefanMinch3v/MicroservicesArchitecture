@@ -10,7 +10,6 @@
         public int BlobId { get; set; }
         public long Filesize { get; set; }
         public string FileName { get; set; }
-        public string Revision { get; set; } = string.Empty;
         public string FileType { get; set; }
         public string ContentType { get; set; }
         public int EmployeeId { get; set; }

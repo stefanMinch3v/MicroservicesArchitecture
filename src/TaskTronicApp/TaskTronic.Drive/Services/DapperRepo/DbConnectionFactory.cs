@@ -1,4 +1,4 @@
-﻿namespace TaskTronic.Drive.Data.DapperRepo
+﻿namespace TaskTronic.Drive.Services.DapperRepo
 {
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;

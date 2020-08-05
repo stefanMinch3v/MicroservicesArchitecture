@@ -140,18 +140,6 @@ export class DriveService {
             }));
     }
 
-    getFileById(catalogId: number, folderId: number, fileId: number): Observable<FileModel> {
-        const url = environment.driveUrl + `${this.DRIVE_FILES}GetFileById`;
-
-        return this.http.get(url, {
-            params: {
-                catalogId: catalogId.toString(),
-                folderId: folderId.toString(),
-                fileId: fileId.toString()
-            }}).pipe(map((response: FileModel) => response));
-    }
-
-
     searchForFile(catalogId: number, currentFolderId: number, value: string): Observable<Array<FileModel>> {
         const url = environment.driveUrl + `${this.DRIVE_FOLDERS}SearchForFiles`;
 

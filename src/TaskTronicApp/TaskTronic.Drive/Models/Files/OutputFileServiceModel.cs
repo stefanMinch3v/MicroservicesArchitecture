@@ -1,6 +1,8 @@
 ﻿namespace TaskTronic.Drive.Models.Files
 {
-    public class OutputFileServiceModel
+    using System;
+
+    public class OutputFileServiceModel : IFileContract
     {
         public int FileId { get; set; }
         public int CatalogId { get; set; }
@@ -11,6 +13,7 @@
         public long FileSize { get; set; }
         public string ContentType { get; set; }
         public string UpdaterUsername { get; set; }
-        public int UpdaterId { get; set; }
+        public int EmployeeId { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
     }
 }

@@ -1,26 +1,26 @@
-﻿namespace TaskTronic.Drive.Data.DapperRepo
+﻿namespace TaskTronic.Drive.Services.DapperRepo
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TaskTronic.Drive.Models.Folders;
 
-    public interface IFolderDAL
+    public interface IFolderDapper
     {
-        Task<bool> RenameFolderAsync(int catalogId, int folderId, string newFolderName);
+        Task<OutputFolderServiceModel> GetFolderByIdAsync(int folderId);
 
-        Task<FolderServiceModel> GetFolderByIdAsync(int folderId);
+        Task<OutputFolderCatalogServiceModel> GetFolderCatalogAsync(int folderId);
 
         Task<OutputFolderFlatServiceModel> GetFolderFlatByIdAsync(int folderId);
 
-        Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId);
+        Task<OutputFolderServiceModel> GetRootFolderByCatalogIdAsync(int catalogId);
 
         Task<int?> GetRootFolderIdAsync(int folderId);
 
-        Task<IEnumerable<FolderServiceModel>> GetSubFoldersAsync(int folderId);
+        Task<IEnumerable<OutputFolderServiceModel>> GetSubFoldersAsync(int folderId);
 
         Task<bool> IsFolderPrivateAsync(int folderId);
 
-        Task<IEnumerable<FolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, int employeeId);
+        Task<IEnumerable<OutputFolderWithAccessServiceModel>> GetFolderTreeAsync(int folderId, int employeeId);
 
         Task<int> GetFolderNumbersWithExistingNameAsync(string name, int parentFolderId);
 
@@ -28,7 +28,7 @@
 
         Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllFlatForEmployeeAsync(int employeeId);
 
-        Task<IList<FolderSearchServiceModel>> GetAllForSearchAsync(int catalogId, int? rootFolderId);
+        Task<IEnumerable<OutputFolderSearchServiceModel>> GetAllForSearchAsync(int catalogId, int? rootFolderId);
 
         // transactions
         Task<(bool Success, int MessageId)> DeleteAsync(int catalogId, int folderId);

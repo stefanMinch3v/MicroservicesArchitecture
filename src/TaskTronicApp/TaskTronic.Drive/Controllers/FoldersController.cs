@@ -83,7 +83,7 @@
 
         [HttpGet]
         [Route(nameof(GetRootFolder))]
-        public async Task<ActionResult<FolderServiceModel>> GetRootFolder(int companyDepartmentsId)
+        public async Task<ActionResult<OutputFolderServiceModel>> GetRootFolder(int companyDepartmentsId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -98,7 +98,7 @@
 
         [HttpGet]
         [Route(nameof(GetFolderById))]
-        public async Task<ActionResult<FolderServiceModel>> GetFolderById(int folderId)
+        public async Task<ActionResult<OutputFolderServiceModel>> GetFolderById(int folderId)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -147,7 +147,7 @@
 
         [HttpGet]
         [Route(nameof(SearchForFiles))]
-        public async Task<ActionResult<IReadOnlyCollection<FileServiceModel>>> SearchForFiles(
+        public async Task<ActionResult<IReadOnlyCollection<OutputFileSearchServiceModel>>> SearchForFiles(
             int catalogId,
             int currentFolderId,
             string searchValue)
@@ -159,7 +159,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return (await this.folderService.SearchFilesAsync(catalogId, employeeId, currentFolderId, searchValue)).ToArray();
+            return Ok(await this.folderService.SearchFilesAsync(catalogId, employeeId, currentFolderId, searchValue));
         }
     }
 }

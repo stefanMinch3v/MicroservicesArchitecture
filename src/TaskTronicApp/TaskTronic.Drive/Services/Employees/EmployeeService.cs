@@ -1,8 +1,8 @@
 ﻿namespace TaskTronic.Drive.Services.Employees
 {
     using AutoMapper;
+    using DapperRepo;
     using Data;
-    using Data.DapperRepo;
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Employees;
@@ -12,24 +12,23 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using TaskTronic.Data.Models;
-    using TaskTronic.Services;
 
     public class EmployeeService : IEmployeeService
     {
         private readonly IMapper mapper;
-        private readonly IFileDAL fileDAL;
-        private readonly IFolderDAL folderDAL;
+        private readonly IFileDapper fileDapper;
+        private readonly IFolderDapper folderDapper;
         private readonly DriveDbContext dbContext;
 
         public EmployeeService(
             DriveDbContext dbContext, 
             IMapper mapper,
-            IFileDAL fileDAL,
-            IFolderDAL folderDAL)
+            IFileDapper fileDapper,
+            IFolderDapper folderDapper)
         {
             this.mapper = mapper;
-            this.fileDAL = fileDAL;
-            this.folderDAL = folderDAL;
+            this.fileDapper = fileDapper;
+            this.folderDapper = folderDapper;
             this.dbContext = dbContext;
         }
 
@@ -65,9 +64,9 @@
 
             foreach (var employee in employees)
             {
-                employee.TotalFiles = await this.fileDAL.CountFilesForEmployeeAsync(employee.Id);
+                employee.TotalFiles = await this.fileDapper.CountFilesForEmployeeAsync(employee.Id);
 
-                employee.TotalFolders = await this.folderDAL.CountFoldersForEmployeeAsync(employee.Id);
+                employee.TotalFolders = await this.folderDapper.CountFoldersForEmployeeAsync(employee.Id);
             }
 
             return employees;

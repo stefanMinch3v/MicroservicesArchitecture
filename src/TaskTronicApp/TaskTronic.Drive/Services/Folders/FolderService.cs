@@ -1,6 +1,6 @@
 ﻿namespace TaskTronic.Drive.Services.Folders
 {
-    using Data.DapperRepo;
+    using DapperRepo;
     using Exceptions;
     using MassTransit;
     using Models.Files;
@@ -10,35 +10,38 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using TaskTronic.Common;
     using TaskTronic.Data.Models;
+    using TaskTronic.Drive.Data;
     using TaskTronic.Messages.Drive.Folders;
 
     public class FolderService : IFolderService
     {
-        private readonly IFolderDAL folderDAL;
-        private readonly IPermissionsDAL permissionsDAL;
-        private readonly IFileDAL fileDAL;
+        private readonly IFolderDapper folderDapper;
+        private readonly IPermissionDapper permissionsDapper;
+        private readonly IFileDapper fileDapper;
         private readonly IEmployeeService employeeService;
         private readonly IMessageService messageService;
         private readonly IBus publisher;
+        private readonly DriveDbContext dbContext;
 
         public FolderService(
-            IFolderDAL folderDAL,
-            IPermissionsDAL permissionsDAL,
-            IFileDAL file,
+            IFolderDapper folderDapper,
+            IPermissionDapper permissionsDapper,
+            IFileDapper fileDapper,
             IEmployeeService employeeService,
             IMessageService messageService,
-            IBus publisher)
+            IBus publisher,
+            DriveDbContext dbContext)
         {
-            this.folderDAL = folderDAL;
-            this.permissionsDAL = permissionsDAL;
-            this.fileDAL = file;
+            this.folderDapper = folderDapper;
+            this.permissionsDapper = permissionsDapper;
+            this.fileDapper = fileDapper;
             this.employeeService = employeeService;
             this.messageService = messageService;
             this.publisher = publisher;
+            this.dbContext = dbContext;
         }
 
         public async Task<bool> CreateFolderAsync(InputFolderServiceModel inputModel)
@@ -49,7 +52,7 @@
             if (inputModel.Name != DriveConstants.ROOT_FOLDER_NAME)
             {
                 // TODO: fix (needs to be fixed cuz the names are sometimes incorrect)
-                var numberOfExistingNames = await folderDAL.GetFolderNumbersWithExistingNameAsync(
+                var numberOfExistingNames = await folderDapper.GetFolderNumbersWithExistingNameAsync(
                     inputModel.Name,
                     inputModel.ParentId.Value);
 
@@ -59,28 +62,27 @@
                 }
             }
 
-            var insertedData = await folderDAL.CreateFolderAsync(inputModel);
-            var folderId = insertedData.FolderId;
+            var (FolderId, MessageId) = await folderDapper.CreateFolderAsync(inputModel);
 
-            if (folderId > 0 && inputModel.IsPrivate)
+            if (FolderId > 0 && inputModel.IsPrivate)
             {
-                await this.permissionsDAL.CreateFolderPermissionsAsync(folderId, inputModel);
+                await this.permissionsDapper.CreateFolderPermissionsAsync(inputModel.CatalogId, FolderId, inputModel.EmployeeId);
             }
 
             // send message to the subscribers
-            if (folderId > 0)
+            if (FolderId > 0)
             {
                 var messageData = new FolderCreatedMessage
                 {
-                    FolderId = folderId
+                    FolderId = FolderId
                 };
 
                 await this.publisher.Publish(messageData);
 
-                await this.messageService.MarkMessageAsPublishedAsync(insertedData.MessageId);
+                await this.messageService.MarkMessageAsPublishedAsync(MessageId);
             }
 
-            return folderId > 0;
+            return FolderId > 0;
         }
 
         public async Task<bool> RenameFolderAsync(int catalogId, int folderId, int employeeId, string newFolderName)
@@ -88,14 +90,23 @@
             Guard.AgainstEmptyString<FolderException>(newFolderName, nameof(newFolderName));
             Guard.AgainstInvalidWindowsCharacters<FolderException>(newFolderName, newFolderName);
 
-            var folder = await this.folderDAL.GetFolderByIdAsync(folderId);
+            await this.CheckFolderPermissionsAsync(catalogId, folderId, employeeId);
 
-            await this.ValidateFolderAndCheckPermissionsAsync(catalogId, employeeId, folder);
+            var folder = await this.dbContext.Folders.FindAsync(folderId);
 
-            return await this.folderDAL.RenameFolderAsync(catalogId, folderId, newFolderName);
+            if (folder is null)
+            {
+                return false;
+            }
+
+            folder.Name = newFolderName;
+
+            await this.dbContext.SaveChangesAsync();
+
+            return true;
         }
 
-        public async Task<FolderServiceModel> GetFolderByIdAsync(
+        public async Task<OutputFolderServiceModel> GetFolderByIdAsync(
             int folderId, 
             int employeeId, 
             int? companyDepartmentsId = null)
@@ -110,7 +121,7 @@
                 }
             }
 
-            var folder = await this.folderDAL.GetFolderByIdAsync(folderId);
+            var folder = await this.folderDapper.GetFolderByIdAsync(folderId);
             Guard.AgainstNullObject<FolderException>(folder, nameof(folder));
 
             var rootId = folder.RootId;
@@ -122,7 +133,7 @@
 
             var folderToReturn = await this.GenerateFolderWithTreeAsync(rootId.Value, employeeId, folderId);
 
-            folderToReturn.Files = await fileDAL.GetFilesByFolderIdAsync(folderId);
+            folderToReturn.Files = (await fileDapper.GetFilesByFolderIdAsync(folderId)).ToArray();
 
             foreach (var file in folderToReturn.Files)
             {
@@ -150,21 +161,21 @@
         }
 
         public Task<bool> IsFolderPrivateAsync(int folderId)
-            => folderDAL.IsFolderPrivateAsync(folderId);
+            => folderDapper.IsFolderPrivateAsync(folderId);
 
-        public async Task<FolderServiceModel> GetRootFolderByCatalogIdAsync(
+        public async Task<OutputFolderServiceModel> GetRootFolderByCatalogIdAsync(
             int catalogId, 
             int employeeId,
             bool includeSubfolders = true)
         {
-            var root = await this.folderDAL.GetRootFolderByCatalogIdAsync(catalogId);
+            var root = await this.folderDapper.GetRootFolderByCatalogIdAsync(catalogId);
 
             if (root is null)
             {
                 return null;
             }
 
-            FolderServiceModel folder;
+            OutputFolderServiceModel folder;
 
             if (includeSubfolders)
             {
@@ -175,7 +186,7 @@
                 folder = root;
             }
 
-            folder.Files = await this.fileDAL.GetFilesByFolderIdAsync(folder.FolderId);
+            folder.Files = (await this.fileDapper.GetFilesByFolderIdAsync(folder.FolderId)).ToArray();
 
             foreach (var file in folder.Files)
             {
@@ -203,37 +214,35 @@
 
         public async Task<bool> DeleteFolderAsync(int catalogId, int employeeId, int folderId)
         {
-            var existingFolder = await this.folderDAL.GetFolderByIdAsync(folderId);
+            var existingFolder = await this.folderDapper.GetFolderByIdAsync(folderId);
             return await this.DeleteFolderOperationsAsync(catalogId, employeeId, existingFolder);
         }
 
         public Task<IReadOnlyCollection<OutputFolderFlatServiceModel>> GetAllForEmployeeAsync(int employeeId)
-            => this.folderDAL.GetAllFlatForEmployeeAsync(employeeId);
+            => this.folderDapper.GetAllFlatForEmployeeAsync(employeeId);
 
-        public async Task<IEnumerable<FileServiceModel>> SearchFilesAsync(
+        public async Task<IReadOnlyCollection<OutputFileSearchServiceModel>> SearchFilesAsync(
             int catalogId,
             int employeeId, 
             int currentFolderId, 
             string searchValue)
         {
-            var rootFolderId = await this.folderDAL.GetRootFolderIdAsync(currentFolderId);
-
+            var rootFolderId = await this.folderDapper.GetRootFolderIdAsync(currentFolderId);
             if (rootFolderId is null)
             {
                 rootFolderId = currentFolderId;
             }
 
-            var folders = await this.folderDAL.GetAllForSearchAsync(catalogId, rootFolderId);
-
+            var folders = await this.folderDapper.GetAllForSearchAsync(catalogId, rootFolderId);
             if (!folders.Any())
             {
-                return Enumerable.Empty<FileServiceModel>();
+                return Array.Empty<OutputFileSearchServiceModel>();
             }
 
             var currentFolder = folders.FirstOrDefault(f => f.FolderId == currentFolderId);
             if (currentFolder is null)
             {
-                return Enumerable.Empty<FileServiceModel>();
+                return Array.Empty<OutputFileSearchServiceModel>();
             }
 
             var folderTree = await this.AttachSubFoldersForSearchAsync(catalogId, employeeId, currentFolder, folders);
@@ -241,7 +250,7 @@
             var accessibleFolderIdsToLookAt = this.GetFolderIdsFromCurrentFolder(folderTree, new List<int>())
                 .Distinct();
 
-            var foundFiles = await this.fileDAL.SearchFilesAsync(
+            var foundFiles = await this.fileDapper.SearchFilesAsync(
                 catalogId, 
                 searchValue,
                 accessibleFolderIdsToLookAt);
@@ -252,17 +261,22 @@
 
             return foundFiles
                 .OrderByDescending(f => f.CreateDate)
-                .ThenBy(f => f.SearchFolderNamesPath.Count);
+                .ThenBy(f => f.SearchFolderNamesPath.Count)
+                .ToArray();
         }
 
         public async Task CheckFolderPermissionsAsync(int catalogId, int folderId, int employeeId)
-        { 
-            var folder = await this.folderDAL.GetFolderFlatByIdAsync(folderId);
+        {
+            var folder = await this.folderDapper.GetFolderFlatByIdAsync(folderId);
             Guard.AgainstNullObject<FolderException>(folder, nameof(folder));
 
             if (folder.IsPrivate)
             {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folderId, employeeId);
+                var hasPermission = await this.permissionsDapper.HasUserPermissionForFolderAsync(
+                    catalogId,
+                    folderId,
+                    employeeId);
+
                 if (!hasPermission)
                 {
                     throw new PermissionException { Message = "You dont have access to this folder." };
@@ -270,7 +284,7 @@
             }
         }
 
-        private async Task AddUpdatersUsernamesAsync(IEnumerable<FileServiceModel> foundFiles)
+        private async Task AddUpdatersUsernamesAsync(IEnumerable<OutputFileSearchServiceModel> foundFiles)
         {
             foreach (var file in foundFiles)
             {
@@ -278,17 +292,17 @@
             }
         }
 
-        private async Task<FolderSearchServiceModel> AttachSubFoldersForSearchAsync(
+        private async Task<OutputFolderSearchServiceModel> AttachSubFoldersForSearchAsync(
             int catalogId,
             int userId,
-            FolderSearchServiceModel currentFolder,
-            IList<FolderSearchServiceModel> allFolders)
+            OutputFolderSearchServiceModel currentFolder,
+            IEnumerable<OutputFolderSearchServiceModel> allFolders)
         {
             currentFolder.SubFolders = allFolders
                 .Where(f => f.ParentId == currentFolder.FolderId)
                 .ToList();
 
-            var userPermissions = await this.permissionsDAL.GetUserFolderPermissionsAsync(catalogId, userId);
+            var userPermissions = await this.permissionsDapper.GetUserFolderPermissionsAsync(catalogId, userId);
 
             await this.AttachSubFoldersRecursivelyForSearchAsync(
                 catalogId, 
@@ -303,8 +317,8 @@
         private async Task AttachSubFoldersRecursivelyForSearchAsync(
             int catalogId,
             int userId,
-            IList<FolderSearchServiceModel> folders,
-            IList<FolderSearchServiceModel> allFolders,
+            ICollection<OutputFolderSearchServiceModel> folders,
+            IEnumerable<OutputFolderSearchServiceModel> allFolders,
             IEnumerable<int> userPermissions)
         {
             foreach (var folder in folders)
@@ -322,11 +336,16 @@
                     .Where(f => f.ParentId == folder.FolderId)
                     .ToList();
 
-                await this.AttachSubFoldersRecursivelyForSearchAsync(catalogId, userId, folder.SubFolders, allFolders, userPermissions).ConfigureAwait(false);
+                await this.AttachSubFoldersRecursivelyForSearchAsync(
+                    catalogId, 
+                    userId, 
+                    folder.SubFolders, 
+                    allFolders, 
+                    userPermissions);
             }
         }
 
-        private List<int> GetFolderIdsFromCurrentFolder(FolderSearchServiceModel folder, List<int> savedIds)
+        private List<int> GetFolderIdsFromCurrentFolder(OutputFolderSearchServiceModel folder, List<int> savedIds)
         {
             if (folder is null)
             {
@@ -344,7 +363,9 @@
             return savedIds;
         }
 
-        private void AddFolerNameToSearchFiles(IEnumerable<FileServiceModel> files, IEnumerable<FolderSearchServiceModel> folders)
+        private void AddFolerNameToSearchFiles(
+            IEnumerable<OutputFileSearchServiceModel> files, 
+            IEnumerable<OutputFolderSearchServiceModel> folders)
         {
             foreach (var file in files)
             {
@@ -363,11 +384,11 @@
             }
         }
 
-        private async Task<bool> DeleteFolderOperationsAsync(int catalogId, int employeeId, FolderServiceModel existingFolder)
+        private async Task<bool> DeleteFolderOperationsAsync(int catalogId, int employeeId, OutputFolderServiceModel existingFolder)
         {
             try
             {
-                await this.ValidateFolderAndCheckPermissionsAsync(catalogId, employeeId, existingFolder);
+                await this.CheckFolderPermissionsAsync(catalogId, existingFolder?.FolderId ?? 0, employeeId);
                 await this.AttachSubFoldersAsync(catalogId, employeeId, existingFolder);
                 await this.DeleteFilesAsync(catalogId, employeeId, existingFolder);
                 await this.DeleteFolderAndSubFoldersRecursivelyAsync(catalogId, employeeId, existingFolder);
@@ -388,7 +409,7 @@
             }
         }
 
-        private async Task DeleteFolderAndSubFoldersRecursivelyAsync(int catalogId, int employeeId, FolderServiceModel folder)
+        private async Task DeleteFolderAndSubFoldersRecursivelyAsync(int catalogId, int employeeId, OutputFolderServiceModel folder)
         {
             // Cant delete the root folder
             if (folder is null || !folder.RootId.HasValue)
@@ -397,7 +418,7 @@
             }
 
             // folders must be empty at this point
-            var (isDeleted, insertedMessageId) = await this.folderDAL.DeleteAsync(catalogId, folder.FolderId);
+            var (isDeleted, insertedMessageId) = await this.folderDapper.DeleteAsync(catalogId, folder.FolderId);
             if (!isDeleted)
             {
                 return;
@@ -420,32 +441,36 @@
             }
         }
 
-        private async Task AttachSubFoldersAsync(int catalogId, int employeeId, FolderServiceModel folder)
+        private async Task AttachSubFoldersAsync(int catalogId, int employeeId, OutputFolderServiceModel folder)
         {
-            folder.SubFolders = await this.folderDAL.GetSubFoldersAsync(folder.FolderId);
+            folder.SubFolders = (await this.folderDapper.GetSubFoldersAsync(folder.FolderId)).ToArray();
             await this.AttachSubFoldersRecursivelyAsync(catalogId, employeeId, folder.SubFolders);
         }
 
-        private async Task AttachSubFoldersRecursivelyAsync(int catalogId, int employeeId, IEnumerable<FolderServiceModel> folders)
+        private async Task AttachSubFoldersRecursivelyAsync(int catalogId, int employeeId, IEnumerable<OutputFolderServiceModel> folders)
         {
             foreach (var folder in folders)
             {
                 // skip if you dont have access
                 if (folder.IsPrivate)
                 {
-                    var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(catalogId, folder.FolderId, employeeId);
+                    var hasPermission = await this.permissionsDapper.HasUserPermissionForFolderAsync(
+                        catalogId, 
+                        folder.FolderId, 
+                        employeeId);
+
                     if (!hasPermission)
                     {
                         continue;
                     }
                 }
 
-                folder.SubFolders = await this.folderDAL.GetSubFoldersAsync(folder.FolderId);
+                folder.SubFolders = (await this.folderDapper.GetSubFoldersAsync(folder.FolderId)).ToArray();
                 await this.AttachSubFoldersRecursivelyAsync(catalogId, employeeId, folder.SubFolders);
             }
         }
 
-        private async Task DeleteFilesAsync(int catalogId, int employeeId, FolderServiceModel parentFolder)
+        private async Task DeleteFilesAsync(int catalogId, int employeeId, OutputFolderServiceModel parentFolder)
         {
             if (parentFolder is null)
             {
@@ -463,32 +488,11 @@
 
         private async Task DeleteFilesForFolderAsync(int folderId)
         {
-            var files = await this.fileDAL.GetFilesByFolderIdAsync(folderId);
+            var files = await this.fileDapper.GetFilesByFolderIdAsync(folderId);
 
             foreach (var file in files)
             {
-                await this.fileDAL.DeleteFileAsync(file.CatalogId, file.FolderId, file.FileId, file.BlobId);
-            }
-        }
-
-        private async Task ValidateFolderAndCheckPermissionsAsync(int catalogId, int employeeId, FolderServiceModel folder)
-        {
-            if (folder is null)
-            {
-                throw new FolderException { Message = "The folder does not exist." };
-            }
-
-            if (folder.IsPrivate)
-            {
-                var hasPermission = await this.permissionsDAL.HasUserPermissionForFolderAsync(
-                    catalogId, 
-                    folder.FolderId, 
-                    employeeId);
-
-                if (!hasPermission)
-                {
-                    throw new PermissionException { Message = "You dont have access to this folder." };
-                }
+                await this.fileDapper.DeleteFileAsync(file.CatalogId, file.FolderId, file.FileId, file.BlobId);
             }
         }
 
@@ -515,8 +519,8 @@
         {
             if (model.ParentId != null && model.RootId != null)
             {
-                var parentModelTask = this.folderDAL.GetFolderByIdAsync(model.ParentId.Value);
-                var rootModelTask = this.folderDAL.GetFolderByIdAsync(model.RootId.Value);
+                var parentModelTask = this.folderDapper.GetFolderCatalogAsync(model.ParentId.Value);
+                var rootModelTask = this.folderDapper.GetFolderCatalogAsync(model.RootId.Value);
 
                 await Task.WhenAll(parentModelTask, rootModelTask);
 
@@ -540,9 +544,9 @@
             }
         }
 
-        private FolderServiceModel MapToFolderModel(FolderWithAccessServiceModel folder)
+        private OutputFolderServiceModel MapToFolderModel(OutputFolderWithAccessServiceModel folder)
         {
-            return new FolderServiceModel
+            return new OutputFolderServiceModel
             {
                 CatalogId = folder.CatalogId,
                 EmployeeId = folder.EmployeeId,
@@ -558,7 +562,7 @@
             };
         }
 
-        private void CalculateTotalFileCountAndFolderCountForTree(FolderServiceModel folder)
+        private void CalculateTotalFileCountAndFolderCountForTree(OutputFolderServiceModel folder)
         {
             if (folder.SubFolders.Any())
             {
@@ -572,12 +576,12 @@
             }
         }
 
-        private async Task<FolderServiceModel> GenerateFolderWithTreeAsync(int rootFolderId, int employeeId, int folderId)
+        private async Task<OutputFolderServiceModel> GenerateFolderWithTreeAsync(int rootFolderId, int employeeId, int folderId)
         {
-            var folderTree = await this.folderDAL.GetFolderTreeAsync(rootFolderId, employeeId);
+            var folderTree = await this.folderDapper.GetFolderTreeAsync(rootFolderId, employeeId);
             var rootTree = this.MapToFolderModel(folderTree.First(f => f.ParentId is null && f.RootId is null));
 
-            var foldersToFindSubfoldersFor = new List<FolderServiceModel> { rootTree };
+            var foldersToFindSubfoldersFor = new List<OutputFolderServiceModel> { rootTree };
 
             while (foldersToFindSubfoldersFor.Any())
             {
@@ -595,7 +599,7 @@
 
             var folderToReturn = this.FindFolderWithId(rootTree, folderId);
 
-            folderToReturn.Files = await this.fileDAL.GetFilesByFolderIdAsync(folderToReturn.FolderId);
+            folderToReturn.Files = (await this.fileDapper.GetFilesByFolderIdAsync(folderToReturn.FolderId)).ToArray();
 
             foreach (var subfolder in folderToReturn.SubFolders)
             {
@@ -605,7 +609,7 @@
             return folderToReturn;
         }
 
-        private FolderServiceModel FindFolderWithId(FolderServiceModel folder, int folderId)
+        private OutputFolderServiceModel FindFolderWithId(OutputFolderServiceModel folder, int folderId)
         {
             if (folder.FolderId == folderId)
             {

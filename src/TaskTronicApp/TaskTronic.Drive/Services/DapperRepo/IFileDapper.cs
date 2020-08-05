@@ -1,27 +1,28 @@
-﻿namespace TaskTronic.Drive.Data.DapperRepo
+﻿namespace TaskTronic.Drive.Services.DapperRepo
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using TaskTronic.Drive.Models.Files;
 
-    public interface IFileDAL
+    public interface IFileDapper
     {
         Task ReadStreamFromFileAsync(int blobId, Stream stream);
 
-        Task<IEnumerable<FileServiceModel>> GetFilesByFolderIdAsync(int folderId);
+        Task<IEnumerable<OutputFileServiceModel>> GetFilesByFolderIdAsync(int folderId);
 
-        Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId);
-
-        Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, string newFileName);
+        Task<IEnumerable<IFileContract>> GetFileNamesAndTypesAsync(int folderId);
 
         Task<bool> CreateBlobAsync(InputFileServiceModel file);
 
-        Task<int?> DoesFileWithSameNameExistInFolder(int catalogId, int folderId, string fileName, string fileType);
+        Task<int> DoesFileWithSameNameExistInFolder(int catalogId, int folderId, string fileName, string fileType);
 
         Task<OutputFileDownloadServiceModel> GetFileInfoForDownloadAsync(int fileId);
 
-        Task<IEnumerable<FileServiceModel>> SearchFilesAsync(int catalogId, string value, IEnumerable<int> accessibleFiles);
+        Task<IEnumerable<OutputFileSearchServiceModel>> SearchFilesAsync(
+            int catalogId, 
+            string value, 
+            IEnumerable<int> accessibleFiles);
 
         Task<int> CountFilesForEmployeeAsync(int employeeId);
 

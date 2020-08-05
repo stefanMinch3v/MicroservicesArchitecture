@@ -1,12 +1,11 @@
-﻿namespace TaskTronic.Drive.Data.DapperRepo
+﻿namespace TaskTronic.Drive.Services.DapperRepo
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using TaskTronic.Drive.Models.Folders;
 
-    public interface IPermissionsDAL
+    public interface IPermissionDapper
     {
-        Task CreateFolderPermissionsAsync(int folderId, InputFolderServiceModel inputModel);
+        Task CreateFolderPermissionsAsync(int catalogId, int folderId, int employeeId);
 
         Task<IEnumerable<int>> GetUserFolderPermissionsAsync(int catalogId, int employeeId);
 

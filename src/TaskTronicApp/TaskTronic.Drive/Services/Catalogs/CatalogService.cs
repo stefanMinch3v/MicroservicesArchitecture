@@ -1,38 +1,45 @@
 ﻿namespace TaskTronic.Drive.Services.Catalogs
 {
-    using Data.DapperRepo;
     using Folders;
+    using Microsoft.EntityFrameworkCore;
     using Models.Folders;
     using System;
     using System.Threading.Tasks;
+    using TaskTronic.Drive.Data;
+    using TaskTronic.Drive.Data.Models;
 
     public class CatalogService : ICatalogService
     {
-        private readonly ICatalogDAL catalogDAL;
         private readonly IFolderService folderService;
+        private readonly DriveDbContext dbContext;
 
         public CatalogService(
-            ICatalogDAL catalogDAL,
-            IFolderService folder)
+            IFolderService folder,
+            DriveDbContext dbContext)
         {
-            this.catalogDAL = catalogDAL;
             this.folderService = folder;
+            this.dbContext = dbContext;
         }
 
         public async Task<int> GetIdAsync(int companyDepartmentsId, int employeeId)
         {
-            var catalogId = await this.catalogDAL.GetAsync(companyDepartmentsId);
+            var catalog = await this.dbContext.Catalogs
+                .FirstOrDefaultAsync(c => c.CompanyDepartmentsId == companyDepartmentsId);
 
-            if (catalogId == 0)
+            if (catalog is null)
             {
-                var createdCatId = await this.catalogDAL.AddAsync(companyDepartmentsId);
+                var newCatalog = new Catalog { CompanyDepartmentsId = companyDepartmentsId };
 
-                await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(createdCatId, employeeId));
+                this.dbContext.Catalogs.Add(newCatalog);
 
-                return createdCatId;
+                await this.dbContext.SaveChangesAsync();
+
+                await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(newCatalog.CatalogId, employeeId));
+
+                return newCatalog.CatalogId;
             }
 
-            return catalogId;
+            return catalog.CatalogId;
         }
 
         private InputFolderServiceModel CreateInputFolderModel(int catId, int employeeId)
@@ -41,7 +48,7 @@
                 CatalogId = catId,
                 EmployeeId = employeeId,
                 Name = DriveConstants.ROOT_FOLDER_NAME,
-                CreateDate = DateTimeOffset.UtcNow
+                CreateDate = DateTime.UtcNow
             };
     }
 }

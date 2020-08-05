@@ -1,17 +1,12 @@
 ﻿namespace TaskTronic.Drive.Services.Files
 {
     using Models.Files;
-    using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
 
     public interface IFileService
     {
         Task ReadStreamFromFileAsync(int blobId, Stream stream);
-
-        Task<FileServiceModel> GetFileByIdAsync(int catalogId, int folderId, int fileId);
-
-        Task<IReadOnlyCollection<FileServiceModel>> GetFilesByFolderIdAsync(int catalogId, int folderId, int employeeId);
 
         Task<bool> DeleteFileAsync(int employeeId, int catalogId, int folderId, int fileId);
 
