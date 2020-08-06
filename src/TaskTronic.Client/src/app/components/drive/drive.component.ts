@@ -34,13 +34,8 @@ export class DriveComponent implements OnInit {
   public selectedFolderId: number;
   public folder: Folder;
   public newFolderName: string;
-  public creatingFolder: boolean;
-  public creatingFile: boolean;
   public selectedFolder: Folder;
-  public folderToMove: Folder;
-  public selectedFile: FileModel;
   public newFileName: string;
-  public fileToMove: FileModel;
   public parentFolderChain: FolderIdName[] = [];
   public isLoading = true;
 
@@ -153,6 +148,18 @@ export class DriveComponent implements OnInit {
     }
   }
 
+  public togglePrivate(folderId: number, catalogId: number): void {
+    this.driveService.togglePrivate(folderId, catalogId)
+      .subscribe(_ => this.reloadFolder());
+  }
+
+  public isCurrentUserAuthor(userEmail: string): boolean {
+    const emailStartIndex = userEmail.indexOf('@');
+    const authorUsername = userEmail.substring(0, emailStartIndex);
+
+    return this.authService.getUser() === authorUsername;
+  }
+
   private addFolderToParentFolderChain(folderId: number, name: string): void {
     this.removeFolderFromTheParentFolderChain(folderId);
     this.parentFolderChain.push(new FolderIdName(folderId, name));
@@ -191,20 +198,18 @@ export class DriveComponent implements OnInit {
           if (res) {
             this.reloadFolder();
           }
-        }, error => console.log(error));
+        });
     }
   }
 
   public createFolder() {
-    this.creatingFolder = true;
     this.newFolderName = 'Default folder';
 
     this.driveService.createFolder(this.folder, this.newFolderName)
       .subscribe(_ => {
         this.reloadFolder();
         this.newFolderName = '';
-        this.creatingFolder = false;
-      }, error => this.creatingFolder = false);
+      });
     // if (!this.newFolderName || this.newFolderName.length < 1) {
     //   this.notificationService.errorMessage('Empty name');
     // } else if (this.newFolderName.length > 50) {
@@ -269,9 +274,9 @@ export class DriveComponent implements OnInit {
           if (res) {
             this.reloadFolder();
           } else {
-            console.log('Could not remove the data');
+            this.notificationService.warningMessage('Could not remove the data');
           }
-      }, error => console.log(error));
+      });
     }
   }
 

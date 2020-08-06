@@ -99,6 +99,18 @@ export class DriveService {
             }));
     }
 
+    togglePrivate(folderId: number, catalogId: number): Observable<void> {
+        const url = environment.driveUrl + `${this.DRIVE_FOLDERS}TogglePrivate`;
+
+        return this.http.post(url, {}, {
+            params: {
+                catalogId: String(catalogId),
+                folderId: String(folderId)
+            }}).pipe(map(_ => {
+                this.notificationService.successMessage('Folder status changed');
+            }));
+    }
+
     downloadFile(catalogId: number, folderId: number, fileId: number, shouldOpen: boolean): string {
         const url = environment.driveUrl + `${this.DRIVE_FILES}DownloadFile`;
 
@@ -113,18 +125,6 @@ export class DriveService {
         const options = new HttpParams({ fromObject: parameters });
         return `${url}?${options.toString()}`;
     }
-
-    // downloadFileWithoutUrlToken(catalogId: number, folderId: number, fileId: number, shouldOpen: boolean): Observable<Blob> {
-    //     const url = environment.driveUrl + `${this.DRIVE_FILES}DownloadFile`;
-
-    //     return this.http.get(url, {
-    //         params: {
-    //             catalogId: catalogId.toString(),
-    //             folderId: folderId.toString(),
-    //             fileId: fileId.toString(),
-    //             shouldOpen: String(shouldOpen)
-    //         }}).pipe(map((response: Blob) => response));
-    // }
 
     deleteFile(catalogId: number, folderId: number, fileId: number): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FILES}DeleteFile`;

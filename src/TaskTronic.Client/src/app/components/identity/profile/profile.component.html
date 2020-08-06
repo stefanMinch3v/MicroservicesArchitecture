@@ -31,7 +31,7 @@
 	</table>
 </div>
 <hr>
-<h4 class="ml-2">My folders</h4>
+<h4 class="ml-2">My folders' views</h4>
 <div *ngIf="totalViews && totalViews.length > 0" class="table-responsive">
 	<table class="table table-bordered table-hover"> 
 		<thead>
@@ -48,7 +48,10 @@
 				<td>{{view.name}}</td>
 				<td>{{view.folderId}}</td>
 				<td>{{view.totalViews}}</td>
-				<td>{{view.isPrivate}}</td>
+				<td>
+					<span *ngIf="view.isPrivate"><i class="fas fa-check fa-2x"></i></span>
+					<span *ngIf="!view.isPrivate"><i class="fas fa-times fa-2x"></i></span>
+				</td>
 				<td>{{view.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
 			</tr>
 		</tbody>

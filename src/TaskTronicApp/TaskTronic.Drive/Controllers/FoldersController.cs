@@ -78,7 +78,36 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.folderService.RenameFolderAsync(catalogId, folderId, employeeId, name);
+            try
+            {
+                return await this.folderService.RenameFolderAsync(catalogId, folderId, employeeId, name);
+            }
+            catch (FolderException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route(nameof(TogglePrivate))]
+        public async Task<ActionResult> TogglePrivate(int catalogId, int folderId)
+        {
+            var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
+
+            if (employeeId == 0)
+            {
+                return BadRequest(DriveConstants.INVALID_EMPLOYEE);
+            }
+
+            try
+            {
+                await this.folderService.TogglePrivateAsync(catalogId, folderId, employeeId);
+                return Ok();
+            }
+            catch (FolderException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]

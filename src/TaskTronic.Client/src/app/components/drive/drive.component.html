@@ -129,6 +129,11 @@
             <button  class="btn btn-sm btn-warning" (click)="openModal(folder.name, true, folder.folderId, folder.folderId)">
               Edit
             </button>
+            <span *ngIf="isCurrentUserAuthor(folder.updaterUsername)"> | </span>
+            <button *ngIf="isCurrentUserAuthor(folder.updaterUsername)" (click)="togglePrivate(folder.folderId, folder.catalogId)" class="btn btn-sm btn-primary">
+              <span *ngIf="folder.isPrivate">Make public</span>
+              <span *ngIf="!folder.isPrivate">Make private</span>
+            </button>
           </td>
           <td>{{folder.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
           <td>Folder</td>

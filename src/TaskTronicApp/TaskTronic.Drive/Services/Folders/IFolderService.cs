@@ -31,5 +31,7 @@
             int employeeId,
             int currentFolderId,
             string searchValue);
+
+        Task TogglePrivateAsync(int catalogId, int folderId, int employeeId);
     }
 }

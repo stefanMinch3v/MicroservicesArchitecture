@@ -3,6 +3,7 @@
     using DapperRepo;
     using Exceptions;
     using MassTransit;
+    using Microsoft.EntityFrameworkCore;
     using Models.Files;
     using Models.Folders;
     using Services.Employees;
@@ -97,6 +98,11 @@
             if (folder is null)
             {
                 return false;
+            }
+
+            if (folder.ParentId is null)
+            {
+                throw new FolderException { Message = "Cannot rename Root folder" };
             }
 
             folder.Name = newFolderName;
@@ -284,6 +290,50 @@
             }
         }
 
+        public async Task TogglePrivateAsync(int catalogId, int folderId, int employeeId)
+        {
+            var folder = await this.dbContext.Folders
+                .FirstOrDefaultAsync(f => f.CatalogId == catalogId
+                    && f.FolderId == folderId
+                    && f.EmployeeId == employeeId);
+
+            if (folder is null)
+            {
+                throw new FolderException { Message = "Cannot make other people's folder private" };
+            }
+
+            if (folder.RootId is null)
+            {
+                throw new FolderException { Message = "Cannot make Root folder private" };
+            }
+
+            folder.IsPrivate = !folder.IsPrivate;
+
+            if (folder.IsPrivate)
+            {
+                this.dbContext.Permissions.Add(new Data.Models.Permission
+                {
+                    CatalogId = catalogId,
+                    FolderId = folderId,
+                    EmployeeId = employeeId
+                });
+            } 
+            else
+            {
+                var permission = await this.dbContext.Permissions
+                    .FirstOrDefaultAsync(p => p.EmployeeId == employeeId
+                        && p.FolderId == folderId
+                        && p.CatalogId == catalogId);
+
+                if (permission != null)
+                {
+                    this.dbContext.Permissions.Remove(permission);
+                }
+            }
+
+            await this.dbContext.SaveChangesAsync();
+        }
+
         private async Task AddUpdatersUsernamesAsync(IEnumerable<OutputFileSearchServiceModel> foundFiles)
         {
             foreach (var file in foundFiles)
@@ -298,9 +348,21 @@
             OutputFolderSearchServiceModel currentFolder,
             IEnumerable<OutputFolderSearchServiceModel> allFolders)
         {
-            currentFolder.SubFolders = allFolders
-                .Where(f => f.ParentId == currentFolder.FolderId)
-                .ToList();
+            foreach (var subFolder in allFolders.Where(f => f.ParentId == currentFolder.FolderId))
+            {
+                if (subFolder.IsPrivate)
+                {
+                    var hasPermission = this.dbContext.Permissions
+                        .Any(p => p.FolderId == subFolder.FolderId && p.EmployeeId == userId);
+
+                    if (!hasPermission)
+                    {
+                        continue;
+                    }
+                }
+
+                currentFolder.SubFolders.Add(subFolder);
+            }
 
             var userPermissions = await this.permissionsDapper.GetUserFolderPermissionsAsync(catalogId, userId);
 
@@ -325,6 +387,11 @@
             {
                 if (folder.IsPrivate)
                 {
+                    if (!userPermissions.Any())
+                    {
+                        continue;
+                    }
+
                     var hasPermission = userPermissions.Any(p => p == folder.FolderId);
                     if (!hasPermission)
                     {

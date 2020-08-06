@@ -43,7 +43,7 @@
             this.recurringJobManager.AddOrUpdate(
                 nameof(MessagesHostedService),
                 () => this.ProccessPendingMessages(cancellationToken),
-                "*/5 * * * * *"); // Cron job expression syntax -> runs in every 5 sec
+                "*/15 * * * * *"); // Cron job expression syntax -> runs in every 15 sec
 
             return Task.CompletedTask;
         }
