@@ -95,7 +95,7 @@ export class DriveComponent implements OnInit {
   }
 
   public navigateToRoot(): void {
-    const url = this.router.createUrlTree(['dok', this.companyDepartmentsId]);
+    const url = this.router.createUrlTree(['drive', this.companyDepartmentsId]);
     this.location.go(url.toString());
     this.getRootFolder();
   }
@@ -132,7 +132,7 @@ export class DriveComponent implements OnInit {
   // breadcrumbs actions
   private setUrl(folder: Folder): void {
     this.parentArray = [];
-    const url = this.router.createUrlTree(['dok', this.companyDepartmentsId]);
+    const url = this.router.createUrlTree(['drive', this.companyDepartmentsId]);
     let newUrl = url.toString();
 
     if (folder.parentFolder) {
