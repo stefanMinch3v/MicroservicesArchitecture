@@ -1,5 +1,6 @@
-<div class="col-md-10 center-spinner" *ngIf="!companyWrapper">
-	<i class="fa fa-refresh fa-spin my-spinner"></i>
+<!--Spinner-->
+<div *ngIf="isLoadingCompanies" class="ml-2">
+	<i class="fas fa-sync fa-spin"></i>
 </div>
 
 <div *ngIf="companyWrapper && companyWrapper.companies" class="table-responsive">
@@ -30,8 +31,16 @@
 		</tbody>
 	</table>
 </div>
+
 <hr>
+
 <h4 class="ml-2">My folders' views</h4>
+
+<!--Spinner-->
+<div *ngIf="isLoadingViews" class="ml-2">
+	<i class="fas fa-sync fa-spin"></i>
+</div>
+
 <div *ngIf="totalViews && totalViews.length > 0" class="table-responsive">
 	<table class="table table-bordered table-hover"> 
 		<thead>

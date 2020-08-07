@@ -42,6 +42,11 @@
       ></drive-breadcrumbs>
     </div>
 
+    <!--Spinner-->
+    <div *ngIf="isLoading" class="my-spinner">
+      <i class="fas fa-sync fa-spin"></i>
+    </div>
+    
     <table *ngIf="hasSearchResult && searchResults.length > 0" class="table table-borderless">
       <thead>
         <tr>

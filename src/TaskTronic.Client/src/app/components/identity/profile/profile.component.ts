@@ -16,6 +16,9 @@ export class ProfileComponent implements OnInit {
   companyWrapper: CompanyWrapper;
   totalViews: Array<TotalView>;
 
+  isLoadingCompanies: boolean;
+  isLoadingViews: boolean;
+
   constructor(
     private readonly employeeService: EmployeeService,
     private readonly notificationService: NotificationService,
@@ -23,11 +26,8 @@ export class ProfileComponent implements OnInit {
     private readonly gatewayService: GatewayService) { }
 
   ngOnInit() {
-    this.companyService.getCompanies()
-      .subscribe(companyWrapper => this.companyWrapper = companyWrapper);
-
-    this.gatewayService.getTotalViews()
-      .subscribe(views => this.totalViews = views);
+    this.reloadCompanies();
+    this.reloadTotalViews();
   }
 
   public selectCompanyDepartment(companyId: number, departmentId: number): void {
@@ -38,9 +38,7 @@ export class ProfileComponent implements OnInit {
     this.employeeService.setCompany(companyId, departmentId)
       .subscribe(_ => {
         this.notificationService.successMessage('Data saved.');
-
-        this.companyService.getCompanies()
-          .subscribe(companyWrapper => this.companyWrapper = companyWrapper);
+        this.reloadCompanies();
       });
   }
 
@@ -54,5 +52,25 @@ export class ProfileComponent implements OnInit {
     }
 
     return false;
+  }
+
+  private reloadCompanies(): void {
+    this.isLoadingCompanies = true;
+
+    this.companyService.getCompanies()
+      .subscribe(companyWrapper => {
+        this.companyWrapper = companyWrapper;
+        this.isLoadingCompanies = false;
+      });
+  }
+
+  private reloadTotalViews(): void {
+    this.isLoadingViews = true;
+
+    this.gatewayService.getTotalViews()
+      .subscribe(views => {
+        this.totalViews = views;
+        this.isLoadingViews = false;
+      });
   }
 }

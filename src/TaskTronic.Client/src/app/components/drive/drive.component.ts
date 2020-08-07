@@ -36,7 +36,7 @@ export class DriveComponent implements OnInit {
   public newFolderName: string;
   public selectedFolder: Folder;
   public newFileName: string;
-  private parentArray = [];
+  private parentArray: FolderIdName[] = [];
   public parentFolderChain: FolderIdName[] = [];
   public isLoading = true;
 
@@ -92,14 +92,14 @@ export class DriveComponent implements OnInit {
       });
   }
 
-  public navigateToRoot() {
+  public navigateToRoot(): void {
     const url = this.router.createUrlTree(['dok', this.companyDepartmentsId]);
     this.location.go(url.toString());
     this.getRootFolder();
   }
 
   // Edit file/folder
-  public openModal(name: string, isFolder: boolean, currentFolderId: number, elementId: number) {
+  public openModal(name: string, isFolder: boolean, currentFolderId: number, elementId: number): void {
     this.modalNameToChange = name;
     this.modalIsFolder = isFolder;
     this.modalElementId = elementId;
@@ -120,7 +120,7 @@ export class DriveComponent implements OnInit {
   }
 
   // breadcrumbs actions
-  private setUrl(folder: Folder) {
+  private setUrl(folder: Folder): void {
     this.parentArray = [];
     const url = this.router.createUrlTree(['dok', this.companyDepartmentsId]);
     let newUrl = url.toString();
@@ -135,13 +135,13 @@ export class DriveComponent implements OnInit {
     this.parentFolderChain = this.parentArray;
 
     this.parentArray.forEach(el => {
-      newUrl = newUrl.concat('/', el.id.toString());
+      newUrl = newUrl.concat('/', el.name.toString());
     });
 
     this.location.go(newUrl);
   }
 
-  private getAllParents(folder: Folder) {
+  private getAllParents(folder: Folder): void {
     this.parentArray.push(new FolderIdName(folder.folderId, folder.name));
     if (folder.parentFolder) {
       this.getAllParents(folder.parentFolder);
@@ -153,7 +153,7 @@ export class DriveComponent implements OnInit {
     this.getFolder(folderId);
   }
 
-  public deleteFolder(folder: Folder) {
+  public deleteFolder(folder: Folder): void {
     const confirmation = confirm('Confirm delete of ' + folder.name);
 
     if (confirmation) {
@@ -166,7 +166,7 @@ export class DriveComponent implements OnInit {
     }
   }
 
-  public createFolder() {
+  public createFolder(): void {
     this.newFolderName = 'Default folder';
 
     this.driveService.createFolder(this.folder, this.newFolderName)
@@ -187,7 +187,7 @@ export class DriveComponent implements OnInit {
       .subscribe(_ => this.reloadFolder());
   }
 
-  public renameFolder() {
+  public renameFolder(): void {
     if (!this.modalNameToChange ||
         this.modalNameToChange.length < 2 ||
         this.modalNameToChange.length > 255) {
@@ -246,12 +246,12 @@ export class DriveComponent implements OnInit {
   }
 
   // FILE ACTIONS
-  public downloadFile(file: FileModel, shouldOpen: boolean = false) {
+  public downloadFile(file: FileModel, shouldOpen: boolean = false): void {
     const downloadUrl = this.driveService.downloadFile(file.catalogId, file.folderId, file.fileId, shouldOpen);
     window.open(downloadUrl);
   }
 
-  public deleteFile(file: FileModel) {
+  public deleteFile(file: FileModel): void {
     const confirmation = confirm('Confirm delete of ' + file.fileName);
 
     if (confirmation) {
@@ -266,29 +266,31 @@ export class DriveComponent implements OnInit {
     }
   }
 
-  public searchForFiles(e) {
+  public searchForFiles(e): void {
     e.preventDefault();
-
     const val = this.searchValue.nativeElement.value;
+
     if (val.length > 0) {
+      this.isLoading = true;
       this.driveService.searchForFile(this.folder.catalogId, this.folder.folderId, val)
         .subscribe(result => {
           this.hasSearchResult = true;
           this.searchResults = result;
+          this.isLoading = false;
         });
     } else {
       this.hasSearchResult = false;
     }
   }
 
-  public updateSearch() {
+  public updateSearch(): void {
     const val = this.searchValue.nativeElement.value;
     if (val.length === 0) {
       this.hasSearchResult = false;
     }
   }
 
-  public createNewDocumentFile(isWord: boolean) {
+  public createNewDocumentFile(isWord: boolean): void {
     if (isWord) {
       this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 1)
         .subscribe(_ => {
@@ -302,7 +304,7 @@ export class DriveComponent implements OnInit {
     }
   }
 
-  public renameFile() {
+  public renameFile(): void {
     if (!this.modalNameToChange ||
         this.modalNameToChange.length < 2 ||
         this.modalNameToChange.length > 255) {
