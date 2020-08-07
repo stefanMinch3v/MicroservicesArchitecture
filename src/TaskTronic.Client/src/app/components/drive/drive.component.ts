@@ -46,11 +46,13 @@ export class DriveComponent implements OnInit {
   public searchResults: FileModel[] = [];
   //
 
-  // edit modal
+  // bootstrap modal
   private modalElementId: number;
   private modalCurrentFolderId: number;
   modalNameToChange: string;
   modalIsFolder: boolean;
+  modalIsCreate: boolean;
+  modalIsWordFile: boolean;
   modalRef: BsModalRef;
   @ViewChild('modalTemplate', { static: true }) modalTemplateRef: TemplateRef<any>;
 
@@ -99,11 +101,19 @@ export class DriveComponent implements OnInit {
   }
 
   // Edit file/folder
-  public openModal(name: string, isFolder: boolean, currentFolderId: number, elementId: number): void {
+  public openModal(
+      name: string,
+      isFolder: boolean,
+      currentFolderId: number,
+      elementId: number,
+      isCreateOperation: boolean,
+      isWordFile = true): void {
     this.modalNameToChange = name;
     this.modalIsFolder = isFolder;
     this.modalElementId = elementId;
     this.modalCurrentFolderId = currentFolderId;
+    this.modalIsCreate = isCreateOperation;
+    this.modalIsWordFile = isWordFile;
 
     this.modalRef = this.modalService.show(this.modalTemplateRef);
   }
@@ -167,12 +177,18 @@ export class DriveComponent implements OnInit {
   }
 
   public createFolder(): void {
-    this.newFolderName = 'Default folder';
+    if (!this.modalNameToChange) {
+        this.notificationService.errorMessage('Empty name');
+        return;
+      } else if (this.modalNameToChange.length > 50) {
+        this.notificationService.errorMessage('The name is too long');
+        return;
+      }
 
-    this.driveService.createFolder(this.folder, this.newFolderName)
+    this.driveService.createFolder(this.folder, this.modalNameToChange)
       .subscribe(_ => {
+        this.modalRef.hide();
         this.reloadFolder();
-        this.newFolderName = '';
       });
     // if (!this.newFolderName || this.newFolderName.length < 1) {
     //   this.notificationService.errorMessage('Empty name');
@@ -290,15 +306,17 @@ export class DriveComponent implements OnInit {
     }
   }
 
-  public createNewDocumentFile(isWord: boolean): void {
-    if (isWord) {
-      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 1)
+  public createNewDocumentFile(): void {
+    if (this.modalIsWordFile) {
+      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 1, this.modalNameToChange)
         .subscribe(_ => {
+          this.modalRef.hide();
           this.reloadFolder();
         });
     } else {
-      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 2)
+      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 2, this.modalNameToChange)
         .subscribe(_ => {
+          this.modalRef.hide();
           this.reloadFolder();
         });
     }

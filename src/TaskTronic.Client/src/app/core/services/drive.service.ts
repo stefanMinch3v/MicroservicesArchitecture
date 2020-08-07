@@ -151,13 +151,14 @@ export class DriveService {
             }}).pipe(map((response: Array<FileModel>) => response));
     }
 
-    createNewFile(catalogId: number, folderId: number, newFileType: number): Observable<boolean> {
+    createNewFile(catalogId: number, folderId: number, newFileType: number, fileName: string): Observable<boolean> {
         const url = environment.driveUrl + `${this.DRIVE_FILES}CreateNewFile`;
 
         return this.http.post(url, {}, {
             params: {
                 catalogId: catalogId.toString(),
                 folderId: folderId.toString(),
+                fileName: fileName.toString(),
                 newFileType: newFileType.toString()
             }}).pipe(map((response: boolean) => {
                 const message = newFileType === 1 ? 'Word file added' : 'Excel file added';

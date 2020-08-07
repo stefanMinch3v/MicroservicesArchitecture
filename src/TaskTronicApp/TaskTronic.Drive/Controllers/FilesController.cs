@@ -135,7 +135,7 @@
 
         [HttpPost]
         [Route(nameof(CreateNewFile))]
-        public async Task<ActionResult<bool>> CreateNewFile(int catalogId, int folderId, NewFileType newFileType)
+        public async Task<ActionResult<bool>> CreateNewFile(int catalogId, int folderId, string fileName, NewFileType newFileType)
         {
             var employeeId = await this.employeeService.GetIdByUserAsync(this.currentUser.UserId);
 
@@ -144,7 +144,7 @@
                 return BadRequest(DriveConstants.INVALID_EMPLOYEE);
             }
 
-            return await this.fileService.CreateNewFileAsync(catalogId, employeeId, folderId, newFileType);
+            return await this.fileService.CreateNewFileAsync(catalogId, employeeId, folderId, fileName, newFileType);
         }
 
         private static string GetMimeType(string extension)

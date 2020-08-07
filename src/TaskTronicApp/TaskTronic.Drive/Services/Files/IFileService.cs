@@ -16,6 +16,6 @@
 
         Task<bool> RenameFileAsync(int catalogId, int folderId, int fileId, int employeeId, string newFileName);
 
-        Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType);
+        Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, string fileName, NewFileType fileType);
     }
 }

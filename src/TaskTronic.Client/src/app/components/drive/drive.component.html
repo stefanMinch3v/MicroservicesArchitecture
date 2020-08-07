@@ -2,13 +2,13 @@
     <!-- TOPBAR -->
     <div class="top-bar" [ngClass]="{'top-bar-custom-padding': hasSearchResult}">
       <div>
-        <button class="btn-sm btn-info over-cursor" (click)='createFolder()'>
+        <button class="btn-sm btn-info over-cursor" (click)="openModal('', true, 0, 0, true)">
           <i class="fa fa-plus"></i> New Folder
         </button>
-        <button class="btn-sm btn-success over-cursor" (click)="createNewDocumentFile(true)">
+        <button class="btn-sm btn-success over-cursor" (click)="openModal('', false, 0, 0, true)">
           <i class="fa fa-plus"></i> New Word file
         </button>
-        <button class="btn-sm btn-success over-cursor" (click)="createNewDocumentFile(false)">
+        <button class="btn-sm btn-success over-cursor" (click)="openModal('', false, 0, 0, true, false)">
           <i class="fa fa-plus"></i> New Excel file
         </button>
 
@@ -76,11 +76,11 @@
           <td>
             <button class="btn btn-sm btn-danger" (click)="deleteFile(file)">Delete</button>
             |
-            <button class="btn btn-sm btn-warning" (click)="openModal(file.fileName, false, file.folderId, file.fileId)">Edit</button>
+            <button class="btn btn-sm btn-warning" (click)="openModal(file.fileName, false, file.folderId, file.fileId, false)">Edit</button>
             |
             <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
           </td>
-          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
+          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
           <td>{{file.updaterUsername}}</td>
@@ -124,7 +124,7 @@
         <tr *ngFor="let folder of folder.subFolders" class="folder-row">
           <td></td>
           <td>
-            <i class="fas fa-folder" style="color: #F7D774;"></i>
+            <i class="fas fa-folder" [ngStyle]="{'color': folder.isPrivate ? '#F7774' : '#F7D774'}"></i>
             <span title="{{folder.name}}" class="folder-name" (click)="openFolder(folder.folderId)">{{folder.name}}</span>
           </td>
           <td>
@@ -132,7 +132,7 @@
               Delete
             </button>
             |
-            <button  class="btn btn-sm btn-warning" (click)="openModal(folder.name, true, folder.folderId, folder.folderId)">
+            <button  class="btn btn-sm btn-warning" (click)="openModal(folder.name, true, folder.folderId, folder.folderId, false)">
               Edit
             </button>
             <span *ngIf="isCurrentUserAuthor(folder.updaterUsername)"> | </span>
@@ -141,9 +141,12 @@
               <span *ngIf="!folder.isPrivate">Make private</span>
             </button>
           </td>
-          <td>{{folder.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
+          <td>{{folder.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
           <td>Folder</td>
-          <td>{{folder.folderCount}} folders, {{folder.fileCount}} files</td>
+          <td>
+            <span>{{folder.folderCount}} {{folder.folderCount === 1 ? 'folder' : 'folders'}},</span>
+            <span>{{folder.fileCount}} {{folder.fileCount === 1 ? 'file' : 'files'}}</span>
+          </td>
           <td>{{folder.updaterUsername}}</td>
         </tr>
         <tr *ngFor="let file of folder.files" class="file-row">
@@ -163,11 +166,11 @@
           <td>
             <button class="btn btn-sm btn-danger" (click)="deleteFile(file)">Delete</button>
             |
-            <button class="btn btn-sm btn-warning" (click)="openModal(file.fileName, false, file.folderId, file.fileId)">Edit</button>
+            <button class="btn btn-sm btn-warning" (click)="openModal(file.fileName, false, file.folderId, file.fileId, false)">Edit</button>
             |
             <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
           </td>
-          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
+          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
           <td>{{file.updaterUsername}}</td>
@@ -190,7 +193,7 @@
 <!--Bootstrap modal-->
 <ng-template #modalTemplate>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">Edit modal</h4>
+    <h4 class="modal-title pull-left">{{modalIsCreate ? 'Create' : 'Edit'}} modal</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -201,7 +204,9 @@
   </div>
 
   <div class="modal-footer">
-    <button *ngIf="modalIsFolder" type="button" class="btn btn-outline-dark" (click)="renameFolder()">Save</button>
-    <button *ngIf="!modalIsFolder" type="button" class="btn btn-outline-dark" (click)="renameFile()">Save</button>
+    <button *ngIf="modalIsFolder && !modalIsCreate" type="button" class="btn btn-outline-dark" (click)="renameFolder()">Edit</button>
+    <button *ngIf="modalIsFolder && modalIsCreate" type="button" class="btn btn-outline-dark" (click)="createFolder()">Create</button>
+    <button *ngIf="!modalIsFolder && !modalIsCreate" type="button" class="btn btn-outline-dark" (click)="renameFile()">Edit</button>
+    <button *ngIf="!modalIsFolder && modalIsCreate" type="button" class="btn btn-outline-dark" (click)="createNewDocumentFile()">Create</button>
   </div>
 </ng-template>

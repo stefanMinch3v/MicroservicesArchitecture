@@ -213,11 +213,11 @@
             return await this.fileDapper.GetFileInfoForDownloadAsync(fileId);
         }
 
-        public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, NewFileType fileType)
+        public async Task<bool> CreateNewFileAsync(int catalogId, int employeeId, int folderId, string fileName, NewFileType fileType)
             => fileType switch
             {
-                NewFileType.Word => await this.CreateEmptyWordDocAsync(catalogId, employeeId, folderId),
-                NewFileType.Excel => await this.CreateEmptyExcelDocAsync(catalogId, employeeId, folderId),
+                NewFileType.Word => await this.CreateEmptyWordDocAsync(catalogId, employeeId, folderId, fileName),
+                NewFileType.Excel => await this.CreateEmptyExcelDocAsync(catalogId, employeeId, folderId, fileName),
                 _ => throw new InvalidOperationException($"Unsupported file type: {fileType}"),
             };
 
@@ -265,7 +265,7 @@
             }
         }
 
-        private async Task<bool> CreateEmptyWordDocAsync(int catalogId, int employeeId, int folderId)
+        private async Task<bool> CreateEmptyWordDocAsync(int catalogId, int employeeId, int folderId, string fileName)
         {
             using var ms = new MemoryStream();
 
@@ -273,7 +273,7 @@
             {
                 Chunk = 0,
                 Chunks = 1,
-                FileName = $"Document",
+                FileName = string.IsNullOrEmpty(fileName) ? "Document" : fileName,
                 FileType = ".docx",
                 Filesize = 0,
                 CatalogId = catalogId,
@@ -285,7 +285,7 @@
             });
         }
 
-        private async Task<bool> CreateEmptyExcelDocAsync(int catalogId, int employeeId, int folderId)
+        private async Task<bool> CreateEmptyExcelDocAsync(int catalogId, int employeeId, int folderId, string fileName)
         {
             using var ms = this.GenerateEmptyExcelFileInStream();
 
@@ -293,7 +293,7 @@
             {
                 Chunk = 0,
                 Chunks = 1,
-                FileName = $"Excel",
+                FileName = string.IsNullOrEmpty(fileName) ? "Excel" : fileName,
                 FileType = ".xlsx",
                 Filesize = ms.Length,
                 CatalogId = catalogId,
