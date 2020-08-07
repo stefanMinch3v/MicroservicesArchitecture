@@ -1,6 +1,6 @@
 <div class="content-group" #pluploadcontainer>
     <!-- TOPBAR -->
-    <div class="top-bar">
+    <div class="top-bar" [ngClass]="{'top-bar-custom-padding': hasSearchResult}">
       <div>
         <button class="btn-sm btn-info over-cursor" (click)='createFolder()'>
           <i class="fa fa-plus"></i> New Folder
@@ -34,6 +34,7 @@
         </form>
       </div>
   
+      <!--Breadcrumbs-->
       <drive-breadcrumbs *ngIf="!hasSearchResult"
         [parentFolderChain]="parentFolderChain"
         (rootFolderClicked)="navigateToRoot()"
@@ -170,7 +171,8 @@
     </table>
 </div>
 
-<div id="upload-overlay" class="upload-overlay">
+<!--Plupload-->
+<!-- <div id="upload-overlay" class="upload-overlay">
   <div *ngIf="uploader &&  uploader.files" style="width: 50%;">
     <div *ngFor="let file of uploader.files" class="upload-overlay-text">
       <span>{{file.name}}</span>
@@ -178,8 +180,9 @@
         <div class="progress-bar" [style.width]="file.percent + '%'"></div>
       </div>
   </div>
-</div> 
+</div>  -->
 
+<!--Bootstrap modal-->
 <ng-template #modalTemplate>
   <div class="modal-header">
     <h4 class="modal-title pull-left">Edit modal</h4>

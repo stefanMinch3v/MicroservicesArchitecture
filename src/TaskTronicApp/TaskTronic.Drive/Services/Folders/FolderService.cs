@@ -611,8 +611,13 @@
             }
         }
 
-        private OutputFolderServiceModel MapToFolderModel(OutputFolderWithAccessServiceModel folder)
+        private OutputFolderServiceModel MapToOutputFolderServiceModel(OutputFolderWithAccessServiceModel folder)
         {
+            if (folder is null)
+            {
+                return null;
+            }
+
             return new OutputFolderServiceModel
             {
                 CatalogId = folder.CatalogId,
@@ -646,7 +651,7 @@
         private async Task<OutputFolderServiceModel> GenerateFolderWithTreeAsync(int rootFolderId, int employeeId, int folderId)
         {
             var folderTree = await this.folderDapper.GetFolderTreeAsync(rootFolderId, employeeId);
-            var rootTree = this.MapToFolderModel(folderTree.First(f => f.ParentId is null && f.RootId is null));
+            var rootTree = this.MapToOutputFolderServiceModel(folderTree.First(f => f.ParentId is null && f.RootId is null));
 
             var foldersToFindSubfoldersFor = new List<OutputFolderServiceModel> { rootTree };
 
@@ -655,7 +660,7 @@
                 var folder = foldersToFindSubfoldersFor.First();
                 folder.SubFolders = folderTree
                     .Where(f => f.HasAccess && f.ParentId == folder.FolderId)
-                    .Select(MapToFolderModel)
+                    .Select(this.MapToOutputFolderServiceModel)
                     .ToList();
 
                 foldersToFindSubfoldersFor.Remove(folder);
@@ -672,6 +677,8 @@
             {
                 subfolder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(subfolder.EmployeeId);
             }
+
+            this.AddParentFolderRecursively(folderTree, folderToReturn);
 
             return folderToReturn;
         }
@@ -698,6 +705,20 @@
                 }
 
                 return null;
+            }
+        }
+
+        // need for the breadcrumbs navigation
+        private void AddParentFolderRecursively(
+            IEnumerable<OutputFolderWithAccessServiceModel> folders, 
+            OutputFolderServiceModel folder)
+        {
+            if (folder.ParentId.HasValue)
+            {
+                folder.ParentFolder = this.MapToOutputFolderServiceModel(
+                    folders.FirstOrDefault(x => x.FolderId == folder.ParentId.Value));
+
+                this.AddParentFolderRecursively(folders, folder.ParentFolder);
             }
         }
     }

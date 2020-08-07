@@ -19,6 +19,9 @@
         public DateTimeOffset CreateDate { get; set; }
         public string UpdaterUsername { get; set; }
 
+		// for breadcrumbs navigation
+        public OutputFolderServiceModel ParentFolder { get; set; }
+
         public ICollection<OutputFileServiceModel> Files { get; set; } = new List<OutputFileServiceModel>();
         public ICollection<OutputFolderServiceModel> SubFolders { get; set; } = new List<OutputFolderServiceModel>();
     }

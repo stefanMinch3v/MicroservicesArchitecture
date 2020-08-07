@@ -11,6 +11,7 @@ export interface Folder {
     files: FileModel[];
     subFolders: Folder[];
     rootFolder: Folder;
+    parentFolder: Folder;
     fileCount: number;
     folderCount: number;
     createDate: Date;

@@ -6,7 +6,7 @@
             </button>
         </span>
 
-        <span *ngIf="parentFolder === parentFolderChain[0]">
+        <span *ngIf="parentFolder !== parentFolderChain[0]">
             <span class="breadcrumb-separator">&gt;</span>
             <button class="btn btn-sm btn-default" (click)="otherFolderClicked.emit(parentFolder)">{{parentFolder.name}}</button>
         </span>

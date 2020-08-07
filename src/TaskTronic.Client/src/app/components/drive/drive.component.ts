@@ -1,5 +1,6 @@
 import { Router, ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, TemplateRef } from '@angular/core';
+import { Location } from '@angular/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { DriveService } from 'src/app/core/services/drive.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
@@ -20,14 +21,13 @@ import { CommonHelper } from 'src/app/core/helpers/common.helper';
   providers: [FaIconPipe]
 })
 export class DriveComponent implements OnInit {
-  private readonly FILE_MAX_SIZE = 2147483647;
-
+  // private readonly FILE_MAX_SIZE = 2147483647;
   // PLUPLOAD
   // @ViewChild('pluploader') element: ElementRef;
   // @ViewChild('pluploadcontainer') containerElement: ElementRef;
-  public dropElement: any;
-  public uploader: plupload.Uploader;
-  parameters: object;
+  // public dropElement: any;
+  // public uploader: plupload.Uploader;
+  // public parameters: object;
   //
 
   public companyDepartmentsId: number;
@@ -36,12 +36,13 @@ export class DriveComponent implements OnInit {
   public newFolderName: string;
   public selectedFolder: Folder;
   public newFileName: string;
+  private parentArray = [];
   public parentFolderChain: FolderIdName[] = [];
   public isLoading = true;
 
   // search
   @ViewChild('searchValue', {static: true}) searchValue: ElementRef;
-  public hasSearchResult = false;
+  public hasSearchResult: boolean;
   public searchResults: FileModel[] = [];
   //
 
@@ -59,6 +60,7 @@ export class DriveComponent implements OnInit {
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly location: Location,
     private readonly signalRService: SignalRService,
     private readonly faIconPipe: FaIconPipe,
     private readonly employeeService: EmployeeService,
@@ -90,18 +92,13 @@ export class DriveComponent implements OnInit {
       });
   }
 
-  // ngAfterViewInit() {
-  //   if (this.uploader) {
-  //     this.uploader.settings.multipart_params = this.getGroupParameters();
-  //   } else {
-  //     this.uploader = this.initPlupload();
-  //   }
-  // }
-
-  public navigateToRoot(){
-    this.router.navigate(['drive', this.companyDepartmentsId]);
+  public navigateToRoot() {
+    const url = this.router.createUrlTree(['dok', this.companyDepartmentsId]);
+    this.location.go(url.toString());
+    this.getRootFolder();
   }
 
+  // Edit file/folder
   public openModal(name: string, isFolder: boolean, currentFolderId: number, elementId: number) {
     this.modalNameToChange = name;
     this.modalIsFolder = isFolder;
@@ -111,48 +108,6 @@ export class DriveComponent implements OnInit {
     this.modalRef = this.modalService.show(this.modalTemplateRef);
   }
 
-  public getRootFolder(): void {
-    this.isLoading = true;
-    this.driveService.getRootFolder(this.companyDepartmentsId)
-      .subscribe(folder => {
-        this.folder = folder;
-        this.addFolderToParentFolderChain(folder.folderId, folder.name);
-        this.isLoading = false;
-      }, error => {
-        this.isLoading = false;
-      });
-  }
-
-  private getFolder(folderId: number): void {
-    this.isLoading = true;
-
-    this.driveService.getFolder(folderId, this.companyDepartmentsId)
-      .subscribe(folder => {
-
-        this.folder = folder;
-        this.addFolderToParentFolderChain(folder.folderId, folder.name);
-        this.isLoading = false;
-      }, error => {
-        this.isLoading = false;
-        this.navigateToRoot();
-      });
-  }
-
-  public reloadFolder(): void {
-    if (this.folder) {
-      if (this.folder.rootId) {
-        this.getFolder(this.folder.folderId);
-      } else {
-        this.getRootFolder();
-      }
-    }
-  }
-
-  public togglePrivate(folderId: number, catalogId: number): void {
-    this.driveService.togglePrivate(folderId, catalogId)
-      .subscribe(_ => this.reloadFolder());
-  }
-
   public isCurrentUserAuthor(userEmail: string): boolean {
     const emailStartIndex = userEmail.indexOf('@');
     const authorUsername = userEmail.substring(0, emailStartIndex);
@@ -160,33 +115,42 @@ export class DriveComponent implements OnInit {
     return this.authService.getUser() === authorUsername;
   }
 
-  private addFolderToParentFolderChain(folderId: number, name: string): void {
-    this.removeFolderFromTheParentFolderChain(folderId);
-    this.parentFolderChain.push(new FolderIdName(folderId, name));
-  }
-
-  private removeFolderFromTheParentFolderChain(folderId: number): void {
-    const parentIndex = this.parentFolderChain.findIndex(f => f.id === folderId);
-
-    if (parentIndex >= 0) {
-      this.parentFolderChain = this.parentFolderChain.slice(0, parentIndex);
-    } else {
-      this.parentFolderChain = [...this.parentFolderChain];
-    }
-  }
-
-  getFontAwesomeIconName(fileType: string): string {
+  public getFontAwesomeIconName(fileType: string): string {
     return this.faIconPipe.transform(fileType) + ' pr-3';
   }
 
-  // FOLDER ACTIONS
-  public openFolder(folderId: number): void {
-    this.selectedFolderId = folderId;
-    this.router.navigate(['drive', this.companyDepartmentsId, this.selectedFolderId]);
+  // breadcrumbs actions
+  private setUrl(folder: Folder) {
+    this.parentArray = [];
+    const url = this.router.createUrlTree(['dok', this.companyDepartmentsId]);
+    let newUrl = url.toString();
+
+    if (folder.parentFolder) {
+      this.getAllParents(folder);
+    } else {
+      this.parentArray.push(new FolderIdName(folder.folderId, folder.name));
+    }
+
+    this.parentArray = this.parentArray.reverse();
+    this.parentFolderChain = this.parentArray;
+
+    this.parentArray.forEach(el => {
+      newUrl = newUrl.concat('/', el.id.toString());
+    });
+
+    this.location.go(newUrl);
   }
 
-  public stopPropagation(event: MouseEvent) {
-    event.stopPropagation();
+  private getAllParents(folder: Folder) {
+    this.parentArray.push(new FolderIdName(folder.folderId, folder.name));
+    if (folder.parentFolder) {
+      this.getAllParents(folder.parentFolder);
+    }
+  }
+
+  // FOLDER actions
+  public openFolder(folderId: number): void {
+    this.getFolder(folderId);
   }
 
   public deleteFolder(folder: Folder) {
@@ -218,6 +182,11 @@ export class DriveComponent implements OnInit {
     // }
   }
 
+  public togglePrivate(folderId: number, catalogId: number): void {
+    this.driveService.togglePrivate(folderId, catalogId)
+      .subscribe(_ => this.reloadFolder());
+  }
+
   public renameFolder() {
     if (!this.modalNameToChange ||
         this.modalNameToChange.length < 2 ||
@@ -237,6 +206,100 @@ export class DriveComponent implements OnInit {
         this.modalRef.hide();
         this.reloadFolder();
       });
+  }
+
+  private getRootFolder(): void {
+    this.isLoading = true;
+    this.driveService.getRootFolder(this.companyDepartmentsId)
+      .subscribe(folder => {
+        this.folder = folder;
+        this.setUrl(this.folder);
+        this.isLoading = false;
+      }, error => {
+        this.isLoading = false;
+      });
+  }
+
+  private reloadFolder(): void {
+    if (this.folder) {
+      if (this.folder.rootId) {
+        this.getFolder(this.folder.folderId);
+      } else {
+        this.getRootFolder();
+      }
+    }
+  }
+
+  private getFolder(folderId: number): void {
+    this.isLoading = true;
+
+    this.driveService.getFolder(folderId, this.companyDepartmentsId)
+      .subscribe(folder => {
+
+        this.folder = folder;
+        this.setUrl(this.folder);
+        this.isLoading = false;
+      }, error => {
+        this.isLoading = false;
+        this.navigateToRoot();
+      });
+  }
+
+  // FILE ACTIONS
+  public downloadFile(file: FileModel, shouldOpen: boolean = false) {
+    const downloadUrl = this.driveService.downloadFile(file.catalogId, file.folderId, file.fileId, shouldOpen);
+    window.open(downloadUrl);
+  }
+
+  public deleteFile(file: FileModel) {
+    const confirmation = confirm('Confirm delete of ' + file.fileName);
+
+    if (confirmation) {
+      this.driveService.deleteFile(file.catalogId, file.folderId, file.fileId)
+        .subscribe(res => {
+          if (res) {
+            this.reloadFolder();
+          } else {
+            this.notificationService.warningMessage('Could not remove the data');
+          }
+      });
+    }
+  }
+
+  public searchForFiles(e) {
+    e.preventDefault();
+
+    const val = this.searchValue.nativeElement.value;
+    if (val.length > 0) {
+      this.driveService.searchForFile(this.folder.catalogId, this.folder.folderId, val)
+        .subscribe(result => {
+          this.hasSearchResult = true;
+          this.searchResults = result;
+        });
+    } else {
+      this.hasSearchResult = false;
+    }
+  }
+
+  public updateSearch() {
+    const val = this.searchValue.nativeElement.value;
+    if (val.length === 0) {
+      this.hasSearchResult = false;
+    }
+  }
+
+  public createNewDocumentFile(isWord: boolean) {
+    if (isWord) {
+      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 1)
+        .subscribe(_ => {
+          this.reloadFolder();
+        });
+    } else {
+      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 2)
+        .subscribe(_ => {
+          this.reloadFolder();
+        });
+    }
   }
 
   public renameFile() {
@@ -259,28 +322,29 @@ export class DriveComponent implements OnInit {
         this.reloadFolder();
       });
   }
-  // FILE ACTIONS
-  public downloadFile(file: FileModel, shouldOpen: boolean = false) {
-    const downloadUrl = this.driveService.downloadFile(file.catalogId, file.folderId, file.fileId, shouldOpen);
-    window.open(downloadUrl);
-  }
 
-  public deleteFile(file: FileModel) {
-    const confirmation = confirm('Confirm delete of ' + file.fileName);
-
-    if (confirmation) {
-      this.driveService.deleteFile(file.catalogId, file.folderId, file.fileId)
-        .subscribe(res => {
-          if (res) {
-            this.reloadFolder();
-          } else {
-            this.notificationService.warningMessage('Could not remove the data');
-          }
-      });
-    }
+  public pluploadHell(): void {
+    this.notificationService.warningMessage('Plupload needs to be adjusted, now does not work.');
   }
 
   // PLUPLOAD
+  // ngAfterViewInit() {
+  //   if (this.uploader) {
+  //     this.uploader.settings.multipart_params = this.getGroupParameters();
+  //   } else {
+  //     this.uploader = this.initPlupload();
+  //   }
+  // }
+
+  // public getGroupParameters(): object {
+  //   if (this.folder) {
+  //     return {
+  //       catalogId: this.folder.catalogId.toString(),
+  //       folderId: this.folder.folderId.toString()
+  //     };
+  //   }
+  // }
+
   // initPlupload() {
   //   this.parameters = this.getGroupParameters();
 
@@ -366,57 +430,4 @@ export class DriveComponent implements OnInit {
 
   //   return uploader;
   // }
-
-  getGroupParameters(): object {
-    if (this.folder) {
-      return {
-        catalogId: this.folder.catalogId.toString(),
-        folderId: this.folder.folderId.toString()
-      };
-    }
-  }
-
-  searchForFiles(e) {
-    e.preventDefault();
-
-    const val = this.searchValue.nativeElement.value;
-    if (val.length > 0) {
-      this.driveService.searchForFile(this.folder.catalogId, this.folder.folderId, val)
-        .subscribe(result => {
-          this.hasSearchResult = true;
-          this.searchResults = result;
-        });
-    } else {
-      this.hasSearchResult = false;
-    }
-  }
-
-  updateSearch() {
-    const val = this.searchValue.nativeElement.value;
-    if (val.length === 0) {
-      this.hasSearchResult = false;
-    }
-  }
-
-  createNewDocumentFile(isWord: boolean) {
-    if (isWord) {
-      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 1)
-        .subscribe(_ => {
-          this.reloadFolder();
-        });
-    } else {
-      this.driveService.createNewFile(this.folder.catalogId, this.folder.folderId, 2)
-        .subscribe(_ => {
-          this.reloadFolder();
-        });
-    }
-  }
-
-  pluploadHell(): void {
-    this.notificationService.warningMessage('Plupload needs to be adjusted, now does not work.');
-  }
-
-  notImplementedYet(): void {
-    this.notificationService.warningMessage('Not implemented yet.');
-  }
 }
