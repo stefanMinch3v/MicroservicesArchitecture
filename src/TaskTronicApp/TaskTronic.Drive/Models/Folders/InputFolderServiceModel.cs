@@ -10,6 +10,6 @@
         public string Name { get; set; }
         public bool IsPrivate { get; set; }
         public int EmployeeId { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
     }
 }

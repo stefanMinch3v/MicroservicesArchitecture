@@ -14,7 +14,6 @@
         public string FileType { get; set; }
         public string ContentType { get; set; }
         public DateTimeOffset CreateDate { get; set; }
-        public DateTimeOffset UpdateDate { get; set; }
         public string UpdaterUsername { get; set; }
         public List<string> SearchFolderNamesPath { get; set; }
         public int EmployeeId { get; set; }

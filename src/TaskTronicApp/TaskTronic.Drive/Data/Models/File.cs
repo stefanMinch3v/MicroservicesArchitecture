@@ -1,8 +1,8 @@
 ﻿namespace TaskTronic.Drive.Data.Models
 {
-    using Common;
+    using System;
 
-    public class File : DateTrack
+    public class File
     {
         public int FileId { get; set; }
         public int CatalogId { get; set; }
@@ -14,5 +14,6 @@
         public string ContentType { get; set; }
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
     }
 }

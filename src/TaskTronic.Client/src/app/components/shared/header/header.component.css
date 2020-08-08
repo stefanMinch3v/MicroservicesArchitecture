@@ -89,3 +89,8 @@
   #menu {
     float: right;
   }
+
+  .inactive-link {
+    pointer-events: none;
+    cursor: default;
+ }

@@ -143,10 +143,10 @@
 
             foreach (var file in folderToReturn.Files)
             {
-                file.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
+                file.CreatorUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
             }
 
-            folder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
+            folder.CreatorUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
 
             // save and send message
             var messageData = new FolderOpenedMessage
@@ -196,10 +196,10 @@
 
             foreach (var file in folder.Files)
             {
-                file.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
+                file.CreatorUsername = await this.employeeService.GetEmailByIdAsync(file.EmployeeId);
             }
 
-            folder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
+            folder.CreatorUsername = await this.employeeService.GetEmailByIdAsync(folder.EmployeeId);
 
             var messageData = new FolderOpenedMessage
             {
@@ -675,7 +675,7 @@
 
             foreach (var subfolder in folderToReturn.SubFolders)
             {
-                subfolder.UpdaterUsername = await this.employeeService.GetEmailByIdAsync(subfolder.EmployeeId);
+                subfolder.CreatorUsername = await this.employeeService.GetEmailByIdAsync(subfolder.EmployeeId);
             }
 
             this.AddParentFolderRecursively(folderTree, folderToReturn);

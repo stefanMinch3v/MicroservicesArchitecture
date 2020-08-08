@@ -144,7 +144,6 @@
                 file.FileType);
 
             file.CreateDate = DateTimeOffset.UtcNow;
-            file.UpdateDate = DateTimeOffset.UtcNow;
 
             if (existingFileId > 0)
             {

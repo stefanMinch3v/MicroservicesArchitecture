@@ -20,6 +20,5 @@
         public bool ReplaceExistingFiles { get; set; }
 
         public DateTimeOffset CreateDate { get; set; }
-        public DateTimeOffset? UpdateDate { get; set; }
     }
 }

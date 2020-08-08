@@ -56,7 +56,7 @@
           <th scope="col">Date</th>
           <th scope="col">Type</th>
           <th scope="col">Size</th>
-          <th scope="col">Updater</th>
+          <th scope="col">Created By</th>
         </tr>
       </thead>
       <tbody *ngFor="let file of searchResults">
@@ -83,7 +83,7 @@
           <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
-          <td>{{file.updaterUsername}}</td>
+          <td>{{file.creatorUsername}}</td>
         </tr>
       </tbody>
     </table>
@@ -97,7 +97,7 @@
           <th scope="col">Date</th>
           <th scope="col">Type</th>
           <th scope="col">Size</th>
-          <th scope="col">Updater</th>
+          <th scope="col">Created By</th>
         </tr>
       </thead>
       <tbody>
@@ -117,7 +117,7 @@
           <th scope="col">Date</th>
           <th scope="col">Type</th>
           <th scope="col">Size</th>
-          <th scope="col">Updater</th>
+          <th scope="col">Created By</th>
         </tr>
       </thead>
       <tbody *ngIf="folder && folder.subFolders">
@@ -135,8 +135,8 @@
             <button  class="btn btn-sm btn-warning" (click)="openModal(folder.name, true, folder.folderId, folder.folderId, false)">
               Edit
             </button>
-            <span *ngIf="isCurrentUserAuthor(folder.updaterUsername)"> | </span>
-            <button *ngIf="isCurrentUserAuthor(folder.updaterUsername)" (click)="togglePrivate(folder.folderId, folder.catalogId)" class="btn btn-sm btn-primary">
+            <span *ngIf="isCurrentUserAuthor(folder.creatorUsername)"> | </span>
+            <button *ngIf="isCurrentUserAuthor(folder.creatorUsername)" (click)="togglePrivate(folder.folderId, folder.catalogId)" class="btn btn-sm btn-primary">
               <span *ngIf="folder.isPrivate">Make public</span>
               <span *ngIf="!folder.isPrivate">Make private</span>
             </button>
@@ -147,7 +147,7 @@
             <span>{{folder.folderCount}} {{folder.folderCount === 1 ? 'folder' : 'folders'}},</span>
             <span>{{folder.fileCount}} {{folder.fileCount === 1 ? 'file' : 'files'}}</span>
           </td>
-          <td>{{folder.updaterUsername}}</td>
+          <td>{{folder.creatorUsername}}</td>
         </tr>
         <tr *ngFor="let file of folder.files" class="file-row">
           <td></td>
@@ -173,7 +173,7 @@
           <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
-          <td>{{file.updaterUsername}}</td>
+          <td>{{file.creatorUsername}}</td>
         </tr>
       </tbody>
     </table>

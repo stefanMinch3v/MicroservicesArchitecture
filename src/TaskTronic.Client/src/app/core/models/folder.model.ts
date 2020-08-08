@@ -15,5 +15,5 @@ export interface Folder {
     fileCount: number;
     folderCount: number;
     createDate: Date;
-    updaterUsername: string;
+    creatorUsername: string;
 }

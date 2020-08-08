@@ -12,7 +12,7 @@
         {
         }
 
-        public DbSet<Permission> Permissions { get; set; } // not implemented yet
+        public DbSet<Permission> Permissions { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Catalog> Catalogs { get; set; }

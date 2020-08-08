@@ -12,9 +12,9 @@
         <ul>
             <li><a routerLink="/drive"><i class="fa fa-fw fa-home"></i> Drive</a></li>
             <li><a routerLink="/identity/profile" *ngIf="isUserAuth()"><i class="fa fa-fw fa-user-edit"></i> Profile</a></li>
-            <li><a routerLink="/identity/login" *ngIf="!isUserAuth()"><i class="fa fa-fw fa-user"></i> Sign in</a></li>
-            <li><a href="#" *ngIf="isUserAuth()"><i class="fa fa-fw fa-user"></i> Hello, {{authService.getUser()}}</a></li>
-            <li><a (click)="logout()" routerLink="" *ngIf="isUserAuth()"><i class="fa fa-fw fa-user"></i> Logout</a></li>
+            <li><a routerLink="/identity/login" *ngIf="!isUserAuth()"><i class="fas fa-sign-in-alt"></i> Sign in</a></li>
+            <li><a class="inactive-link" *ngIf="isUserAuth()"><i class="fa fa-fw fa-user"></i> Hello, {{authService.getUser()}}</a></li>
+            <li><a (click)="logout()" routerLink="" *ngIf="isUserAuth()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
 </div>

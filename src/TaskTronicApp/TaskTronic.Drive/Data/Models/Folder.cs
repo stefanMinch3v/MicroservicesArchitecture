@@ -1,8 +1,8 @@
 ﻿namespace TaskTronic.Drive.Data.Models
 {
-    using Common;
+    using System;
 
-    public class Folder : DateTrack
+    public class Folder
     {
         public int FolderId { get; set; }
         public int CatalogId { get; set; }
@@ -12,5 +12,6 @@
         public bool IsPrivate { get; set; }
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
     }
 }

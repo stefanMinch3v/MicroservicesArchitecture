@@ -17,7 +17,7 @@
         public int FileCount { get; set; }
         public int FolderCount { get; set; }
         public DateTimeOffset CreateDate { get; set; }
-        public string UpdaterUsername { get; set; }
+        public string CreatorUsername { get; set; }
 
 		// for breadcrumbs navigation
         public OutputFolderServiceModel ParentFolder { get; set; }

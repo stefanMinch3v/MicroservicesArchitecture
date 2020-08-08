@@ -9,7 +9,7 @@ export interface FileModel {
     contentType: string;
     createDate: Date;
     updateDate: Date;
-    updaterUsername: string;
+    creatorUsername: string;
     searchFolderNamesPath: string[];
     employeeId: number;
 }

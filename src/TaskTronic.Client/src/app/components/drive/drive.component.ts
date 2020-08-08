@@ -100,7 +100,7 @@ export class DriveComponent implements OnInit {
     this.getRootFolder();
   }
 
-  // Edit file/folder
+  // Create/Edit for file/folder
   public openModal(
       name: string,
       isFolder: boolean,

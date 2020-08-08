@@ -1,8 +1,8 @@
 export class TotalView {
     constructor(
-        totalViews: number,
-        folderId: number,
-        name: string,
-        isPrivate: boolean,
-        createDate: Date) {}
+        public totalViews: number,
+        public folderId: number,
+        public name: string,
+        public isPrivate: boolean,
+        public createDate: Date) {}
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskTronic.Drive.Data;
 
 namespace TaskTronic.Drive.Data.Migrations
 {
     [DbContext(typeof(DriveDbContext))]
-    partial class DriveDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200808161340_RemovedUnusedUpdateDate")]
+    partial class RemovedUnusedUpdateDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

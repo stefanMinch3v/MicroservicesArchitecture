@@ -12,7 +12,7 @@
         public string FileType { get; set; }
         public long FileSize { get; set; }
         public string ContentType { get; set; }
-        public string UpdaterUsername { get; set; }
+        public string CreatorUsername { get; set; }
         public int EmployeeId { get; set; }
         public DateTimeOffset CreateDate { get; set; }
     }
