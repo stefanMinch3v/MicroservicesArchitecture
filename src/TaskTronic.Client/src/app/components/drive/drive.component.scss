@@ -36,30 +36,6 @@
     font-size: 1.5em !important;
 }
   
-.upload-overlay {
-    height: 100%;
-    width: 0;
-    position: fixed; /* Stay in place */
-    z-index: 9999; /* Sit on top */
-    left: 0;
-    top: 0;
-    background-color:rgba(0, 0, 0, 0.7);
-    overflow-x: hidden; /* Disable horizontal scroll */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .fa, .fal {
-        font-size: 80px;
-        color: #292929
-    }
-
-    .upload-overlay-text {
-        font-size: 16px;
-        color: #fff;
-    }
-}
-  
 .center-content-vertically {
     display: flex;
     align-items: center;
@@ -93,4 +69,9 @@
     margin-left: 45%;
     position: absolute;
     top: 22%;
+}
+
+#pick-files,
+#upload-files {
+    color: white !important;
 }

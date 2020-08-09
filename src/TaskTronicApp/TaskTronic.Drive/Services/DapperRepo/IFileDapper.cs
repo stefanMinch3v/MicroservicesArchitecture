@@ -11,7 +11,7 @@
 
         Task<IEnumerable<OutputFileServiceModel>> GetFilesByFolderIdAsync(int folderId);
 
-        Task<IEnumerable<IFileContract>> GetFileNamesAndTypesAsync(int folderId);
+        Task<IEnumerable<FileContract>> GetFileNamesAndTypesAsync(int folderId);
 
         Task<bool> CreateBlobAsync(InputFileServiceModel file);
 

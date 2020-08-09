@@ -9,12 +9,14 @@ import { FaIconPipe } from 'src/app/core/pipes/fa-icons.pipe';
 import { AppendFolderPath } from 'src/app/core/pipes/append-folder-path.pipe';
 import { FaIconColorPipe } from 'src/app/core/pipes/fa-icons-color.pipe';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { OverflowEllipsisPipe } from 'src/app/core/pipes/overflow-ellipsis.pipe';
 
 @NgModule({
   declarations: [
     DriveComponent,
     DriveBreadcrumbs,
     FileSizeDisplayPipe,
+    OverflowEllipsisPipe,
     FaIconPipe,
     AppendFolderPath,
     FaIconColorPipe

@@ -11,6 +11,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using TaskTronic.Common;
     using TaskTronic.Data.Models;
@@ -59,7 +60,7 @@
 
                 if (numberOfExistingNames > 0)
                 {
-                    inputModel.Name = inputModel.Name + $" ({++numberOfExistingNames})";
+                    inputModel.Name += $" ({++numberOfExistingNames})";
                 }
             }
 
@@ -333,6 +334,38 @@
 
             await this.dbContext.SaveChangesAsync();
         }
+
+        // todo same thing as file regex
+        //private void RenameFolderName(dynamic folder, dynamic newFolder)
+        //{
+        //    var nameExists = true;
+        //    var name = folder.Name;
+
+        //    while (nameExists)
+        //    {
+        //        // check if folder has " (x) "
+        //        var match = Regex.Match(name, @"(.+)\((\d+)\)");
+
+        //        // if not add (1)
+        //        if (!match.Success)
+        //        {
+        //            name += " (1)";
+        //        }
+        //        else
+        //        {
+        //            // else add (x+1)
+        //            int.TryParse(match.Groups[2].Value, out int currentCount);
+
+        //            name = name.Replace($"({currentCount})", $"({currentCount + 1})");
+        //        }
+
+        //        if (!newFolder.SubFolders.Any(f => f.Name.Equals(name)))
+        //        {
+        //            nameExists = false;
+        //            folder.Name = name;
+        //        }
+        //    }
+        //}
 
         private async Task AddUpdatersUsernamesAsync(IEnumerable<OutputFileSearchServiceModel> foundFiles)
         {

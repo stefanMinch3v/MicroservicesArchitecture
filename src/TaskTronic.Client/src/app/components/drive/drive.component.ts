@@ -1,5 +1,5 @@
 import { Router, ActivatedRoute } from '@angular/router';
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
 import { Location } from '@angular/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { DriveService } from 'src/app/core/services/drive.service';
@@ -13,6 +13,7 @@ import { SignalRService } from 'src/app/core/services/signalR.service';
 import { FaIconPipe } from 'src/app/core/pipes/fa-icons.pipe';
 import { EmployeeService } from 'src/app/core/services/employee.service';
 import { CommonHelper } from 'src/app/core/helpers/common.helper';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-drive',
@@ -21,13 +22,10 @@ import { CommonHelper } from 'src/app/core/helpers/common.helper';
   providers: [FaIconPipe]
 })
 export class DriveComponent implements OnInit {
-  // private readonly FILE_MAX_SIZE = 2147483647;
+  private readonly FILE_MAX_SIZE = 2147483647;
   // PLUPLOAD
-  // @ViewChild('pluploader') element: ElementRef;
-  // @ViewChild('pluploadcontainer') containerElement: ElementRef;
-  // public dropElement: any;
-  // public uploader: plupload.Uploader;
-  // public parameters: object;
+  public uploader: plupload.Uploader;
+  private pluploadFilesPercentage: HTMLElement;
   //
 
   public companyDepartmentsId: number;
@@ -145,7 +143,7 @@ export class DriveComponent implements OnInit {
     this.parentFolderChain = this.parentArray;
 
     this.parentArray.forEach(el => {
-      newUrl = newUrl.concat('/', el.name.toString());
+      newUrl = newUrl.concat('/', el.id.toString());
     });
 
     this.location.go(newUrl);
@@ -190,12 +188,6 @@ export class DriveComponent implements OnInit {
         this.modalRef.hide();
         this.reloadFolder();
       });
-    // if (!this.newFolderName || this.newFolderName.length < 1) {
-    //   this.notificationService.errorMessage('Empty name');
-    // } else if (this.newFolderName.length > 50) {
-    //   this.notificationService.errorMessage('The name is too long');
-    // } else {
-    // }
   }
 
   public togglePrivate(folderId: number, catalogId: number): void {
@@ -231,6 +223,8 @@ export class DriveComponent implements OnInit {
         this.folder = folder;
         this.setUrl(this.folder);
         this.isLoading = false;
+
+        this.pluploadInit();
       }, error => {
         this.isLoading = false;
       });
@@ -255,6 +249,8 @@ export class DriveComponent implements OnInit {
         this.folder = folder;
         this.setUrl(this.folder);
         this.isLoading = false;
+
+        this.pluploadInit();
       }, error => {
         this.isLoading = false;
         this.navigateToRoot();
@@ -343,111 +339,82 @@ export class DriveComponent implements OnInit {
       });
   }
 
-  public pluploadHell(): void {
-    this.notificationService.warningMessage('Plupload needs to be adjusted, now does not work.');
+  // PLUPLOAD, copy-paste from docs
+  pluploadInit(): void {
+    if (this.uploader) {
+      this.clearPluploadContainer();
+      this.uploader.settings.multipart_params = this.getGroupParameters();
+    } else {
+      this.pluploadFilesPercentage = document.getElementById('file-list');
+      this.uploader = this.initPlupload();
+    }
   }
 
-  // PLUPLOAD
-  // ngAfterViewInit() {
-  //   if (this.uploader) {
-  //     this.uploader.settings.multipart_params = this.getGroupParameters();
-  //   } else {
-  //     this.uploader = this.initPlupload();
-  //   }
-  // }
+  public startUpload(): void {
+    this.uploader.start();
+  }
 
-  // public getGroupParameters(): object {
-  //   if (this.folder) {
-  //     return {
-  //       catalogId: this.folder.catalogId.toString(),
-  //       folderId: this.folder.folderId.toString()
-  //     };
-  //   }
-  // }
+  public getGroupParameters(): object {
+    if (this.folder) {
+      return {
+        catalogId: this.folder.catalogId.toString(),
+        folderId: this.folder.folderId.toString()
+      };
+    }
+  }
 
-  // initPlupload() {
-  //   this.parameters = this.getGroupParameters();
+  initPlupload(): plupload.Uploader {
+    const uploader = new plupload.Uploader({
+        runtimes : 'html5,flash,silverlight,html4',
+        browse_button : 'pick-files', // can pass in id
+        container: document.getElementById('pluploadcontainer'),
+        multipart_params: this.getGroupParameters(),
+        chunk_size: '10mb',
+        url : environment.driveUrl + '/files/UploadFileToFolder',
+        headers: { Authorization: 'Bearer ' + this.authService.getToken() },
+        filters : { prevent_empty: false } as any,
+        // Flash settings
+        flash_swf_url : '/plupload/js/Moxie.swf',
+        // Silverlight settings
+        silverlight_xap_url : '/plupload/js/Moxie.xap',
+        init: {
+            PostInit: () => {
+                this.clearPluploadContainer();
+                document.getElementById('upload-files').onclick = () => {
+                    uploader.start();
+                    return false;
+                };
+            },
+            FilesAdded: (up, files) => {
+                plupload.each(files, (file) => {
+                    this.pluploadFilesPercentage
+                      .innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
+                });
+            },
+            UploadProgress: (up, file) => {
+                document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + '%</span>';
+            },
+            UploadComplete: (up, file) => {
+              if (file.length > 0) {
+                this.uploader.files.length = 0;
+                this.reloadFolder();
+              } else {
+                this.notificationService.warningMessage('No files selected');
+              }
+            },
+            Error: (up, err) => {
+              console.log(err);
+              this.notificationService.errorMessage(err);
+            }
+        }
+    });
 
-  //   const uploader = new plupload.Uploader({
-  //     runtimes: 'html5',
-  //     browse_button: this.element.nativeElement,
-  //     drop_element: 'app-body',
-  //     container: this.containerElement.nativeElement,
-  //     multipart_params: this.parameters,
-  //     chunk_size: '10mb',
-  //     url: environment.driveUrl + '/files/UploadFileToFolder',
-  //     headers: { Authorization: 'Bearer ' + this.authService.getToken() },
-  //     filters: { prevent_empty: false} as any
-  //   });
+    uploader.init();
 
-  //   uploader.init();
+    return uploader;
+  }
 
-  //   uploader.bind('FilesAdded', (up, files) => {
-  //     const fileNamesAdded = [];
-
-  //     files.forEach(element => {
-  //       if (element.size > this.FILE_MAX_SIZE) {
-  //         up.removeFile(element);
-
-  //         if (up.state === plupload.STARTED && element.status === plupload.UPLOADING) {
-  //           up.stop();
-  //           up.start();
-  //         }
-
-  //         this.notificationService.errorMessage('File max size is 2GB');
-  //         return;
-  //       }
-
-  //       fileNamesAdded.push(element.name.toString());
-  //     });
-
-  //     this.driveService.checkFilesNamesForFolder(this.folder.catalogId, this.folder.folderId, fileNamesAdded)
-  //       .subscribe(response => {
-  //         const fileNamesToBeRenamed = [];
-
-  //         for (const key in response) {
-  //           const value = response[key];
-  //           if (value) {
-  //             fileNamesToBeRenamed.push(key);
-  //           }
-  //         }
-
-  //         if (fileNamesToBeRenamed.length > 0) {
-  //           const confirmation = confirm('Some files already exist in the folder, do you want to replace them?');
-  //           if (confirmation) {
-  //               uploader.settings.multipart_params.replaceExistingFiles = true;
-  //               document.getElementById('upload-overlay').style.width = '100%';
-  //               uploader.start();
-  //           }
-  //           // ask user to choose from -> overwrite files / rename files / cancel upload
-  //           // and tell user what files clashes
-
-  //           // set users chocie like this
-  //           // uploader.settings.multipart_params.GOOD_override_name = true/false;
-
-  //           // end with this
-  //           // document.getElementById('upload-overlay').style.width = '100%';
-  //           // uploader.start();
-  //         } else {
-  //           document.getElementById('upload-overlay').style.width = '100%';
-  //           uploader.start();
-  //         }
-  //       });
-  //   });
-
-  //   uploader.bind('UploadComplete', (up, file) => {
-  //     setTimeout(() => {
-  //       this.uploader.files.length = 0;
-  //       document.getElementById('upload-overlay').style.width = '0';
-  //       this.reloadFolder();
-  //     }, 500);
-  //   });
-
-  //   uploader.bind('BeforeChunkUpload', (up: plupload.Uploader, file: any, post: any) => {
-  //     // Send the total file size
-  //     post.total_filesize = file.size;
-  //   });
-
-  //   return uploader;
-  // }
+  private clearPluploadContainer(): void {
+    this.pluploadFilesPercentage.innerHTML = '';
+  }
 }

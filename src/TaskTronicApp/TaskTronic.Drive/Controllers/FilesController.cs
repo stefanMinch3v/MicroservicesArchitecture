@@ -110,15 +110,11 @@
             }
 
             var form = Request.Form;
-
             var extension = Path.GetExtension(form["name"]);
-
             var contentType = GetMimeType(extension);
 
-            bool.TryParse(form["replaceExistingFiles"], out bool replaceExistingFiles);
-
             var model = this.GenerateInputFileModel(
-                int.Parse(form["catId"]),
+                int.Parse(form["catalogId"]),
                 int.Parse(form["folderId"]),
                 contentType,
                 extension,
@@ -126,7 +122,6 @@
                 employeeId,
                 int.Parse(form["chunk"]),
                 int.Parse(form["chunks"]),
-                replaceExistingFiles,
                 file.Length,
                 file.OpenReadStream());
 
@@ -171,7 +166,6 @@
             int employeeId,
             int chunk,
             int chunks,
-            bool replaceExistingFiles,
             long length,
             Stream openReadStream)
             => new InputFileServiceModel
@@ -184,7 +178,6 @@
                 EmployeeId = employeeId,
                 Chunk = chunk,
                 Chunks = chunks,
-                ReplaceExistingFiles = replaceExistingFiles,
                 Filesize = length,
                 Stream = openReadStream
             };

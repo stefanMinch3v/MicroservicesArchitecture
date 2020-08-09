@@ -1,4 +1,4 @@
-<div class="content-group" #pluploadcontainer>
+<div class="content-group">
     <!-- TOPBAR -->
     <div class="top-bar" [ngClass]="{'top-bar-custom-padding': hasSearchResult}">
       <div>
@@ -14,17 +14,16 @@
 
         <p class="col-md-1"></p>
 
-        <div class="btn btn-sm btn-warning" (click)="pluploadHell()">
-          <div class="plupload-container" #pluploadcontainer>
-            <div class="plupload-drop-target" #pluploader><span><i class="fa fa-upload"></i> Upload/Plupload</span></div>
-          </div>
+        <div id="pluploadcontainer">
+          <a id="pick-files" class="btn btn-sm btn-warning">
+            <i class="far fa-object-group"></i> Select files
+          </a>
+          |
+          <a id="upload-files" class="btn btn-sm btn-warning" (click)="startUpload()">
+            <i class="fa fa-upload"></i> Upload files
+          </a>
         </div>
-      </div>
-
-      <div class="upload-button">
-        <div class="plupload-container" #pluploadcontainer>
-          <div class="plupload-drop-target" #pluploader></div>
-        </div>
+        <div id="file-list"></div>
       </div>
   
       <div class="seachFilesContainer">
@@ -80,7 +79,7 @@
             |
             <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
           </td>
-          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
+          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
           <td>{{file.creatorUsername}}</td>
@@ -141,7 +140,7 @@
               <span *ngIf="!folder.isPrivate">Make private</span>
             </button>
           </td>
-          <td>{{folder.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
+          <td>{{folder.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
           <td>Folder</td>
           <td>
             <span>{{folder.folderCount}} {{folder.folderCount === 1 ? 'folder' : 'folders'}},</span>
@@ -160,7 +159,7 @@
                 class="file-name" 
                 title="{{file.fileName}}"
                 (click)="downloadFile(file, true)">
-              {{file.fileName}}
+              {{file.fileName | overflowEllipsis}}
             </span>
           </td>
           <td>
@@ -170,7 +169,7 @@
             |
             <button class="btn btn-sm btn-success" (click)="downloadFile(file)">Download</button>
           </td>
-          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss z'}}</td>
+          <td>{{file.createDate | date : 'dd-MM-yyyy HH:mm:ss'}}</td>
           <td>{{file.fileType}}</td>
           <td>{{file.fileSize | displayFileSize}}</td>
           <td>{{file.creatorUsername}}</td>
@@ -178,17 +177,6 @@
       </tbody>
     </table>
 </div>
-
-<!--Plupload-->
-<!-- <div id="upload-overlay" class="upload-overlay">
-  <div *ngIf="uploader &&  uploader.files" style="width: 50%;">
-    <div *ngFor="let file of uploader.files" class="upload-overlay-text">
-      <span>{{file.name}}</span>
-      <div class="progress">
-        <div class="progress-bar" [style.width]="file.percent + '%'"></div>
-      </div>
-  </div>
-</div>  -->
 
 <!--Bootstrap modal-->
 <ng-template #modalTemplate>

@@ -17,7 +17,6 @@
         public Stream Stream { get; set; }
         public int Chunk { get; set; }
         public int Chunks { get; set; }
-        public bool ReplaceExistingFiles { get; set; }
 
         public DateTimeOffset CreateDate { get; set; }
     }

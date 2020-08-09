@@ -495,7 +495,7 @@
             return await db.ExecuteScalarAsync<int>(sql, new { employeeId });
         }
 
-        public async Task<IEnumerable<IFileContract>> GetFileNamesAndTypesAsync(int folderId)
+        public async Task<IEnumerable<FileContract>> GetFileNamesAndTypesAsync(int folderId)
         {
             var sql = $@"
                 SELECT FileName, FileType 
@@ -504,7 +504,7 @@
 
             using var conn = this.dbConnectionFactory.GetSqlConnection;
 
-            return await conn.QueryAsync<IFileContract>(sql, new { folderId });
+            return await conn.QueryAsync<FileContract>(sql, new { folderId });
         }
     }
 }
