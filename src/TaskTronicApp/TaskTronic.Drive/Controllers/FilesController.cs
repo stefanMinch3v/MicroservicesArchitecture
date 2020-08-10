@@ -56,7 +56,9 @@
 
             var dispositionAttribute = shouldOpen ? "inline" : "attachment";
 
-            Response.Headers.Add("Content-Disposition", $"{dispositionAttribute}; filename={downloadFile.FileName}");
+            Response.Headers.Add(
+                "Content-Disposition", 
+                $"{dispositionAttribute}; filename={downloadFile.FileName}{downloadFile.FileType}");
             Response.Headers.Add("Content-Length", $"{downloadFile.FileSize}");
             Response.Headers.Add("Content-Type", $"{downloadFile.ContentType}");
 
