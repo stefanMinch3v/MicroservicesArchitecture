@@ -9,7 +9,11 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Tokens;
+    using Microsoft.OpenApi.Models;
+    using Swashbuckle.AspNetCore.SwaggerGen;
     using System;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Reflection;
     using System.Text;
     using TaskTronic.Messages;
@@ -188,6 +192,55 @@
             healthChecks.AddRabbitMQ(rabbitConnectionString: "amqp://rabbitmq:rabbitmq@rabbitmq/");
 
             return services;
+        }
+
+        public static IServiceCollection AddSwaggerOptions(this IServiceCollection services, string assemblyName)
+            => services
+                .AddSwaggerGen(options =>
+                {
+                    options.SwaggerDoc(
+                        "all",
+                        new OpenApiInfo
+                        {
+                            Title = assemblyName,
+                            Version = "All"
+                        });
+
+                    options.AddJwtToSwagger();
+
+                    var xmlFile = $"{assemblyName}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    options.IncludeXmlComments(xmlPath);
+
+                    options.CustomSchemaIds(type => type.FullName);
+                });
+
+        private static void AddJwtToSwagger(this SwaggerGenOptions swagger)
+        {
+            swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = $"Authorization header using the 'Bearer' scheme.\n\rEnter 'Bearer' [space] and then your token in the text input below.\r\nExample: 'Bearer 12345abcdef'",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "bearer",
+                BearerFormat = "Bearer"
+            });
+
+            swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        },
+                    },
+                    new List<string>()
+                }
+            });
         }
     }
 }

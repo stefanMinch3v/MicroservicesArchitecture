@@ -10,6 +10,7 @@ namespace TaskTronic.Identity
     using Services.Identity;
     using Services.Jwt;
     using Services.Messages;
+    using System.Reflection;
     using TaskTronic.Identity.Messages;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
@@ -24,6 +25,7 @@ namespace TaskTronic.Identity
         public void ConfigureServices(IServiceCollection services)
             => services
                 .AddApiService<IdentityDbContext>(this.Configuration)
+                .AddSwaggerOptions(Assembly.GetExecutingAssembly().GetName().Name)
                 .AddTransient<IDbSeeder, IdentityDbSeeder>()
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<IMessageService, MessageService>()
@@ -45,7 +47,7 @@ namespace TaskTronic.Identity
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
-                .UseApiService(env)
+                .UseApiService(env, addSwaggerUI: true)
                 .Initialize();
     }
 }

@@ -7,6 +7,7 @@ namespace TaskTronic.Statistics
     using Microsoft.Extensions.DependencyInjection;
     using Services.FolderViews;
     using Services.Statistics;
+    using System.Reflection;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
     using TaskTronic.Statistics.Messages;
@@ -21,6 +22,7 @@ namespace TaskTronic.Statistics
         public void ConfigureServices(IServiceCollection services)
             => services
                 .AddApiService<StatisticsDbContext>(this.Configuration)
+                .AddSwaggerOptions(Assembly.GetExecutingAssembly().GetName().Name)
                 .AddTransient<IDbSeeder, StatisticsDbSeeder>()
                 .AddTransient<IStatisticsService, StatisticsService>()
                 .AddTransient<IFolderViewService, FolderViewService>()
@@ -35,7 +37,7 @@ namespace TaskTronic.Statistics
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
-                .UseApiService(env)
+                .UseApiService(env, addSwaggerUI: true)
                 .Initialize();
     }
 }

@@ -12,6 +12,7 @@ namespace TaskTronic.Drive
     using Services.Files;
     using Services.Folders;
     using Services.Messages;
+    using System.Reflection;
     using TaskTronic.Drive.Messages;
     using TaskTronic.Infrastructure;
     using TaskTronic.Services;
@@ -26,6 +27,7 @@ namespace TaskTronic.Drive
         public void ConfigureServices(IServiceCollection services)
             => services
                 .AddApiService<DriveDbContext>(this.Configuration, "/api/files/DownloadFile")
+                .AddSwaggerOptions(Assembly.GetExecutingAssembly().GetName().Name)
                 .AddSingleton<IDbConnectionFactory, DbConnectionFactory>()
                 .AddTransient<IDbSeeder, DriveDbSeeder>()
                 .AddTransient<IFileService, FileService>()
@@ -44,7 +46,7 @@ namespace TaskTronic.Drive
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
-                .UseApiService(env)
+                .UseApiService(env, addSwaggerUI: true)
                 .Initialize();
     }
 }

@@ -12,11 +12,17 @@
     {
         public static IApplicationBuilder UseApiService(
             this IApplicationBuilder app,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            bool addSwaggerUI = false)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            if (addSwaggerUI)
+            {
+                app.AddSwaggerUI();
             }
 
             app
@@ -65,13 +71,19 @@
 
         public static IApplicationBuilder UseGatewayApiService(
             this IApplicationBuilder app,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            bool addSwaggerUI = false)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
+            if (addSwaggerUI)
+            {
+                app.AddSwaggerUI();
+            }
+
             app
                 //.UseHttpsRedirection()
                 .UseRouting()
@@ -90,5 +102,16 @@
 
             return app;
         }
+
+        public static IApplicationBuilder AddSwaggerUI(this IApplicationBuilder app)
+            => app
+                .UseSwagger()
+                .UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/swagger/all/swagger.json", "All versions");
+                    options.DisplayRequestDuration();
+                    options.EnableDeepLinking();
+                    options.DisplayOperationId();
+                });
     }
 }

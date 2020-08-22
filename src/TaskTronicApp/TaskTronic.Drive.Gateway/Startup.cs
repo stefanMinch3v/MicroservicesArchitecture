@@ -31,6 +31,7 @@ namespace TaskTronic.Drive.Gateway
                 .AddScoped<ICurrentTokenService, CurrentTokenService>()
                 .AddTransient<JwtHeaderAuthenticationMiddleware>()
                 .AddCors()
+                .AddSwaggerOptions(Assembly.GetExecutingAssembly().GetName().Name)
                 .AddControllers();
 
             services
@@ -44,6 +45,6 @@ namespace TaskTronic.Drive.Gateway
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             => app
-                .UseGatewayApiService(env);
+                .UseGatewayApiService(env, addSwaggerUI: true);
     }
 }
