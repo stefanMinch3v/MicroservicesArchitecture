@@ -4,12 +4,15 @@
     using Microsoft.EntityFrameworkCore;
     using Models.Folders;
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using TaskTronic.Drive.Data;
     using TaskTronic.Drive.Data.Models;
 
     public class CatalogService : ICatalogService
     {
+        private static readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
+
         private readonly IFolderService folderService;
         private readonly DriveDbContext dbContext;
 
@@ -23,23 +26,32 @@
 
         public async Task<int> GetIdAsync(int companyDepartmentsId, int employeeId)
         {
-            var catalog = await this.dbContext.Catalogs
-                .FirstOrDefaultAsync(c => c.CompanyDepartmentsId == companyDepartmentsId);
+            await locker.WaitAsync();
 
-            if (catalog is null)
+            try
             {
-                var newCatalog = new Catalog { CompanyDepartmentsId = companyDepartmentsId };
+                var catalog = await this.dbContext.Catalogs
+                    .FirstOrDefaultAsync(c => c.CompanyDepartmentsId == companyDepartmentsId);
 
-                this.dbContext.Catalogs.Add(newCatalog);
+                if (catalog is null)
+                {
+                    var newCatalog = new Catalog { CompanyDepartmentsId = companyDepartmentsId };
 
-                await this.dbContext.SaveChangesAsync();
+                    this.dbContext.Catalogs.Add(newCatalog);
 
-                await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(newCatalog.CatalogId, employeeId));
+                    await this.dbContext.SaveChangesAsync();
 
-                return newCatalog.CatalogId;
+                    await this.folderService.CreateFolderAsync(this.CreateInputFolderModel(newCatalog.CatalogId, employeeId));
+
+                    return newCatalog.CatalogId;
+                }
+
+                return catalog.CatalogId;
             }
-
-            return catalog.CatalogId;
+            finally
+            {
+                locker.Release();
+            }
         }
 
         private InputFolderServiceModel CreateInputFolderModel(int catId, int employeeId)
