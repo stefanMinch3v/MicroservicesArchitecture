@@ -63,3 +63,11 @@ Identity project:
 - OpenXml
 - JwtBearer
 - SignalR
+
+## Images from Admin Panel (MVC) and Drive (Angular)
+![Drive](https://i.imgur.com/SWvvTKk.png)
+![Drive2](https://i.imgur.com/RsbXWUI.png)
+![Drive3](https://i.imgur.com/xSo28F0.png)
+![AdminPanel1](https://i.imgur.com/FmbiXDa.png)
+![AdminPanel2](https://i.imgur.com/X185B3M.png)
+![AdminPanel3](https://i.imgur.com/ALL4lUY.png)
